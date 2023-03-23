@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "855965823686",
+    "project_id": "musicappsviolin",
+    "storage_bucket": "musicappsviolin.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:855965823686:android:9e361f0d88a523f2371dc7",
+        "android_client_info": {
+          "package_name": "com.kobera.music"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "855965823686-tucqpiahjdripa6gaos2nqt2614to39a.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBosOXKULYzNu2Y9qe5bzmzAcFSLHa8lXE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "855965823686-tucqpiahjdripa6gaos2nqt2614to39a.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
