@@ -1,10 +1,12 @@
 package com.kobera.music.common.sound.di
 
-import com.kobera.music.common.sound.FrequencyReader
+import com.kobera.music.common.sound.SingleFrequencyReader
 import com.kobera.music.common.sound.PcmAudioRecorder
+import com.kobera.music.common.sound.frequency_baseline.A4Frequency
 import org.koin.dsl.module
 
 val soundModule = module {
+    single { A4Frequency(applicationContext = get()) }
     single { PcmAudioRecorder(applicationContext = get()) }
-    factory { FrequencyReader(pcmAudioRecorder = get()) }
+    factory { SingleFrequencyReader(pcmAudioRecorder = get()) }
 }

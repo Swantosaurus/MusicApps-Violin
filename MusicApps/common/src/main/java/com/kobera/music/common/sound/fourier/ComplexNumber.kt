@@ -1,4 +1,4 @@
-package com.kobera.music.common.sound
+package com.kobera.music.common.sound.fourier
 
 import kotlin.math.sqrt
 
@@ -13,6 +13,5 @@ data class ComplexNumber(val real: Double, val imag: Double){
     infix operator fun minus(other: ComplexNumber) : ComplexNumber {
         return ComplexNumber(real - other.real, imag - other.imag)
     }
+    fun magnitude() : Double = sqrt(real * real + imag * imag)
 }
-
-

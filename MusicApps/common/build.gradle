@@ -47,4 +47,7 @@ dependencies {
     def koin_version = "3.2.0"
     implementation "io.insert-koin:koin-core:$koin_version"
     implementation "io.insert-koin:koin-androidx-compose:$koin_version"
+
+
+    implementation 'com.jakewharton.timber:timber:4.7.1'
 }
