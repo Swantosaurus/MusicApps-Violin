@@ -2,4 +2,5 @@
     <string name="app_name">ViolinApp</string>
     <string name="unknown">Unknown</string>
     <string name="tuner_silence">Can\'t hear you</string>
+    <string name="toggle_only_violin_notes">Toggle only violin notes</string>
 </resources>

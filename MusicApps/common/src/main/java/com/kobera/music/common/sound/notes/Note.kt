@@ -1,10 +1,9 @@
 package com.kobera.music.common.sound.notes
 
-import android.util.Log
 import kotlin.math.pow
 
 
-data class Note(val name: String, val frequency: Double){
+data class Note(val name: String, val frequency: Double, val rangeInterval : Double = 2.0.pow(1.0 / 24.0), val inTuneInterval : Double = 2.0.pow(1.0 / 240.0)){
 
     fun isInTune(compareFreq: Double) : Boolean {
         val diff = if(compareFreq > frequency ) compareFreq / frequency else frequency / compareFreq
@@ -15,8 +14,20 @@ data class Note(val name: String, val frequency: Double){
         return diff < rangeInterval
     }
 
-    fun getDifferenceAngle(compareFreq: Double, maxAngle: Double) : Double  =
-         ((compareFreq / frequency) - 1) / (rangeInterval-1) * maxAngle
+    fun getDifferenceAngle(compareFreq: Double, maxAngle: Double) : Double  {
+        val angle = if(rangeInterval > maxRangeIntervalForAngle) {
+            ((compareFreq / frequency) - 1) / (maxRangeIntervalForAngle-1) * maxAngle
+        } else {
+            ((compareFreq / frequency) - 1) / (rangeInterval - 1) * maxAngle
+        }
+        return if(angle > maxAngle) {
+            maxAngle
+        } else if(angle < -maxAngle){
+            -maxAngle
+        } else angle
+
+    }
+
 
 
     fun nextNote(){
@@ -43,8 +54,7 @@ data class Note(val name: String, val frequency: Double){
             "B"
         )
 
-        val rangeInterval = 2.0.pow(1.0 / 24.0)
-        val inTuneInterval = 2.0.pow(1.0 / 240.0)
+        private val maxRangeIntervalForAngle = 2.0.pow(1.0/12)
     }
 
     private val TAG = this::class.simpleName

@@ -7,14 +7,18 @@ import com.kobera.music.common.sound.SingleFrequencyReader
 import com.kobera.music.common.sound.frequency_baseline.A4Frequency
 import com.kobera.music.common.sound.notes.FrequencyToNote
 import com.kobera.music.common.sound.notes.Note
+import com.kobera.music.common.sound.notes.Notes
 import com.kobera.music.violin.R
+import com.kobera.music.violin.sound.notes.violinStrings
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import timber.log.Timber
+import kotlin.math.pow
 
 class TunerViewModel(
     private val resourceProvider: ResourceProvider,
@@ -26,7 +30,9 @@ class TunerViewModel(
 
     val note = _note.asStateFlow()
 
+    private val _notesInTuner : MutableStateFlow<NotesInTunerState> = MutableStateFlow(NotesInTunerState.AllNotes())
 
+    val notesInTuner = _notesInTuner.asStateFlow()
 
     val sensitivity : Flow<Float> = frequencyReader.silenceThreshold.map { (it.toDouble()/10_000_000).toFloat() }
 
@@ -42,11 +48,12 @@ class TunerViewModel(
                             _note.value = LastNoteState.Silence(lastNote.note, lastNote.frequency, lastNote.differenceAngle)
                         }
                     }
-                    is SingleFrequencyReader.FrequencyState.Frequency -> {
+                    is SingleFrequencyReader.FrequencyState.HasFrequency -> {
                         val note = FrequencyToNote.transform(
                             frequency = it.frequency,
                             a4Frequency = a4Frequency.frequency.value,
-                            unknownString = resourceProvider.getString(R.string.unknown)
+                            unknownString = resourceProvider.getString(R.string.unknown),
+                            notes = _notesInTuner.value.notes.values
                         )
                         lastHadNote = LastNoteState.HasNote(
                                 note = note,
@@ -69,8 +76,36 @@ class TunerViewModel(
         frequencyReader.setSilenceThreshold((to*10_000_000).toLong())
     }
 
+    fun setTunerNotes(to: NotesInTunerState) {
+        _notesInTuner.value = to
+    }
+
     fun stopRecording() {
         frequencyReader.stop()
+    }
+}
+
+abstract class  NotesInTunerState : KoinComponent{
+    abstract val notes: Map<String, Note>
+    val a4Frequency : A4Frequency  by inject()
+    class AllNotes() : NotesInTunerState() {
+        override val notes: Map<String, Note>
+            get() = Notes.getNotes(frequencyA4 = a4Frequency.frequency.value)
+    }
+
+    class ViolinNotes() : NotesInTunerState() {
+        override val notes: Map<String, Note>
+            get() = Notes.getNotesViolin(a4Frequency.frequency.value)
+    }
+
+    fun Notes.getNotesViolin(frequencyA4: Double): Map<String, Note> {
+        val onlyViolinNotes = getNotes(frequencyA4 = frequencyA4)
+            .filter { violinStrings.contains(it.key) }.toMutableMap()
+        onlyViolinNotes.entries.forEach{
+            it.setValue(it.value.copy(rangeInterval = 2.0.pow(7.0/24)))
+        }
+
+        return onlyViolinNotes
     }
 }
 

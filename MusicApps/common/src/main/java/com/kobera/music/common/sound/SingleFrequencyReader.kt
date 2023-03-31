@@ -86,8 +86,14 @@ class SingleFrequencyReader(
                 var counter: Int? = null // to skip rest of indexes when we fond result
 
                 for (index in minFourierIndexSearched until maxFourierIndexSearched) {
-                    if (frequencyDomain[index] > maxValue) {
-                        //Log.d(TAG, "Index: $index Frequency: ${index.toDouble() / PcmAudioRecorder.readSize  * PcmAudioRecorder.sampleRate}")
+                    var currentThreshold = maxValue
+                    if(maxValue == _silenceThreshold.value.toDouble()){
+                        if(Frequency.fromFourierIndex(index = index.toDouble()).value < 240){
+                            currentThreshold *= 0.5
+                        }
+                    }
+
+                    if (frequencyDomain[index] > currentThreshold) {
                         if (counter == null) {
                             counter = (index * 0.2).roundToInt()
                         }
@@ -126,22 +132,11 @@ class SingleFrequencyReader(
 
                 var resultIndex: Double = (indexFromBottom -1)  + finalIndex * accuracy
 
-                /*
-                FourierTransform.fineTuneInBetweenIndexes(
-                    sampleData = pcmAudioData,
-                    from = indexFromBottom - 1,
-                    to = indexFromBottom + 1,
-                    accuracy = accuracy
-                )*/
-
-
-
                 val mostRelevantFrequency: Double =
                     resultIndex * (PcmAudioRecorder.sampleRate.toDouble() / PcmAudioRecorder.readSize.toDouble())
 
-
                 Timber.d("Result Index: $resultIndex Result Frequency: $mostRelevantFrequency")
-                _frequency.value = FrequencyState.Frequency(mostRelevantFrequency)
+                _frequency.value = FrequencyState.HasFrequency(mostRelevantFrequency)
             }
         }
     }
@@ -155,7 +150,7 @@ class SingleFrequencyReader(
 
     sealed interface FrequencyState {
         object Silence: FrequencyState
-        class Frequency(val frequency: Double) : FrequencyState
+        class HasFrequency(val frequency: Double) : FrequencyState
     }
 
     enum class FrequencyReaderState {

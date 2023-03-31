@@ -53,11 +53,14 @@ tasks.withType(Test) {
 
 dependencies {
     implementation project(path: ':common')
-    def composeBomVersion = "2023.01.00"
+    def composeBomVersion = "2023.03.00"
     /*
         COMPOSE DEPENDENCIES
     */
     implementation platform("androidx.compose:compose-bom:$composeBomVersion")
+
+    implementation "com.google.accompanist:accompanist-systemuicontroller:0.28.0"
+
 
     implementation 'androidx.core:core-ktx'
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx'
@@ -92,6 +95,7 @@ dependencies {
     def koin_version = "3.2.0"
     implementation "io.insert-koin:koin-core:$koin_version"
     implementation "io.insert-koin:koin-androidx-compose:$koin_version"
+
 
     /*
         LOGGING - TIMBER
