@@ -67,7 +67,7 @@ class PcmAudioRecorder(private val applicationContext : Context) {
             /*sampleRateHz =*/ sampleRate,
             /*channel =*/ AudioFormat.CHANNEL_IN_MONO,
             /* audioFormat = */ AudioFormat.ENCODING_PCM_16BIT,
-            /* bufferSizeInBytes = */readSize * 2
+            /* bufferSizeInBytes = */ readSize * 2
         )
         audioRecord!!.startRecording()
     }

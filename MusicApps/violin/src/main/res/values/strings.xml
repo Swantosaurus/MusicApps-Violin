@@ -3,4 +3,6 @@
     <string name="unknown">Unknown</string>
     <string name="tuner_silence">Can\'t hear you</string>
     <string name="toggle_only_violin_notes">Toggle only violin notes</string>
+    <string name="tuner">Tuner</string>
+    <string name="recognize_note">Recognize Note</string>
 </resources>

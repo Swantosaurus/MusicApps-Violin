@@ -71,18 +71,20 @@ import com.google.accompanist.permissions.PermissionStatus
 import com.google.accompanist.permissions.rememberPermissionState
 import com.kobera.music.common.util.toStringWithNDecimals
 import com.kobera.music.violin.R
-import com.kobera.music.violin.setSystemBarColors
 import com.kobera.music.violin.sound.notes.violinStrings
+import com.kobera.music.violin.utils.setSystemBarColors
+import com.ramcosta.composedestinations.annotation.Destination
 import org.koin.androidx.compose.getViewModel
 import java.lang.Float.min
 import kotlin.math.absoluteValue
 
+@Destination
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun TunerScreen(tunerViewModel: TunerViewModel = getViewModel()) {
     val permission = rememberPermissionState(permission = android.Manifest.permission.RECORD_AUDIO)
     val noteState by tunerViewModel.note.collectAsStateWithLifecycle()
-    val sensitivity by tunerViewModel.sensitivity.collectAsStateWithLifecycle(initialValue = 0.1f)
+    val sensitivity by tunerViewModel.sensitivity.collectAsStateWithLifecycle(initialValue = 0.2f)
     val a4frequency by tunerViewModel.a4Frequency.frequency.collectAsStateWithLifecycle()
     val notesInTunerState by tunerViewModel.notesInTuner.collectAsStateWithLifecycle()
 
@@ -90,15 +92,15 @@ fun TunerScreen(tunerViewModel: TunerViewModel = getViewModel()) {
         permission.launchPermissionRequest()
     }
 
-    DisposableEffect(key1 = Unit) {
-        tunerViewModel.startRecording()
-        onDispose { tunerViewModel.stopRecording() }
-    }
 
-    setSystemBarColors(darkIconsTopBar = false)
 
     when (permission.status) {
         is PermissionStatus.Granted -> {
+            DisposableEffect(key1 = Unit) {
+                tunerViewModel.startRecording()
+                onDispose { tunerViewModel.stopRecording() }
+            }
+
             TunerScreenBody(
                 tunerViewModel = tunerViewModel,
                 noteState = noteState,
@@ -126,6 +128,7 @@ private fun TunerScreenBody(
     a4frequency: () -> Double,
     notesInTunerState: () -> NotesInTunerState,
 ) {
+    setSystemBarColors(darkIconsTopBar = false)
     Scaffold(
         floatingActionButton = {
             Surface(
@@ -172,6 +175,9 @@ private fun TunerScreenBody(
 
 
             SensitivitySetting(
+                modifier = Modifier
+                    .padding(10.dp)
+                    .padding(top = 20.dp),
                 setSensitivity = { tunerViewModel?.setSensitivity(it) },
                 sensitivity = sensitivity
             )

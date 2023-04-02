@@ -10,47 +10,47 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.Color
 import androidx.core.view.WindowCompat
+import androidx.navigation.NavDestination
+import androidx.navigation.NavGraph
+import androidx.navigation.compose.ComposeNavigator
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navigation
 import com.google.accompanist.systemuicontroller.SystemUiController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.kobera.music.violin.feature.NavGraphs
 import com.kobera.music.violin.feature.tuner.ui.TunerScreen
 import com.kobera.music.violin.ui.theme.ViolinAppTheme
+import com.kobera.music.violin.utils.setSystemBarColors
+import com.ramcosta.composedestinations.DestinationsNavHost
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        //enable drawing in the status bars
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         setContent {
-
             ViolinAppTheme {
-                setSystemBarColors()
+                //setSystemBarColors()
                 // A surface container using the 'background' color from the theme
                 Surface(
                     color = MaterialTheme.colorScheme.surface
                 ) {
-                    TunerScreen()
+
+                    MainNavigation()
+                    //TunerScreen()
                 }
             }
         }
     }
 }
 
-
 @Composable
-fun setSystemBarColors(
-    topBarColor: Color = Color.Transparent,
-    bottomBarColor: Color = Color.Transparent,
-    darkIconsTopBar: Boolean = !isSystemInDarkTheme(),
-    darkIconsBottomBar: Boolean = !isSystemInDarkTheme(),
-    systemUiController: SystemUiController = rememberSystemUiController()
-) {
-    //Timber.d("Setting system bar")
-    SideEffect {
-        systemUiController.setStatusBarColor(color = topBarColor, darkIcons = darkIconsTopBar)
-        systemUiController.setNavigationBarColor(
-            color = bottomBarColor,
-            darkIcons = darkIconsBottomBar
-        )
-    }
+private fun MainNavigation() {
+    DestinationsNavHost(navGraph = NavGraphs.root)
 }
+
+

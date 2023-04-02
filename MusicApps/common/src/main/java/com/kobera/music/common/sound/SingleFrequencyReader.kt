@@ -13,7 +13,7 @@ import kotlin.math.roundToInt
 
 class SingleFrequencyReader(
     private val pcmAudioRecorder: PcmAudioRecorder,
-    minSearchedFrequency: Frequency = Frequency(20.0),
+    minSearchedFrequency: Frequency = Frequency(100.0),
     maxSearchedFrequency: Frequency = Frequency(2000.0),
     silenceThreshold: Long = 3_000_000L
 ) {
@@ -46,7 +46,7 @@ class SingleFrequencyReader(
     fun stop() {
         _frequency.value = FrequencyState.Silence
         if(_state.value == FrequencyReaderState.Stopped) {
-            Log.w(TAG, "Already stopped")
+            Timber.w(TAG, "Already stopped")
             return
         }
 
@@ -62,7 +62,7 @@ class SingleFrequencyReader(
 
     fun startSingleToneReading() {
         if (_state.value == FrequencyReaderState.Recording) {
-            Log.w(TAG, "Already recording")
+            Timber.w("Already recording")
             return
         }
         _state.value = FrequencyReaderState.Recording
@@ -109,8 +109,6 @@ class SingleFrequencyReader(
                     }
                 }
 
-                Timber.d("indexFromBottom $indexFromBottom")
-
                 if (indexFromBottom <= 0) {
                     _frequency.value = FrequencyState.Silence
                     return@collect
@@ -135,7 +133,7 @@ class SingleFrequencyReader(
                 val mostRelevantFrequency: Double =
                     resultIndex * (PcmAudioRecorder.sampleRate.toDouble() / PcmAudioRecorder.readSize.toDouble())
 
-                Timber.d("Result Index: $resultIndex Result Frequency: $mostRelevantFrequency")
+                //Timber.d("Result Index: $resultIndex Result Frequency: $mostRelevantFrequency")
                 _frequency.value = FrequencyState.HasFrequency(mostRelevantFrequency)
             }
         }

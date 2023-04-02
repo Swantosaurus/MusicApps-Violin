@@ -1,5 +1,8 @@
 package com.kobera.music.violin.feature.tuner.ui
 
+import android.annotation.SuppressLint
+import android.content.Context
+import android.content.SharedPreferences
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kobera.music.common.resource.ResourceProvider
@@ -21,6 +24,7 @@ import timber.log.Timber
 import kotlin.math.pow
 
 class TunerViewModel(
+    @SuppressLint("StaticFieldLeak") private val applicationContext: Context,
     private val resourceProvider: ResourceProvider,
     private val frequencyReader: SingleFrequencyReader,
     val a4Frequency: A4Frequency
@@ -30,7 +34,8 @@ class TunerViewModel(
 
     val note = _note.asStateFlow()
 
-    private val _notesInTuner : MutableStateFlow<NotesInTunerState> = MutableStateFlow(NotesInTunerState.AllNotes())
+    private val _notesInTuner: MutableStateFlow<NotesInTunerState> =
+        MutableStateFlow(NotesInTunerState.init(applicationContext = applicationContext))
 
     val notesInTuner = _notesInTuner.asStateFlow()
 
@@ -85,15 +90,45 @@ class TunerViewModel(
     }
 }
 
-abstract class  NotesInTunerState : KoinComponent{
+abstract class  NotesInTunerState : KoinComponent {
     abstract val notes: Map<String, Note>
-    val a4Frequency : A4Frequency  by inject()
+    protected val a4Frequency: A4Frequency by inject()
+
+    companion object {
+        private var preferences: SharedPreferences? = null
+        fun init(applicationContext: Context): NotesInTunerState {
+            preferences =
+                applicationContext.getSharedPreferences("notes_in_tuner", Context.MODE_PRIVATE)
+            preferences!!.getInt("notes_in_tuner", 0).let {
+                return when (it) {
+                    0 -> AllNotes()
+                    1 -> ViolinNotes()
+                    else -> AllNotes()
+                }
+            }
+        }
+    }
+
     class AllNotes() : NotesInTunerState() {
+        init {
+            with(preferences!!.edit()) {
+                putInt("notes_in_tuner", 0)
+                apply()
+            }
+        }
+
         override val notes: Map<String, Note>
             get() = Notes.getNotes(frequencyA4 = a4Frequency.frequency.value)
     }
 
     class ViolinNotes() : NotesInTunerState() {
+        init {
+            with(preferences!!.edit()) {
+                putInt("notes_in_tuner", 1)
+                apply()
+            }
+        }
+
         override val notes: Map<String, Note>
             get() = Notes.getNotesViolin(a4Frequency.frequency.value)
     }
