@@ -21,6 +21,7 @@ import com.kobera.music.common.notes.sheet.SheetNote.SheetNoteParams.Accidental
 import com.kobera.music.common.notes.sheet.ui.Clef
 import com.kobera.music.common.notes.sheet.ui.KeySignature
 import com.kobera.music.common.notes.sheet.ui.NotePath
+import com.kobera.music.common.notes.sheet.ui.PathAndCenterOffset
 
 
 @Composable
@@ -33,12 +34,10 @@ fun Sheet(
     val height = 240f
     val lineHeight = height / 6
     val sheetSpacing = 100f
-    val sheetSpacingFromLeft = 20f
-    //Icon(painter = painterResource(id = R.drawable.test), contentDescription = null)
+    val sheetSpacingFromLeft = 40f
     val clefPainter = painterResource(clef.resource)
     Canvas(
         modifier = Modifier
-            //.height(300.dp)
             .fillMaxWidth()
     ) {
         var notesToDraw = notes
@@ -126,7 +125,7 @@ private fun DrawScope.drawKeySharps(
     val noteSpacing = lineHeight / 2
     var spacingLeft = spacingFromLeft
     repeat(numberOfSharps) { index ->
-        var translateTop: Float = -(index / 2) * noteSpacing
+        var translateTop: Float = -(index / 2) * noteSpacing + 2 * noteSpacing
         if (index % 2 == 1) {
             translateTop += noteSpacing * 3f
         } else {
@@ -139,7 +138,7 @@ private fun DrawScope.drawKeySharps(
         translate(left = spacingLeft, top = translateTop) {
             drawSharp(lineHeight = lineHeight)
         }
-        spacingLeft += lineHeight * 1.5f
+        spacingLeft += lineHeight
     }
 
     return spacingLeft + lineHeight
@@ -149,7 +148,7 @@ private fun DrawScope.drawSharp(lineHeight: Float) {
     //vertical lines
     val height = 3f / 2 * lineHeight
     val width = height
-    translate(top = height / 2 - lineHeight / 2) {
+    translate(top = -height / 2) {
         repeat(2) {
             drawLine(
                 color = Color.Black,
@@ -338,12 +337,12 @@ private fun DrawScope.drawNatural(lineHeight: Float): Float {
         drawLine(
             Color.Black,
             start = Offset(0f, 0f),
-            end = Offset(0f, height * 3 / 4),
+            end = Offset(0f, height * 3 / 4 + 2.dp.toPx()),
             strokeWidth = 2.dp.toPx()
         )
         drawLine(
             Color.Black,
-            start = Offset(width, height / 4),
+            start = Offset(width, height / 4 - 2.dp.toPx()),
             end = Offset(width, height),
             strokeWidth = 2.dp.toPx()
         )
@@ -374,28 +373,34 @@ private fun DrawScope.drawNote(
 ): Float {
     val noteWidth = 100f
     val noteStep = lineHeight / 2
+    var notePath: PathAndCenterOffset =
+        getNotePathAndCenterOffset(note = note, lineHeight = lineHeight)
+
+
+    translate(top = noteStep * (-note.sheetDifference(BasicNote(G, 5)))) {
+        translate(left = spacingFromLeft, top = -notePath.centerOffset.y + noteStep) {
+            drawPath(notePath.path, Color.Black)
+        }
+    }
+
+    return noteWidth
+}
+
+private fun getNotePathAndCenterOffset(note: SheetNote, lineHeight: Float): PathAndCenterOffset =
     when (note.noteParams.duration) {
         SheetNote.SheetNoteParams.Duration.Quarter -> {
             if (note > BasicNote(G, octave = 5) || note < BasicNote(D, 3)) {
                 TODO()
             }
-            val notePath = NotePath.drawQuarterNote(
+
+            NotePath.drawQuarterNote(
                 lineHeightPx = lineHeight,
-                legLength = 150f,
+                legLength = lineHeight * 3,
                 facingDown = note > BasicNote(B, 4)
             )
-
-            translate(top = noteStep * (-note.sheetDifference(BasicNote(G, 5)))) {
-                translate(left = spacingFromLeft, top = -notePath.centerOffset.y + noteStep) {
-                    drawPath(notePath.path, Color.Black)
-                }
-            }
         }
 
         else -> {
             TODO()
         }
     }
-
-    return noteWidth
-}

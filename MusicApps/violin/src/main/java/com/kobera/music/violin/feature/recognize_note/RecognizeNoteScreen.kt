@@ -7,6 +7,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.kobera.music.common.notes.InnerTwelveToneInterpretation.*
+import com.kobera.music.common.notes.sheet.InnerSheetNote
 import com.kobera.music.common.notes.sheet.SheetNote
 import com.kobera.music.common.notes.sheet.ui.KeySignature
 import com.kobera.music.common.notes.sheet.ui.compose.Sheet
@@ -41,6 +42,7 @@ fun RecognizeNoteScreenBody() {
                     SheetNote(F, 4),
                     SheetNote(E, 4),
                     SheetNote(D, 4),
+                    SheetNote(InnerSheetNote.D, noteParams = SheetNote.SheetNoteParams(SheetNote.SheetNoteParams.Duration.Quarter, 0, SheetNote.SheetNoteParams.Accidental.Sharp), octave = 4)
                 ),
                 keySignature = KeySignature.Sharps(2)
             )
