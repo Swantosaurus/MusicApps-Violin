@@ -12,9 +12,9 @@ class SheetNote(
 ) : BasicNote(twelveNoteInterpretation = twelveNoteInterpretation, octave = octave) {
 
     constructor(
-        octave: Int,
         innerSheetNote: InnerSheetNote,
-        noteParams: SheetNoteParams
+        noteParams: SheetNoteParams,
+        octave: Int,
     ) : this(
         twelveNoteInterpretation = InnerTwelveToneInterpretation
             .fromSheetNote(innerSheetNote = innerSheetNote, noteParams = noteParams),
@@ -73,7 +73,6 @@ class SheetNote(
             None(0),
             Sharp(1),
             Flat(-1),
-            Natural(0),
             DoubleSharp(2),
             DoubleFlat(-2)
         }

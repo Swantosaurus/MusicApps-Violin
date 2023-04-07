@@ -17,6 +17,7 @@ import com.kobera.music.common.notes.InnerTwelveToneInterpretation.B
 import com.kobera.music.common.notes.InnerTwelveToneInterpretation.D
 import com.kobera.music.common.notes.InnerTwelveToneInterpretation.G
 import com.kobera.music.common.notes.sheet.SheetNote
+import com.kobera.music.common.notes.sheet.SheetNote.SheetNoteParams.Accidental
 import com.kobera.music.common.notes.sheet.ui.Clef
 import com.kobera.music.common.notes.sheet.ui.KeySignature
 import com.kobera.music.common.notes.sheet.ui.NotePath
@@ -60,6 +61,7 @@ fun Sheet(
                     lineHeight = lineHeight
                 )
                 notesToDraw = drawNotes(
+                    keySignature = keySignature,
                     notes = notesToDraw,
                     lineHeight = lineHeight,
                     spacingFromLeft = spcacingFromLeft
@@ -112,19 +114,24 @@ private fun DrawScope.drawKeyFlats(
     TODO()
 }
 
+private fun DrawScope.drawFlat(lineHeight: Float) {
+    TODO()
+}
+
 private fun DrawScope.drawKeySharps(
     numberOfSharps: Int,
     spacingFromLeft: Float,
     lineHeight: Float
 ): Float {
+    val noteSpacing = lineHeight / 2
     var spacingLeft = spacingFromLeft
     repeat(numberOfSharps) { index ->
-        var translateTop: Float = - (index / 2) * lineHeight * 1 / 2
+        var translateTop: Float = -(index / 2) * noteSpacing
         if (index % 2 == 1) {
-            translateTop += lineHeight * 3f / 2
+            translateTop += noteSpacing * 3f
         } else {
             if (index >= 4) {
-                translateTop += lineHeight * 7f / 2
+                translateTop += noteSpacing * 7f
             }
         }
 
@@ -159,7 +166,7 @@ private fun DrawScope.drawSharp(lineHeight: Float) {
                 color = Color.Black,
                 start = Offset(0f, lineHeight / 2 + it * lineHeight / 2 + yModulation),
                 end = Offset(width, lineHeight / 2 + it * lineHeight / 2 - yModulation),
-                strokeWidth = 6.dp.toPx()
+                strokeWidth = 4.dp.toPx()
             )
         }
     }
@@ -203,44 +210,192 @@ private fun DrawScope.drawSheetLines(lineHeight: Float) {
  *  draws notes until they fit in the screen and resutns list of notes that has not been drawn
  */
 private fun DrawScope.drawNotes(
+    keySignature: KeySignature,
     notes: List<SheetNote>,
     lineHeight: Float,
     spacingFromLeft: Float
 ): List<SheetNote> {
-    val noteStep = lineHeight / 2
     var leftSpacing = spacingFromLeft
     val notDrawnNotes = mutableListOf<SheetNote>()
-    val noteWidth = 100f
 
     for (note in notes) {
-        if (leftSpacing >= size.width - noteWidth) {
+        if (leftSpacing >= size.width - 150f) {
             notDrawnNotes += note
             continue
         }
-        when (note.noteParams.duration) {
-            SheetNote.SheetNoteParams.Duration.Quarter -> {
-                if (note > BasicNote(G, octave = 5) || note < BasicNote(D, 3)) {
-                    TODO()
-                }
-                val notePath = NotePath.drawQuarterNote(
-                    lineHeightPx = lineHeight,
-                    legLength = 150f,
-                    facingDown = note > BasicNote(B, 4)
-                )
-                translate(top = noteStep * (-note.sheetDifference(BasicNote(G, 5)))) {
-                    translate(left = leftSpacing, top = -notePath.centerOffset.y + noteStep) {
-                        drawPath(notePath.path, Color.Black)
-                    }
-                }
 
-                leftSpacing += noteWidth
+        leftSpacing += drawAccidental(
+            note = note,
+            keySignature = keySignature,
+            spacingFromLeft = leftSpacing,
+            lineHeight = lineHeight
+        )
+
+
+        leftSpacing += drawNote(
+            note = note,
+            lineHeight = lineHeight,
+            spacingFromLeft = leftSpacing
+        )
+    }
+    return notDrawnNotes
+}
+
+private fun DrawScope.drawAccidental(
+    note: SheetNote,
+    keySignature: KeySignature,
+    spacingFromLeft: Float,
+    lineHeight: Float
+): Float {
+    val accidentalToDraw: Accidental? = note.getAccidentalToDraw(keySignature = keySignature)
+    val noteSpacing = lineHeight / 2
+    accidentalToDraw?.let {
+        translate(
+            left = spacingFromLeft,
+            top = -noteSpacing * (note.sheetDifference(BasicNote(G, 5)) - 1)
+        ) {
+            when (accidentalToDraw) {
+                Accidental.None -> drawNatural(lineHeight = lineHeight)
+                Accidental.Sharp -> drawSharp(lineHeight = lineHeight)
+                Accidental.Flat -> drawFlat(lineHeight = lineHeight)
+                else -> TODO()
+            }
+        }
+
+
+        return 75f
+    }
+    return 0f
+}
+
+
+private fun SheetNote.getAccidentalToDraw(keySignature: KeySignature): Accidental? {
+    if (!isInKeySignature(keySignature)) {
+        return when (noteParams.accidental) {
+            Accidental.None -> {
+                /* nothing to add 👍 */
+                null
             }
 
-            else -> {
+            Accidental.Sharp -> {
+                Accidental.Sharp
+            }
+
+            Accidental.Flat -> {
+                Accidental.Flat
+            }
+
+            else -> TODO()
+        }
+    }
+    return when (keySignature) {
+        is KeySignature.Flats -> {
+            when (noteParams.accidental) {
+                Accidental.Flat -> {
+                    /* nothing to add 👍 */
+                    null
+                }
+
+                Accidental.None -> {
+                    Accidental.None
+                }
+
+                Accidental.Sharp -> {
+                    Accidental.Sharp
+                }
+
+                else -> TODO()
+            }
+        }
+
+        is KeySignature.Sharps -> {
+            when (noteParams.accidental) {
+                Accidental.Flat -> {
+                    Accidental.Flat
+                }
+
+                Accidental.None -> {
+                    Accidental.None
+                }
+
+                Accidental.Sharp -> {
+                    /* nothing to add 👍 */
+                    null
+                }
+
+                else -> TODO()
+            }
+        }
+
+        else -> throw java.lang.IllegalStateException()
+    }
+}
+
+private fun DrawScope.drawNatural(lineHeight: Float): Float {
+    val width = lineHeight
+    val height = lineHeight * 2
+    translate(top = -height / 2) {
+        drawLine(
+            Color.Black,
+            start = Offset(0f, 0f),
+            end = Offset(0f, height * 3 / 4),
+            strokeWidth = 2.dp.toPx()
+        )
+        drawLine(
+            Color.Black,
+            start = Offset(width, height / 4),
+            end = Offset(width, height),
+            strokeWidth = 2.dp.toPx()
+        )
+        drawLine(
+            Color.Black,
+            start = Offset(0f, height / 2),
+            end = Offset(width, height / 4),
+            strokeWidth = 4.dp.toPx()
+        )
+        drawLine(
+            Color.Black,
+            start = Offset(0f, height * 3 / 4),
+            end = Offset(width, height / 2),
+            strokeWidth = 4.dp.toPx()
+        )
+    }
+    return width
+}
+
+private fun SheetNote.isInKeySignature(keySignature: KeySignature): Boolean =
+    keySignature.getKeySignatureNotes().contains(this.innerSheetNote)
+
+
+private fun DrawScope.drawNote(
+    note: SheetNote,
+    lineHeight: Float,
+    spacingFromLeft: Float
+): Float {
+    val noteWidth = 100f
+    val noteStep = lineHeight / 2
+    when (note.noteParams.duration) {
+        SheetNote.SheetNoteParams.Duration.Quarter -> {
+            if (note > BasicNote(G, octave = 5) || note < BasicNote(D, 3)) {
                 TODO()
             }
+            val notePath = NotePath.drawQuarterNote(
+                lineHeightPx = lineHeight,
+                legLength = 150f,
+                facingDown = note > BasicNote(B, 4)
+            )
+
+            translate(top = noteStep * (-note.sheetDifference(BasicNote(G, 5)))) {
+                translate(left = spacingFromLeft, top = -notePath.centerOffset.y + noteStep) {
+                    drawPath(notePath.path, Color.Black)
+                }
+            }
+        }
+
+        else -> {
+            TODO()
         }
     }
 
-    return notDrawnNotes
+    return noteWidth
 }
