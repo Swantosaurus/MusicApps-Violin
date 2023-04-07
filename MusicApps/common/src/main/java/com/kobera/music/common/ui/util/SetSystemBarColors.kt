@@ -1,4 +1,4 @@
-package com.kobera.music.violin.utils
+package com.kobera.music.common.ui.util
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable

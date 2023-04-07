@@ -22,7 +22,6 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.kobera.music.violin.feature.NavGraphs
 import com.kobera.music.violin.feature.tuner.ui.TunerScreen
 import com.kobera.music.violin.ui.theme.ViolinAppTheme
-import com.kobera.music.violin.utils.setSystemBarColors
 import com.ramcosta.composedestinations.DestinationsNavHost
 
 class MainActivity : ComponentActivity() {

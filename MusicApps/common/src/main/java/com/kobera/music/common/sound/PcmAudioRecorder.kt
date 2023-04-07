@@ -84,6 +84,11 @@ class PcmAudioRecorder(private val applicationContext : Context) {
         const val sampleRate = 192_000
         const val readSize = 32_768 // 2 pow 15
     }
+
+    enum class PcmAudioRecorderState {
+        Recording,
+        Stopped
+    }
 }
 fun Frequency.Companion.fromFourierIndex(index: Double): Frequency =
     Frequency(index* PcmAudioRecorder.sampleRate/PcmAudioRecorder.readSize)
@@ -94,7 +99,3 @@ fun Frequency.toFourierIndexIntRoundDown(): Int =
 fun Frequency.toFourierIndexDouble(): Double =
     value/PcmAudioRecorder.sampleRate*PcmAudioRecorder.readSize
 
-enum class PcmAudioRecorderState {
-    Recording,
-    Stopped
-}

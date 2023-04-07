@@ -1,16 +1,17 @@
 package com.kobera.music.violin.feature.tuner.ui
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kobera.music.common.notes.InnerTwelveToneInterpretation
+import com.kobera.music.common.notes.Notes
+import com.kobera.music.common.notes.TwelveToneNoteNames
+import com.kobera.music.common.notes.frequency.FrequencyToNote
+import com.kobera.music.common.notes.frequency.NoteWithFrequency
 import com.kobera.music.common.resource.ResourceProvider
 import com.kobera.music.common.sound.SingleFrequencyReader
 import com.kobera.music.common.sound.frequency_baseline.A4Frequency
-import com.kobera.music.common.sound.notes.FrequencyToNote
-import com.kobera.music.common.sound.notes.Note
-import com.kobera.music.common.sound.notes.Notes
 import com.kobera.music.violin.R
 import com.kobera.music.violin.sound.notes.violinStrings
 import kotlinx.coroutines.flow.Flow
@@ -24,7 +25,7 @@ import timber.log.Timber
 import kotlin.math.pow
 
 class TunerViewModel(
-    @SuppressLint("StaticFieldLeak") private val applicationContext: Context,
+    applicationContext: Context,
     private val resourceProvider: ResourceProvider,
     private val frequencyReader: SingleFrequencyReader,
     val a4Frequency: A4Frequency
@@ -91,7 +92,7 @@ class TunerViewModel(
 }
 
 abstract class  NotesInTunerState : KoinComponent {
-    abstract val notes: Map<String, Note>
+    abstract val notes: Map<String, NoteWithFrequency>
     protected val a4Frequency: A4Frequency by inject()
 
     companion object {
@@ -117,7 +118,7 @@ abstract class  NotesInTunerState : KoinComponent {
             }
         }
 
-        override val notes: Map<String, Note>
+        override val notes: Map<String, NoteWithFrequency>
             get() = Notes.getNotes(frequencyA4 = a4Frequency.frequency.value)
     }
 
@@ -129,14 +130,21 @@ abstract class  NotesInTunerState : KoinComponent {
             }
         }
 
-        override val notes: Map<String, Note>
+        override val notes: Map<String, NoteWithFrequency>
             get() = Notes.getNotesViolin(a4Frequency.frequency.value)
     }
 
-    fun Notes.getNotesViolin(frequencyA4: Double): Map<String, Note> {
+    fun Notes.getNotesViolin(frequencyA4: Double): Map<String, NoteWithFrequency> {
         val onlyViolinNotes = getNotes(frequencyA4 = frequencyA4)
-            .filter { violinStrings.contains(it.key) }.toMutableMap()
-        onlyViolinNotes.entries.forEach{
+            .filter {
+                for (violinStringNote in violinStrings) {
+                    if (it.value sameNoteAs violinStringNote) {
+                        return@filter true
+                    }
+                }
+                return@filter false
+            }.toMutableMap()
+        onlyViolinNotes.entries.forEach {
             it.setValue(it.value.copy(rangeInterval = 2.0.pow(7.0/24)))
         }
 
@@ -146,15 +154,25 @@ abstract class  NotesInTunerState : KoinComponent {
 
 sealed interface LastNoteState {
     class Silence(
-        note: Note = Note("A4", 440.0),
-        frequency: Double = 440.0,
+        note: NoteWithFrequency = NoteWithFrequency(
+            twelveNoteInterpretation = InnerTwelveToneInterpretation.A,
+            name = TwelveToneNoteNames.getName(InnerTwelveToneInterpretation.A),
+            octave = 4,
+            frequency = Notes.defaultA4Frequency,
+        ),
+        frequency: Double = Notes.defaultA4Frequency,
         differenceAngle: Double = 0.0
-    ): HasNote(
+    ) : HasNote(
         note = note,
         frequency = frequency,
         differenceAngle = differenceAngle
     )
-    open class HasNote(val note: Note, val frequency: Double, val differenceAngle: Double): LastNoteState {
+
+    open class HasNote(
+        val note: NoteWithFrequency,
+        val frequency: Double,
+        val differenceAngle: Double
+    ) : LastNoteState {
         fun isInTune() = note.isInTune(frequency)
     }
 }

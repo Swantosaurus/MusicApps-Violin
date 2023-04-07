@@ -1,6 +1,5 @@
 package com.kobera.music.common.sound
 
-import android.util.Log
 import com.kobera.music.common.sound.fourier.FourierTransform
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -13,7 +12,7 @@ import kotlin.math.roundToInt
 
 class SingleFrequencyReader(
     private val pcmAudioRecorder: PcmAudioRecorder,
-    minSearchedFrequency: Frequency = Frequency(100.0),
+    minSearchedFrequency: Frequency = Frequency(150.0),
     maxSearchedFrequency: Frequency = Frequency(2000.0),
     silenceThreshold: Long = 3_000_000L
 ) {
@@ -89,7 +88,7 @@ class SingleFrequencyReader(
                     var currentThreshold = maxValue
                     if(maxValue == _silenceThreshold.value.toDouble()){
                         if(Frequency.fromFourierIndex(index = index.toDouble()).value < 240){
-                            currentThreshold *= 0.5
+                            currentThreshold *= 0.6
                         }
                     }
 

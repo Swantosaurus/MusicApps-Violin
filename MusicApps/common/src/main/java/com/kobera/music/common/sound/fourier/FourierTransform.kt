@@ -5,7 +5,6 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 object FourierTransform {
-
     fun dft(sampleData : ShortArray) : Array<ComplexNumber> =
         dft(sampleData.map { ComplexNumber(it.toDouble(), 0.0) }.toTypedArray())
 
@@ -33,11 +32,14 @@ object FourierTransform {
         return output
     }
 
+    /**
+     * this is not extension of dft because rows in the matrix doesn't make up base
+     * just trying to make biggest scalar sum with vectors and the max is most simular to the
+     */
     fun fineTuneDFT(sampleData: ShortArray, from: Int, to: Int, accuracy: Double): Array<ComplexNumber> =
         fineTuneDFT(sampleData.map{ ComplexNumber(it.toDouble(), 0.0) }.toTypedArray(), from, to, accuracy)
 
     fun fineTuneDFT(sampleData: Array<ComplexNumber>, from: Int, to: Int, accuracy: Double): Array<ComplexNumber>{
-
         val steps = ((to-from)/accuracy).toInt()
         val output = Array(steps) { ComplexNumber(0.0, 0.0) }
         for (i in 0 until steps) {
@@ -115,7 +117,7 @@ object FourierTransform {
     }
 
     private data class IndexAndRelevancy(val index: Double, val relevancy: Double)
-    infix fun Double.average(other: Double): Double =
+    private infix fun Double.average(other: Double): Double =
          (this + other) / 2
 
 

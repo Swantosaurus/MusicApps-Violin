@@ -5,4 +5,16 @@
     <string name="toggle_only_violin_notes">Toggle only violin notes</string>
     <string name="tuner">Tuner</string>
     <string name="recognize_note">Recognize Note</string>
+    <string name="note_c">C</string>
+    <string name="note_c_sharp">C#</string>
+    <string name="cote_d">D</string>
+    <string name="note_d_sharp">D#</string>
+    <string name="note_e">E</string>
+    <string name="note_f">F</string>
+    <string name="note_f_sharp">F#</string>
+    <string name="note_g">G</string>
+    <string name="note_g_sharp">G#</string>
+    <string name="note_a">A</string>
+    <string name="note_a_sharp">A#</string>
+    <string name="note_b">B</string>
 </resources>

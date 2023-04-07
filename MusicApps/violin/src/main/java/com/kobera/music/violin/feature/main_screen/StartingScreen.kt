@@ -17,17 +17,19 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.kobera.music.common.ui.util.setSystemBarColors
 import com.kobera.music.violin.R
 import com.kobera.music.violin.feature.NavGraphs
 import com.kobera.music.violin.feature.destinations.DirectionDestination
 import com.kobera.music.violin.feature.destinations.RecognizeNoteScreenDestination
 import com.kobera.music.violin.feature.destinations.TunerScreenDestination
-import com.kobera.music.violin.utils.setSystemBarColors
 import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Destination(start = true)
+@Destination
+@RootNavGraph(start = true)
 @Composable
 fun StartingScreen(navigator: DestinationsNavigator) {
     Scaffold() { paddingValues ->

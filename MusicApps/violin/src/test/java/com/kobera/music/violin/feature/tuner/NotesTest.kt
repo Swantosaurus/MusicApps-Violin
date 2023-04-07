@@ -1,6 +1,6 @@
 package com.kobera.music.violin.feature.tuner
 
-import com.kobera.music.common.sound.notes.Notes
+import com.kobera.music.common.notes.Notes
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue

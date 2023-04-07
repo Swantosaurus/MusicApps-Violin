@@ -69,10 +69,10 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.PermissionStatus
 import com.google.accompanist.permissions.rememberPermissionState
+import com.kobera.music.common.ui.util.setSystemBarColors
 import com.kobera.music.common.util.toStringWithNDecimals
 import com.kobera.music.violin.R
 import com.kobera.music.violin.sound.notes.violinStrings
-import com.kobera.music.violin.utils.setSystemBarColors
 import com.ramcosta.composedestinations.annotation.Destination
 import org.koin.androidx.compose.getViewModel
 import java.lang.Float.min
@@ -91,8 +91,6 @@ fun TunerScreen(tunerViewModel: TunerViewModel = getViewModel()) {
     LaunchedEffect(key1 = Unit) {
         permission.launchPermissionRequest()
     }
-
-
 
     when (permission.status) {
         is PermissionStatus.Granted -> {
@@ -224,24 +222,24 @@ fun ViolinStrings(noteState: LastNoteState) {
             val stringGrowing = 1.2f
             val violinStringsFromE = violinStrings.reversedArray()
 
-            repeat(times = 4){index ->
+            repeat(times = 4) { drawStringIndex ->
                 drawLine(
                     brush =
-                    if(noteState !is LastNoteState.Silence
+                    if (noteState !is LastNoteState.Silence
                         && noteState is LastNoteState.HasNote
-                        && violinStringsFromE.indexOfFirst { noteState.note.name == it } == index) {
-                        if(noteState.isInTune()) {
+                        && violinStringsFromE.indexOfFirst { noteState.note sameNoteAs it } == drawStringIndex
+                    ) {
+                        if (noteState.isInTune()) {
                             selectedNoteInTune
                         } else {
                             selectedNoteNotInTune
                         }
                     } else {
-                       stringGradient
-                    }
-                               ,
-                    start = Offset(0f, leftSpacing/2 + index * leftSpacing),
-                    end = Offset(maxWidth.value.dp.toPx(), 0f + index * rightSpacing),
-                    strokeWidth = (5 + index * stringGrowing).dp.toPx()
+                        stringGradient
+                    },
+                    start = Offset(0f, leftSpacing / 2 + drawStringIndex * leftSpacing),
+                    end = Offset(maxWidth.value.dp.toPx(), 0f + drawStringIndex * rightSpacing),
+                    strokeWidth = (5 + drawStringIndex * stringGrowing).dp.toPx()
                 )
             }
         }
@@ -258,9 +256,12 @@ private fun SensitivitySetting(modifier: Modifier = Modifier, setSensitivity: (D
             Spacer(modifier = Modifier.weight(1f))
             Text(text = "High")
         }
-        Slider(value = (sensitivity()-1).absoluteValue, onValueChange = {
-            setSensitivity(((it.toDouble()-1).absoluteValue))
-        })
+        Slider(
+            value = (sensitivity()-1).absoluteValue,
+            onValueChange = {
+            setSensitivity(((it.toDouble() - 1).absoluteValue))
+            }
+        )
     }
 }
 
@@ -332,7 +333,7 @@ private fun TunerMeter(modifier: Modifier = Modifier, noteState: LastNoteState) 
         Column (modifier = Modifier.padding(20.dp)) {
             Spacer(modifier = Modifier.weight(1f))
             Text(
-                text = if (noteState is LastNoteState.HasNote) noteState.note.name else "A4",
+                text = if (noteState is LastNoteState.HasNote) noteState.note.name + noteState.note.octave.toString() else "A4",
                 Modifier.align(CenterHorizontally)
             )
             Text(
