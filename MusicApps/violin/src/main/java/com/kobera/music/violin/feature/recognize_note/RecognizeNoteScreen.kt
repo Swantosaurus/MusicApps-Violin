@@ -42,9 +42,26 @@ fun RecognizeNoteScreenBody() {
                     SheetNote(F, 4),
                     SheetNote(E, 4),
                     SheetNote(D, 4),
-                    SheetNote(InnerSheetNote.D, noteParams = SheetNote.SheetNoteParams(SheetNote.SheetNoteParams.Duration.Quarter, 0, SheetNote.SheetNoteParams.Accidental.Sharp), octave = 4)
+                    SheetNote(
+                        InnerSheetNote.D,
+                        noteParams = SheetNote.SheetNoteParams(
+                            SheetNote.SheetNoteParams.Duration.Quarter,
+                            0,
+                            SheetNote.SheetNoteParams.Accidental.Sharp
+                        ),
+                        octave = 4
+                    ),
+                    SheetNote(
+                        InnerSheetNote.D,
+                        noteParams = SheetNote.SheetNoteParams(
+                            SheetNote.SheetNoteParams.Duration.Quarter,
+                            0,
+                            SheetNote.SheetNoteParams.Accidental.Flat
+                        ),
+                        octave = 4
+                    )
                 ),
-                keySignature = KeySignature.Sharps(2)
+                keySignature = KeySignature.Flats(7)
             )
         }
     }

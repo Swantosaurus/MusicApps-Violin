@@ -34,9 +34,7 @@ class SheetNote(
     )
 
     fun sheetDifference(other: BasicNote): Int {
-        val thisInnerSheetNote = InnerSheetNote.fromTwelveTone(this.twelveNoteInterpretation)
-
-        return thisInnerSheetNote.difference(
+        return innerSheetNote.difference(
             InnerSheetNote.fromTwelveTone(other.twelveNoteInterpretation)
         ) + (this.octave - other.octave) * InnerSheetNote.numberOfNotes
     }

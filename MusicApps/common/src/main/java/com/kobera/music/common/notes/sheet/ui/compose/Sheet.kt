@@ -8,6 +8,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
@@ -110,11 +111,52 @@ private fun DrawScope.drawKeyFlats(
     spacingFromLeft: Float,
     lineHeight: Float
 ): Float {
-    TODO()
+    val noteSpacing = lineHeight / 2
+    var leftSpacing = spacingFromLeft
+    repeat(numberOfFlats){ index ->
+        var topOffset = 3 * noteSpacing + (index/2) * noteSpacing
+        if (index % 2 == 0) {
+            topOffset += 3 * noteSpacing
+        }
+
+        translate(left = leftSpacing, top = topOffset) {
+            drawFlat(sheetLineHeight = lineHeight)
+        }
+
+        leftSpacing += lineHeight
+    }
+    return leftSpacing
 }
 
-private fun DrawScope.drawFlat(lineHeight: Float) {
-    TODO()
+private fun DrawScope.drawFlat(sheetLineHeight: Float) {
+    val height = 2*sheetLineHeight
+    val lineWidth = 2.dp.toPx()
+
+    translate(top = -height * 3/4) {
+        drawLine(
+            Color.Black,
+            start = Offset(0f, 0f),
+            end = Offset(0f, height),
+            strokeWidth = lineWidth
+        )
+
+        drawArc(
+            color = Color.Black,
+            startAngle = -135f,
+            sweepAngle = 180f,
+            useCenter = false,
+            size = Size(sheetLineHeight/2 + lineWidth, sheetLineHeight/2),
+            topLeft = Offset(-lineWidth, height/2),
+            style = Stroke(width = 2.dp.toPx())
+        )
+        drawLine(
+            color = Color.Black,
+            start = Offset(0f, height),
+            end = Offset(sheetLineHeight/2, height/2 + (sheetLineHeight/4 + lineWidth/2)),
+            strokeWidth = 2.dp.toPx()
+        )
+    }
+
 }
 
 private fun DrawScope.drawKeySharps(
@@ -256,12 +298,10 @@ private fun DrawScope.drawAccidental(
             when (accidentalToDraw) {
                 Accidental.None -> drawNatural(lineHeight = lineHeight)
                 Accidental.Sharp -> drawSharp(lineHeight = lineHeight)
-                Accidental.Flat -> drawFlat(lineHeight = lineHeight)
+                Accidental.Flat -> drawFlat(sheetLineHeight = lineHeight)
                 else -> TODO()
             }
         }
-
-
         return 75f
     }
     return 0f
