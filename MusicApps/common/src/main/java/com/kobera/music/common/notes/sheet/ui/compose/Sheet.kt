@@ -1,6 +1,9 @@
 package com.kobera.music.common.notes.sheet.ui.compose
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -12,11 +15,13 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kobera.music.common.notes.BasicNote
 import com.kobera.music.common.notes.InnerTwelveToneInterpretation.B
 import com.kobera.music.common.notes.InnerTwelveToneInterpretation.D
 import com.kobera.music.common.notes.InnerTwelveToneInterpretation.G
+import com.kobera.music.common.notes.sheet.InnerSheetNote
 import com.kobera.music.common.notes.sheet.SheetNote
 import com.kobera.music.common.notes.sheet.SheetNote.SheetNoteParams.Accidental
 import com.kobera.music.common.notes.sheet.ui.Clef
@@ -72,6 +77,97 @@ fun Sheet(
     }
 }
 
+@Composable
+@Preview
+fun SheetPreview2() {
+    Box(
+        Modifier
+            .fillMaxSize()
+            .background(Color.White)
+    ) {
+        Sheet(
+            notes = listOf(
+                SheetNote(
+                    innerSheetNote = InnerSheetNote.D,
+                    noteParams = SheetNote.SheetNoteParams(),
+                    octave = 4
+                ),
+                SheetNote(
+                    innerSheetNote = InnerSheetNote.E,
+                    noteParams = SheetNote.SheetNoteParams(),
+                    octave = 4
+                ),
+                SheetNote(
+                    innerSheetNote = InnerSheetNote.F,
+                    noteParams = SheetNote.SheetNoteParams(),
+                    octave = 4
+                ),
+                SheetNote(
+                    innerSheetNote = InnerSheetNote.G,
+                    noteParams = SheetNote.SheetNoteParams(),
+                    octave = 4
+                ),
+                SheetNote(
+                    innerSheetNote = InnerSheetNote.A,
+                    noteParams = SheetNote.SheetNoteParams(),
+                    octave = 4
+                ),
+                SheetNote(
+                    innerSheetNote = InnerSheetNote.B,
+                    noteParams = SheetNote.SheetNoteParams(),
+                    octave = 4
+                ),
+                SheetNote(
+                    innerSheetNote = InnerSheetNote.C,
+                    noteParams = SheetNote.SheetNoteParams(),
+                    octave = 5
+                ),
+                SheetNote(
+                    innerSheetNote = InnerSheetNote.D,
+                    noteParams = SheetNote.SheetNoteParams(),
+                    octave = 5
+                ),
+                SheetNote(
+                    innerSheetNote = InnerSheetNote.C,
+                    noteParams = SheetNote.SheetNoteParams(),
+                    octave = 5
+                ),
+                SheetNote(
+                    innerSheetNote = InnerSheetNote.B,
+                    noteParams = SheetNote.SheetNoteParams(),
+                    octave = 4
+                ),
+                SheetNote(
+                    innerSheetNote = InnerSheetNote.A,
+                    noteParams = SheetNote.SheetNoteParams(),
+                    octave = 4
+                ),
+                SheetNote(
+                    innerSheetNote = InnerSheetNote.G,
+                    noteParams = SheetNote.SheetNoteParams(),
+                    octave = 4
+                ),
+                SheetNote(
+                    innerSheetNote = InnerSheetNote.F,
+                    noteParams = SheetNote.SheetNoteParams(),
+                    octave = 4
+                ),
+                SheetNote(
+                    innerSheetNote = InnerSheetNote.E,
+                    noteParams = SheetNote.SheetNoteParams(),
+                    octave = 4
+                ),
+                SheetNote(
+                    innerSheetNote = InnerSheetNote.D,
+                    noteParams = SheetNote.SheetNoteParams(),
+                    octave = 4
+                ),
+            ),
+            keySignature = KeySignature.Sharps(7)
+        )
+    }
+}
+
 private fun DrawScope.drawKeySignature(
     spacingFromLeft: Float,
     keySignature: KeySignature,
@@ -106,6 +202,112 @@ private fun DrawScope.drawKeySignature(
     }
 }
 
+@Composable
+@Preview
+fun SheetPreview() {
+    Box(
+        Modifier
+            .fillMaxSize()
+            .background(Color.White)) {
+        Sheet(
+            notes = listOf(
+                SheetNote(
+                    innerSheetNote = InnerSheetNote.D,
+                    noteParams = SheetNote.SheetNoteParams(),
+                    octave = 4
+                ),
+                SheetNote(
+                    innerSheetNote = InnerSheetNote.E,
+                    noteParams = SheetNote.SheetNoteParams(),
+                    octave = 4
+                ),
+                SheetNote(
+                    innerSheetNote = InnerSheetNote.F,
+                    noteParams = SheetNote.SheetNoteParams(),
+                    octave = 4
+                ),
+                SheetNote(
+                    innerSheetNote = InnerSheetNote.G,
+                    noteParams = SheetNote.SheetNoteParams(),
+                    octave = 4
+                ),
+                SheetNote(
+                    innerSheetNote = InnerSheetNote.A,
+                    noteParams = SheetNote.SheetNoteParams(),
+                    octave = 4
+                ),
+                SheetNote(
+                    innerSheetNote = InnerSheetNote.B,
+                    noteParams = SheetNote.SheetNoteParams(),
+                    octave = 4
+                ),
+                SheetNote(
+                    innerSheetNote = InnerSheetNote.C,
+                    noteParams = SheetNote.SheetNoteParams(),
+                    octave = 5
+                ),
+                SheetNote(
+                    innerSheetNote = InnerSheetNote.D,
+                    noteParams = SheetNote.SheetNoteParams(),
+                    octave = 5
+                ),
+                SheetNote(
+                    innerSheetNote = InnerSheetNote.C,
+                    noteParams = SheetNote.SheetNoteParams(),
+                    octave = 5
+                ),
+                SheetNote(
+                    innerSheetNote = InnerSheetNote.B,
+                    noteParams = SheetNote.SheetNoteParams(),
+                    octave = 4
+                ),
+                SheetNote(
+                    innerSheetNote = InnerSheetNote.A,
+                    noteParams = SheetNote.SheetNoteParams(),
+                    octave = 4
+                ),
+                SheetNote(
+                    innerSheetNote = InnerSheetNote.G,
+                    noteParams = SheetNote.SheetNoteParams(),
+                    octave = 4
+                ),
+                SheetNote(
+                    innerSheetNote = InnerSheetNote.F,
+                    noteParams = SheetNote.SheetNoteParams(),
+                    octave = 4
+                ),
+                SheetNote(
+                    innerSheetNote = InnerSheetNote.E,
+                    noteParams = SheetNote.SheetNoteParams(),
+                    octave = 4
+                ),
+                SheetNote(
+                    innerSheetNote = InnerSheetNote.D,
+                    noteParams = SheetNote.SheetNoteParams(),
+                    octave = 4
+                ),
+            ),
+            keySignature = KeySignature.Flats(7)
+        )
+    }
+}
+
+@Composable
+@Preview
+fun SheetPreview3() {
+    Box(
+        Modifier
+            .fillMaxSize()
+            .background(Color.White)) {
+        Sheet(
+            notes = listOf(
+                SheetNote(InnerSheetNote.D, SheetNote.SheetNoteParams(accidental = Accidental.Flat), 4),
+                SheetNote(InnerSheetNote.D, SheetNote.SheetNoteParams(accidental = Accidental.Sharp), 4),
+            ),
+            keySignature = KeySignature.Sharps(0))
+    }
+}
+
 private fun DrawScope.drawKeyFlats(
     numberOfFlats: Int,
     spacingFromLeft: Float,
@@ -113,8 +315,8 @@ private fun DrawScope.drawKeyFlats(
 ): Float {
     val noteSpacing = lineHeight / 2
     var leftSpacing = spacingFromLeft
-    repeat(numberOfFlats){ index ->
-        var topOffset = 3 * noteSpacing + (index/2) * noteSpacing
+    repeat(numberOfFlats) { index ->
+        var topOffset = 3 * noteSpacing + (index / 2) * noteSpacing
         if (index % 2 == 0) {
             topOffset += 3 * noteSpacing
         }

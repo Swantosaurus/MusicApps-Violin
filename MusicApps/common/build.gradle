@@ -46,8 +46,6 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 
 
-    implementation 'com.google.android.gms:play-services-auth:20.4.1'
-
     /*
         DEPENDENCY INJECTION - KOIN
      */
@@ -71,6 +69,9 @@ dependencies {
     implementation 'androidx.compose.material3:material3'
     implementation 'androidx.lifecycle:lifecycle-extensions'
 
+
+    debugImplementation 'androidx.compose.ui:ui-tooling'
+    debugImplementation 'androidx.compose.ui:ui-test-manifest'
 
     implementation 'com.jakewharton.timber:timber:4.7.1'
 }

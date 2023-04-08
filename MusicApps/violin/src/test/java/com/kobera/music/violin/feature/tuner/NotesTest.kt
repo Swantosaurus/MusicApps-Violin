@@ -11,7 +11,7 @@ import kotlin.math.pow
 internal class NotesTest {
     @Test
     fun getNotes() {
-        val notes = Notes.getNotes()
+        val notes = Notes.getNotes(440.0)
 
         assertEquals(220.0, notes["A3"]!!.frequency)
 
