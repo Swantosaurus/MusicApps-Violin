@@ -1,8 +1,8 @@
 plugins {
-    id 'com.android.application'
-    id 'org.jetbrains.kotlin.android'
-    id 'com.google.devtools.ksp'
-    id 'org.jetbrains.kotlin.plugin.serialization'
+    alias(libs.plugins.android.application) apply true
+    alias(libs.plugins.kotlin)              apply true
+    alias(libs.plugins.ksp)                 apply true
+    alias(libs.plugins.serialization)       apply true
 }
 
 android {
@@ -65,19 +65,19 @@ dependencies {
     implementation libs.compose.destinations
     ksp libs.compose.destinations.ksp
 
-    //DI
     implementation libs.bundles.di.koin
+
     implementation libs.logging.timber
 
-    def firebaseBom = implementation platform(libs.firebase.bom)
-    //implementation(firebaseBom)
+    implementation platform(libs.firebase.bom)
     implementation libs.bundles.firebase.bom
 
     implementation libs.bundles.accopmanist
+
     implementation libs.bundles.datastore
 
     /*
-       TEST DEPENDENCIES
+       TODO TEST DEPENDENCIES to toml but first decide what testing we will do (ui-testing prolly not worth it)
     */
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
