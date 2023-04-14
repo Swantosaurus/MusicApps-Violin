@@ -1,0 +1,94 @@
+[versions]
+compose-compiler    = "1.4.3"
+compose-bom         = "2023.03.00"
+kotlin              = "1.8.10"
+ksp                 = "1.8.10-1.0.9" # first par of version is kotlin version
+androidStudio       = "8.0.0-beta03" # this version depends on android studio version
+raamcosta           = "1.8.38-beta"
+lifeccle            = "2.6.1"
+koin                = "3.2.0"
+datastore           = "1.0.0"
+accompanist         = "0.30.0"
+
+[libraries]
+accompanist-systemuicontroller    = { group = "com.google.accompanist",                     name = "accompanist-systemuicontroller",version.ref = "accompanist" }
+accompanist-permissions           = { group = "com.google.accompanist",                     name = "accompanist-permissions",       version.ref = "accompanist" }
+
+androidx-compose-bom              = { group = "androidx.compose",                           name = "compose-bom",                   version.ref = "compose-bom" }
+androidx-compose-foundation       = { group = "androidx.compose.foundation",                name = "foundation" }
+androidx-core-ktx-bom             = { group = "androidx.core",                              name = "core-ktx" }
+androidx-lifecicle-ktx-bom        = { group = "androidx.lifecycle",                         name = "lifecycle-runtime-ktx"}
+androidx-lifecycle-extension-bom  = { group = "androidx.lifecycle",                         name = "lifecycle-extensions"}
+androidx-lifecycle-viewmodel      = { group = "androidx.lifecycle",                         name = "lifecycle-viewmodel-compose",   version.ref = "lifeccle"}
+androidx-lifecycle-runtime        = { group = "androidx.lifecycle",                         name = "lifecycle-runtime-compose",     version.ref = "lifeccle"}
+androidx-activity-compose-bom     = { group = "androidx.activity",                          name = "activity-compose"}
+androidx-compose-ui-bom           = { group = "androidx.compose.ui",                        name = "ui" }
+androidx-compose-ui-tooling-bom   = { group = "androidx.compose.ui",                        name = "ui-tooling" }
+androidx-compose-ui-graphics-bom  = { group = "androidx.compose.ui",                        name = "ui-graphics" }
+androidx-compose-material3-bom    = { group = "androidx.compose.material3",                 name = "material3" }
+androidx-compose-navigaiton-bom   = { group = "androidx.navigation",                        name = "navigation-compose",            version     = "2.5.3"}
+androidx-datastore                = { group = "androidx.datastore",                         name = "datastore",                     version.ref = "datastore" }
+androidx-datastore-preferences    = { group = "androidx.datastore",                         name = "datastore-preferences",         version.ref = "datastore" }
+
+firebase-bom                      = { group = "com.google.firebase",                        name = "firebase-bom",                  version     = "31.5.0" }
+firebase-analitics-bom            = { group = "com.google.firebase",                        name = "firebase-analytics-ktx" }
+
+
+koin-compose                      = { group = "io.insert-koin",                             name = "koin-androidx-compose",         version.ref = "koin" }
+koin-core                         = { group = "io.insert-koin",                             name = "koin-core",                     version.ref = "koin" }
+
+kotlinx-collection-immutable      = { group = "org.jetbrains.kotlinx",                      name = "kotlinx-collections-immutable", version     = "0.3.5" }
+kotlinx-serialization-json        = { group = "org.jetbrains.kotlinx",                      name = "kotlinx-serialization-json",    version     = "1.3.2" }
+
+logging-timber                    = { group = "com.jakewharton.timber",                     name = "timber",                        version     = "4.7.1" }
+
+compose-destinations              = { group = "io.github.raamcosta.compose-destinations",   name = "core",                          version.ref = "raamcosta"}
+compose-destinations-ksp          = { group = "io.github.raamcosta.compose-destinations",   name = "ksp",                             version.ref = "raamcosta"}
+
+
+[bundles]
+compose-bom = [
+    "androidx-compose-bom",
+    "androidx-compose-foundation",
+    "androidx-core-ktx-bom",
+    "androidx-lifecicle-ktx-bom",
+    "androidx-lifecycle-extension-bom",
+    "androidx-lifecycle-viewmodel",
+    "androidx-lifecycle-runtime",
+    "androidx-activity-compose-bom",
+    "androidx-compose-ui-bom",
+    "androidx-compose-ui-tooling-bom",
+    "androidx-compose-ui-graphics-bom",
+    "androidx-compose-material3-bom",
+    "androidx-compose-navigaiton-bom",
+]
+
+di-koin = [
+    "koin-compose",
+    "koin-core",
+]
+
+datastore = [
+    "androidx-datastore-preferences",
+    "androidx-datastore",
+    "kotlinx-collection-immutable",
+    "kotlinx-serialization-json",
+]
+
+firebase-bom = [
+    "firebase-analitics-bom",
+]
+
+accopmanist = [
+    "accompanist-systemuicontroller",
+    "accompanist-permissions",
+]
+
+
+
+[plugins]
+kotlin              = { id = "org.jetbrains.kotlin.android",                version.ref = "kotlin" }
+ksp                 = { id = "com.google.devtools.ksp",                     version.ref = "ksp" }
+serialization       = { id = "org.jetbrains.kotlin.plugin.serialization",   version.ref = "kotlin" }
+android-application = { id = "com.android.application",                     version.ref = "androidStudio"}
+android-library     = { id = "com.android.library",                         version.ref = "androidStudio"}

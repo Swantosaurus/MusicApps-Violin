@@ -38,7 +38,7 @@ class SingleFrequencyReader(
 
     val state = _state.asStateFlow()
 
-    private val scope = CoroutineScope(Job() + Dispatchers.IO)
+    private val scope = CoroutineScope(Dispatchers.IO + Job())
 
     private var job : Job? = null
 
@@ -59,7 +59,7 @@ class SingleFrequencyReader(
         this._silenceThreshold.value = silenceThreshold
     }
 
-    fun startSingleToneReading() {
+    fun start() {
         if (_state.value == FrequencyReaderState.Recording) {
             Timber.w("Already recording")
             return
@@ -69,7 +69,6 @@ class SingleFrequencyReader(
 
         startTransformOnNewThread()
     }
-
 
     private fun startTransformOnNewThread() {
         job = scope.launch {
@@ -86,8 +85,8 @@ class SingleFrequencyReader(
 
                 for (index in minFourierIndexSearched until maxFourierIndexSearched) {
                     var currentThreshold = maxValue
-                    if(maxValue == _silenceThreshold.value.toDouble()){
-                        if(Frequency.fromFourierIndex(index = index.toDouble()).value < 240){
+                    if (maxValue == _silenceThreshold.value.toDouble()) {
+                        if (Frequency.fromFourierIndex(index = index.toDouble()).value < 240) {
                             currentThreshold *= 0.6
                         }
                     }
@@ -100,7 +99,7 @@ class SingleFrequencyReader(
                         indexFromBottom = index
                         maxValue = frequencyDomain[index]
                     }
-                    if(counter != null) {
+                    if (counter != null) {
                         counter -= 1
                         if (counter <= 0) {
                             break
@@ -114,20 +113,25 @@ class SingleFrequencyReader(
                 }
 
                 val resultIndexes =
-                    FourierTransform.fineTuneDFT(pcmAudioData, from = indexFromBottom - 1, to = indexFromBottom + 1, accuracy)
+                    FourierTransform.fineTuneDFT(
+                        pcmAudioData,
+                        from = indexFromBottom - 1,
+                        to = indexFromBottom + 1,
+                        accuracy
+                    )
                         .map { it.magnitude() }
 
                 var finalIndex = -1
                 var finalMaxValue = -1.0
 
-                for(i in resultIndexes.indices){
-                    if(resultIndexes[i] > finalMaxValue){
+                for (i in resultIndexes.indices) {
+                    if (resultIndexes[i] > finalMaxValue) {
                         finalMaxValue = resultIndexes[i]
                         finalIndex = i
                     }
                 }
 
-                var resultIndex: Double = (indexFromBottom -1)  + finalIndex * accuracy
+                var resultIndex: Double = (indexFromBottom - 1) + finalIndex * accuracy
 
                 val mostRelevantFrequency: Double =
                     resultIndex * (PcmAudioRecorder.sampleRate.toDouble() / PcmAudioRecorder.readSize.toDouble())
@@ -137,9 +141,6 @@ class SingleFrequencyReader(
             }
         }
     }
-
-
-
 
     companion object {
         private const val accuracy = 0.01

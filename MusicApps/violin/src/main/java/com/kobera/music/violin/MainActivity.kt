@@ -11,6 +11,7 @@ import com.kobera.music.violin.feature.NavGraphs
 import com.kobera.music.violin.ui.theme.ViolinAppTheme
 import com.ramcosta.composedestinations.DestinationsNavHost
 
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -20,14 +21,10 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             ViolinAppTheme {
-                //setSystemBarColors()
-                // A surface container using the 'background' color from the theme
                 Surface(
                     color = MaterialTheme.colorScheme.surface
                 ) {
-
                     MainNavigation()
-                    //TunerScreen()
                 }
             }
         }

@@ -33,7 +33,7 @@ class PcmAudioRecorder(private val applicationContext : Context) {
 
     private var audioSamples = ShortArray(readSize)
 
-    private val scope = CoroutineScope(Job() + Dispatchers.IO)
+    private val scope = CoroutineScope(Job() + Dispatchers.Default)
     private var job : Job? = null
 
     fun start () {

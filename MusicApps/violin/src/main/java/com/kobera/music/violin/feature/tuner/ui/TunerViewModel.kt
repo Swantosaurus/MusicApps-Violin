@@ -13,22 +13,24 @@ import com.kobera.music.common.resource.ResourceProvider
 import com.kobera.music.common.sound.SingleFrequencyReader
 import com.kobera.music.common.sound.frequency_baseline.A4Frequency
 import com.kobera.music.violin.R
+import com.kobera.music.violin.feature.tuner.model.TunerSensitivityStorage
 import com.kobera.music.violin.sound.notes.violinStrings
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import timber.log.Timber
 import kotlin.math.pow
+
 
 class TunerViewModel(
     applicationContext: Context,
     private val resourceProvider: ResourceProvider,
     private val frequencyReader: SingleFrequencyReader,
-    val a4Frequency: A4Frequency
+    val a4Frequency: A4Frequency,
+    val tunerSensitivityStorage : TunerSensitivityStorage
 ): ViewModel() {
 
     private val _note : MutableStateFlow<LastNoteState> = MutableStateFlow(LastNoteState.Silence())
@@ -40,12 +42,12 @@ class TunerViewModel(
 
     val notesInTuner = _notesInTuner.asStateFlow()
 
-    val sensitivity : Flow<Float> = frequencyReader.silenceThreshold.map { (it.toDouble()/10_000_000).toFloat() }
+    val sensitivity : Flow<Float> = tunerSensitivityStorage.sensitivity
 
     private var lastHadNote: LastNoteState.HasNote? = null
 
     fun startRecording() {
-        frequencyReader.startSingleToneReading()
+        frequencyReader.start()
         viewModelScope.launch {
             frequencyReader.frequency.collect { it ->
                 when(it) {
@@ -71,14 +73,26 @@ class TunerViewModel(
                 }
             }
         }
+
+        viewModelScope.launch {
+            sensitivity.collect() {
+                setSensitivity(it, init = true)
+                cancel()
+            }
+        }
     }
 
     fun setA4Frequency(frequency: Double) {
         a4Frequency.set(frequency)
     }
 
-    fun setSensitivity(to: Double) {
-        Timber.d("setting sensitivity to : $to")
+    fun setSensitivity(to: Float, init : Boolean = false) {
+        if(!init) {
+            viewModelScope.launch {
+                tunerSensitivityStorage.storeSensitivity(to)
+            }
+        }
+
         frequencyReader.setSilenceThreshold((to*10_000_000).toLong())
     }
 

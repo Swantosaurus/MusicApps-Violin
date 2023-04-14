@@ -90,6 +90,10 @@ enum class InnerTwelveToneInterpretation {
 
     abstract fun previousTone() : InnerTwelveToneInterpretation
 
+    fun difference(other: InnerTwelveToneInterpretation): Int {
+        return this.ordinal - other.ordinal
+    }
+
     companion object {
         fun fromIndex(i : Int){
             assert(i in 0..11) {

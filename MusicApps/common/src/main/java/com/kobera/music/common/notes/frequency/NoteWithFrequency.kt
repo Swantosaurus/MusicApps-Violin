@@ -1,8 +1,8 @@
 package com.kobera.music.common.notes.frequency
 
-import com.kobera.music.common.notes.BasicNote
 import com.kobera.music.common.notes.InnerTwelveToneInterpretation
 import com.kobera.music.common.notes.TwelveToneNoteNames
+import com.kobera.music.common.notes.TwelvetoneNote
 import kotlin.math.pow
 
 
@@ -13,7 +13,7 @@ class NoteWithFrequency(
     val frequency: Double,
     private val rangeInterval: Double = 2.0.pow(1.0 / 24.0),
     private val inTuneInterval: Double = 2.0.pow(1.0 / 240.0),
-) : BasicNote(
+) : TwelvetoneNote(
     twelveNoteInterpretation = twelveNoteInterpretation,
     octave = octave
 ) {
@@ -22,6 +22,10 @@ class NoteWithFrequency(
         val diff = if (compareFreq > frequency) compareFreq / frequency else frequency / compareFreq
         return diff <= inTuneInterval
     }
+
+    fun isInTune() =
+        isInTune(compareFreq = this.frequency)
+
 
     fun isInRange(compareFreq: Double): Boolean {
         val diff = if (compareFreq > frequency) compareFreq / frequency else frequency / compareFreq

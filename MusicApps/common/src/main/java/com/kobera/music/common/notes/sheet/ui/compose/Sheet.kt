@@ -5,7 +5,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -14,13 +17,14 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.kobera.music.common.notes.BasicNote
 import com.kobera.music.common.notes.InnerTwelveToneInterpretation.B
 import com.kobera.music.common.notes.InnerTwelveToneInterpretation.D
 import com.kobera.music.common.notes.InnerTwelveToneInterpretation.G
+import com.kobera.music.common.notes.TwelvetoneNote
 import com.kobera.music.common.notes.sheet.InnerSheetNote
 import com.kobera.music.common.notes.sheet.SheetNote
 import com.kobera.music.common.notes.sheet.SheetNote.SheetNoteParams.Accidental
@@ -28,6 +32,10 @@ import com.kobera.music.common.notes.sheet.ui.Clef
 import com.kobera.music.common.notes.sheet.ui.KeySignature
 import com.kobera.music.common.notes.sheet.ui.NotePath
 import com.kobera.music.common.notes.sheet.ui.PathAndCenterOffset
+import org.koin.androidx.compose.getViewModel
+import timber.log.Timber
+
+
 
 
 @Composable
@@ -35,44 +43,51 @@ fun Sheet(
     modifier: Modifier = Modifier,
     notes: List<SheetNote>,
     clef: Clef = Clef.Violin,
-    keySignature: KeySignature
+    keySignature: KeySignature,
+    height : Float = 240f,
+    sheetViewModel: SheetViewModel = getViewModel()
 ) {
-    val height = 240f
     val lineHeight = height / 6
     val sheetSpacing = 100f
     val sheetSpacingFromLeft = 40f
     val clefPainter = painterResource(clef.resource)
-    Canvas(
-        modifier = Modifier
-            .fillMaxWidth()
-    ) {
-        var notesToDraw = notes
-        var index = 0
-        while (notesToDraw.isNotEmpty()) {
-            var spcacingFromLeft = sheetSpacingFromLeft
-            translate(top = index * (height + sheetSpacing) + sheetSpacing) {
-                drawSheetLines(lineHeight = lineHeight)
+    val density = LocalDensity.current
 
+    val currentHeight by sheetViewModel.heightFlow.collectAsState()
 
-                spcacingFromLeft = drawClef(
-                    notationHeight = height,
-                    spacingFromLeft = spcacingFromLeft,
-                    painter = clefPainter
-                )
-                //spcacingFromLeft = drawTimeSignature(spacingFromLeft = spcacingFromLeft)
-                spcacingFromLeft = drawKeySignature(
-                    spacingFromLeft = spcacingFromLeft,
-                    keySignature = keySignature,
-                    lineHeight = lineHeight
-                )
-                notesToDraw = drawNotes(
-                    keySignature = keySignature,
-                    notes = notesToDraw,
-                    lineHeight = lineHeight,
-                    spacingFromLeft = spcacingFromLeft
-                )
+    Box(modifier.height(with(density){currentHeight.toDp()})) {
+        Canvas(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            var numberOfSheetIndex = 0
+            var notesToDraw = notes
+            while (notesToDraw.isNotEmpty()) {
+                var spcacingFromLeft = sheetSpacingFromLeft
+                val topSpacing = numberOfSheetIndex * (height + sheetSpacing) + sheetSpacing
+                Timber.d("topSpacing: $topSpacing notesToDraw: $notesToDraw")
+                translate(top = topSpacing) {
+                    drawSheetLines(lineHeight = lineHeight)
+                    spcacingFromLeft = drawClef(
+                        notationHeight = height,
+                        spacingFromLeft = spcacingFromLeft,
+                        painter = clefPainter
+                    )
+                    //spcacingFromLeft = drawTimeSignature(spacingFromLeft = spcacingFromLeft)
+                    spcacingFromLeft = drawKeySignature(
+                        spacingFromLeft = spcacingFromLeft,
+                        keySignature = keySignature,
+                        lineHeight = lineHeight
+                    )
+                    notesToDraw = drawNotes(
+                        keySignature = keySignature,
+                        notes = notesToDraw,
+                        lineHeight = lineHeight,
+                        spacingFromLeft = spcacingFromLeft
+                    )
+                }
+                numberOfSheetIndex++
             }
-            index++
+            sheetViewModel.setHeight(numberOfSheetIndex * (height + sheetSpacing) + sheetSpacing)
         }
     }
 }
@@ -495,7 +510,7 @@ private fun DrawScope.drawAccidental(
     accidentalToDraw?.let {
         translate(
             left = spacingFromLeft,
-            top = -noteSpacing * (note.sheetDifference(BasicNote(G, 5)) - 1)
+            top = -noteSpacing * (note.sheetDifference(TwelvetoneNote(G, 5)) - 1)
         ) {
             when (accidentalToDraw) {
                 Accidental.None -> drawNatural(lineHeight = lineHeight)
@@ -619,7 +634,7 @@ private fun DrawScope.drawNote(
         getNotePathAndCenterOffset(note = note, lineHeight = lineHeight)
 
 
-    translate(top = noteStep * (-note.sheetDifference(BasicNote(G, 5)))) {
+    translate(top = noteStep * (-note.sheetDifference(TwelvetoneNote(G, 5)))) {
         translate(left = spacingFromLeft, top = -notePath.centerOffset.y + noteStep) {
             drawPath(notePath.path, Color.Black)
         }
@@ -631,14 +646,14 @@ private fun DrawScope.drawNote(
 private fun getNotePathAndCenterOffset(note: SheetNote, lineHeight: Float): PathAndCenterOffset =
     when (note.noteParams.duration) {
         SheetNote.SheetNoteParams.Duration.Quarter -> {
-            if (note > BasicNote(G, octave = 5) || note < BasicNote(D, 3)) {
+            if (note > TwelvetoneNote(G, octave = 5) || note < TwelvetoneNote(D, 3)) {
                 TODO()
             }
 
             NotePath.drawQuarterNote(
                 lineHeightPx = lineHeight,
                 legLength = lineHeight * 3,
-                facingDown = note > BasicNote(B, 4)
+                facingDown = note > TwelvetoneNote(B, 4)
             )
         }
 

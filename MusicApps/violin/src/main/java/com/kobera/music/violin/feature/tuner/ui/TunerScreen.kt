@@ -1,6 +1,7 @@
 package com.kobera.music.violin.feature.tuner.ui
 
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.net.Uri
 import android.provider.Settings
 import androidx.compose.animation.AnimatedVisibility
@@ -41,7 +42,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
@@ -67,8 +67,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
-import com.google.accompanist.permissions.PermissionStatus
-import com.google.accompanist.permissions.rememberPermissionState
+import com.kobera.music.common.ui.component.HandleAudioPermission
+import com.kobera.music.common.ui.util.lockScreenOrientation
 import com.kobera.music.common.ui.util.setSystemBarColors
 import com.kobera.music.common.util.toStringWithNDecimals
 import com.kobera.music.violin.R
@@ -82,18 +82,19 @@ import kotlin.math.absoluteValue
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun TunerScreen(tunerViewModel: TunerViewModel = getViewModel()) {
-    val permission = rememberPermissionState(permission = android.Manifest.permission.RECORD_AUDIO)
     val noteState by tunerViewModel.note.collectAsStateWithLifecycle()
     val sensitivity by tunerViewModel.sensitivity.collectAsStateWithLifecycle(initialValue = 0.2f)
     val a4frequency by tunerViewModel.a4Frequency.frequency.collectAsStateWithLifecycle()
     val notesInTunerState by tunerViewModel.notesInTuner.collectAsStateWithLifecycle()
 
-    LaunchedEffect(key1 = Unit) {
-        permission.launchPermissionRequest()
-    }
 
-    when (permission.status) {
-        is PermissionStatus.Granted -> {
+    lockScreenOrientation(
+        orientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT,
+        unlockAfterExitingScreen = true
+    )
+
+    HandleAudioPermission(
+        permissionGranted = {
             DisposableEffect(key1 = Unit) {
                 tunerViewModel.startRecording()
                 onDispose { tunerViewModel.stopRecording() }
@@ -101,27 +102,22 @@ fun TunerScreen(tunerViewModel: TunerViewModel = getViewModel()) {
 
             TunerScreenBody(
                 tunerViewModel = tunerViewModel,
-                noteState = noteState,
+                noteState = { noteState },
                 sensitivity = { sensitivity },
                 a4frequency = { a4frequency },
-                { notesInTunerState })
-        }
-
-        is PermissionStatus.Denied -> {
-            if ((permission.status as PermissionStatus.Denied).shouldShowRationale) {
-                ShowRationale(permissionState = permission)
-            } else {
-                OpenSettingsOrRestartApp()
-            }
-        }
-    }
+                notesInTunerState = { notesInTunerState }
+            )
+        },
+        showRationale = { ShowRationale(permissionState = it) },
+        permissionDenied = { OpenSettingsOrRestartApp() }
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TunerScreenBody(
     tunerViewModel: TunerViewModel?,
-    noteState: LastNoteState,
+    noteState: () -> LastNoteState,
     sensitivity: () -> Float,
     a4frequency: () -> Double,
     notesInTunerState: () -> NotesInTunerState,
@@ -166,7 +162,7 @@ private fun TunerScreenBody(
 
                     TunerMeter(
                         Modifier.aspectRatio(11f / 9),
-                        noteState = noteState
+                        noteStateLambda = noteState
                     )
                 }
             }
@@ -180,17 +176,19 @@ private fun TunerScreenBody(
                 sensitivity = sensitivity
             )
             Box(Modifier.fillMaxSize(), contentAlignment = Center) {
-                ViolinStrings(noteState = noteState)
+                ViolinStrings(noteStateLambda = noteState)
             }
         }
     }
 }
 
 @Composable
-fun ViolinStrings(noteState: LastNoteState) {
+fun ViolinStrings(noteStateLambda: () -> LastNoteState) {
     val primaryColor = MaterialTheme.colorScheme.primary
     val secondaryColor = MaterialTheme.colorScheme.secondary
     val errorColor = MaterialTheme.colorScheme.error
+    val noteState = noteStateLambda()
+
     BoxWithConstraints(
         Modifier
             .height(250.dp)
@@ -248,7 +246,11 @@ fun ViolinStrings(noteState: LastNoteState) {
 }
 
 @Composable
-private fun SensitivitySetting(modifier: Modifier = Modifier, setSensitivity: (Double) -> Unit, sensitivity: () -> Float){
+private fun SensitivitySetting(
+    modifier: Modifier = Modifier,
+    setSensitivity: (Float) -> Unit,
+    sensitivity: () -> Float
+) {
     Column(modifier.padding(horizontal = 10.dp)) {
         Text(modifier = Modifier.fillMaxWidth(), text = "Sensitivity", textAlign = TextAlign.Center)
         Row(Modifier.verticalScroll(rememberScrollState())) {
@@ -257,15 +259,14 @@ private fun SensitivitySetting(modifier: Modifier = Modifier, setSensitivity: (D
             Text(text = "High")
         }
         Slider(
-            value = (sensitivity()-1).absoluteValue,
+            value = (sensitivity() - 1).absoluteValue,
             onValueChange = {
-            setSensitivity(((it.toDouble() - 1).absoluteValue))
+                setSensitivity(((it - 1).absoluteValue))
             }
         )
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun FrequencySetting(modifier : Modifier = Modifier, a4frequency: Int, setFrequency: (Int) -> Unit) {
     Row(
@@ -328,7 +329,8 @@ private fun OnlyViolinNotes(
 }
 
 @Composable
-private fun TunerMeter(modifier: Modifier = Modifier, noteState: LastNoteState) {
+private fun TunerMeter(modifier: Modifier = Modifier, noteStateLambda: () -> LastNoteState) {
+    val noteState = noteStateLambda()
     BoxWithConstraints(modifier = modifier){
         Column (modifier = Modifier.padding(20.dp)) {
             Spacer(modifier = Modifier.weight(1f))
