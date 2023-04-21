@@ -6,6 +6,13 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.platform.LocalContext
 import timber.log.Timber
 
+/**
+ * Locks the screen orientation to a given orientation.
+ *
+ * @param orientation The orientation to lock the screen to. see [ActivityInfo.SCREEN_ORIENTATION_]
+ * @param unlockAfterExitingScreen Whether to unlock the screen orientation after the screen is
+ * exited.
+ */
 @Composable
 fun lockScreenOrientation(orientation: Int, unlockAfterExitingScreen: Boolean = false) {
     val context = LocalContext.current

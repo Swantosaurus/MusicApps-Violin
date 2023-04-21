@@ -8,7 +8,11 @@ import kotlinx.coroutines.flow.map
 
 val Context.gamesAudioSensitivityStorage by preferencesDataStore(name = "games_audio_sensitivity_storage")
 
-
+/**
+ * A storage for the games audio sensitivity in preferences.
+ *
+ * @param applicationContext The application context.
+ */
 class GamesAudioSensitivityStorage(applicationContext: Context) {
     val dataStore = applicationContext.gamesAudioSensitivityStorage
     val key = floatPreferencesKey("sensitivity")
@@ -18,6 +22,11 @@ class GamesAudioSensitivityStorage(applicationContext: Context) {
     }
 
 
+    /**
+     * Updates the sensitivity.
+     *
+     * @param sensitivity The sensitivity.
+     */
     suspend fun updateSensitivity(sensitivity: Float) {
         dataStore.edit { preferences ->
             preferences[key] = sensitivity

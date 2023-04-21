@@ -14,28 +14,37 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 
+/**
+ * A PCM audio recorder. Start recording audio on IO thread and emit the audio data as a flow.
+ *
+ * @param applicationContext The application context.
+ */
 class PcmAudioRecorder(private val applicationContext : Context) {
     private var _pcmAudioDataFlow : MutableSharedFlow<ShortArray> = MutableSharedFlow()
 
+    /**
+     * The audio data flow. Emits the audio data as a flow. Supports collecten on multiple locations
+     */
     val pcmAudioDataFlow = _pcmAudioDataFlow.asSharedFlow()
 
     private var _state : MutableStateFlow<PcmAudioRecorderState> = MutableStateFlow(
         PcmAudioRecorderState.Stopped
     )
 
-    val state = _state.asStateFlow()
-
     private var audioRecord: AudioRecord? = null
 
     private var audioSamples = ShortArray(readSize)
 
-    private val scope = CoroutineScope(Job() + Dispatchers.Default)
+    private val scope = CoroutineScope(Job() + Dispatchers.IO)
+
     private var job : Job? = null
 
+    /**
+     * starts recording audio
+     */
     fun start () {
         _state.value = PcmAudioRecorderState.Recording
 
@@ -51,6 +60,17 @@ class PcmAudioRecorder(private val applicationContext : Context) {
             }
             cancel()
         }
+    }
+
+    /**
+     * stops recording audio
+     */
+    fun stop(){
+        assert(_state.value == PcmAudioRecorderState.Recording)
+        _state.value = PcmAudioRecorderState.Stopped
+        audioRecord!!.stop()
+        audioRecord!!.release()
+        audioRecord = null
     }
 
     private fun initializeAudioRecord(){
@@ -72,14 +92,6 @@ class PcmAudioRecorder(private val applicationContext : Context) {
         audioRecord!!.startRecording()
     }
 
-    fun stop(){
-        assert(_state.value == PcmAudioRecorderState.Recording)
-        _state.value = PcmAudioRecorderState.Stopped
-        audioRecord!!.stop()
-        audioRecord!!.release()
-        audioRecord = null
-    }
-
     companion object {
         const val sampleRate = 192_000
         const val readSize = 32_768 // 2 pow 15
@@ -90,6 +102,10 @@ class PcmAudioRecorder(private val applicationContext : Context) {
         Stopped
     }
 }
+
+/**
+ * Defines translation between frequency and fourier index
+ */
 fun Frequency.Companion.fromFourierIndex(index: Double): Frequency =
     Frequency(index* PcmAudioRecorder.sampleRate/PcmAudioRecorder.readSize)
 

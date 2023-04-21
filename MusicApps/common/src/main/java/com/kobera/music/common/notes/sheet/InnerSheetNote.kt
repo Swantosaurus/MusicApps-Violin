@@ -1,5 +1,9 @@
 package com.kobera.music.common.notes.sheet
 
+
+/**
+ * Represents a note in a ovtave in sheet notation.
+ */
 enum class InnerSheetNote {
     C,
     D,

@@ -3,6 +3,9 @@ package com.kobera.music.common.notes.frequency
 import com.kobera.music.common.notes.InnerTwelveToneInterpretation
 import com.kobera.music.common.notes.Notes
 
+/**
+ * Transforms a frequency to a note.
+ */
 object FrequencyToNote {
     fun transform(
         frequency: Double,

@@ -10,16 +10,29 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import kotlin.math.roundToInt
 
+/**
+ * A single frequency reader. Reads the frequency of a single frequency from a PCM audio stream.
+ *
+ * @param pcmAudioRecorder The PCM audio recorder.
+ * @param minSearchedFrequency The minimum frequency to search for.
+ * @param maxSearchedFrequency The maximum frequency to search for.
+ * @param accuracy The accuracy of the frequency search.
+ * @param silenceThreshold The silence threshold.
+ */
 class SingleFrequencyReader(
     private val pcmAudioRecorder: PcmAudioRecorder,
     minSearchedFrequency: Frequency = Frequency(150.0),
     maxSearchedFrequency: Frequency = Frequency(2000.0),
+    private val accuracy: Double = 0.01,
     silenceThreshold: Long = 3_000_000L
 ) {
     private val _frequency : MutableStateFlow<FrequencyState> = MutableStateFlow(
         FrequencyState.Silence
     )
 
+    /**
+     * The frequency flow. Emits the frequency as a flow.
+     */
     val frequency = _frequency.asStateFlow()
 
     private val maxFourierIndexSearched = maxSearchedFrequency.toFourierIndexIntRoundDown()
@@ -29,14 +42,10 @@ class SingleFrequencyReader(
 
     private var _silenceThreshold : MutableStateFlow<Long> = MutableStateFlow(silenceThreshold)
 
-    val silenceThreshold = _silenceThreshold.asStateFlow()
-
     private val _state: MutableStateFlow<FrequencyReaderState> =
         MutableStateFlow(
             FrequencyReaderState.Stopped
         )
-
-    val state = _state.asStateFlow()
 
     private val scope = CoroutineScope(Dispatchers.IO + Job())
 
@@ -118,8 +127,7 @@ class SingleFrequencyReader(
                         from = indexFromBottom - 1,
                         to = indexFromBottom + 1,
                         accuracy
-                    )
-                        .map { it.magnitude() }
+                    ).map { it.magnitude() }
 
                 var finalIndex = -1
                 var finalMaxValue = -1.0
@@ -131,7 +139,7 @@ class SingleFrequencyReader(
                     }
                 }
 
-                var resultIndex: Double = (indexFromBottom - 1) + finalIndex * accuracy
+                val resultIndex: Double = (indexFromBottom - 1) + finalIndex * accuracy
 
                 val mostRelevantFrequency: Double =
                     resultIndex * (PcmAudioRecorder.sampleRate.toDouble() / PcmAudioRecorder.readSize.toDouble())
@@ -140,10 +148,6 @@ class SingleFrequencyReader(
                 _frequency.value = FrequencyState.HasFrequency(mostRelevantFrequency)
             }
         }
-    }
-
-    companion object {
-        private const val accuracy = 0.01
     }
 
     sealed interface FrequencyState {

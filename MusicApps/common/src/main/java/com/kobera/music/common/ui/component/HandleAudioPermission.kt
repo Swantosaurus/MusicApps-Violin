@@ -8,6 +8,13 @@ import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.PermissionStatus
 import com.google.accompanist.permissions.rememberPermissionState
 
+/**
+ *  Wrapper for the permission composable that handles the different states of the permission.
+ *
+ *  @param permissionGranted: The composable to show when the permission is granted.
+ *  @param showRationale: The composable to show when the permission is denied but the user still can request it.
+ *  @param permissionDenied: The composable to show when the permission is denied and the user can't request it.
+ */
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun HandleAudioPermission(

@@ -4,6 +4,11 @@ import android.content.Context
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
+/**
+ * A class that stores the frequency of A4 to android preferences.
+ *
+ * @param applicationContext The application context.
+ */
 class A4Frequency(applicationContext: Context) {
     private var _frequency : MutableStateFlow<Double>
     private val preferences = applicationContext.getSharedPreferences("default_a4frequency", Context.MODE_PRIVATE)

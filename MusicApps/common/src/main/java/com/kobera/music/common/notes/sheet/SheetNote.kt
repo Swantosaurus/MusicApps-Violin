@@ -3,7 +3,9 @@ package com.kobera.music.common.notes.sheet
 import com.kobera.music.common.notes.InnerTwelveToneInterpretation
 import com.kobera.music.common.notes.TwelvetoneNote
 
-
+/*
+ * Represents a note for sheet music.
+ */
 data class SheetNote(
     val innerSheetNote: InnerSheetNote,
     val noteParams: SheetNoteParams = SheetNoteParams(),

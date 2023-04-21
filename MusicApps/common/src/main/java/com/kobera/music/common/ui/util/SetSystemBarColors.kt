@@ -7,10 +7,14 @@ import androidx.compose.ui.graphics.Color
 import com.google.accompanist.systemuicontroller.SystemUiController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
-
 /**
- * sets colors of system bars
- * has to be in main module to work properly
+ * Sets the system bar colors.
+ *
+ * @param topBarColor The color of the top bar.
+ * @param bottomBarColor The color of the bottom bar.
+ * @param darkIconsTopBar Whether to use dark icons on the top bar.
+ * @param darkIconsBottomBar Whether to use dark icons on the bottom bar.
+ * @param systemUiController The system UI controller.
  */
 @Composable
 fun setSystemBarColors(

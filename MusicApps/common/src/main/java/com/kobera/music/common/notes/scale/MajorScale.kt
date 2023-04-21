@@ -5,6 +5,9 @@ import com.kobera.music.common.notes.sheet.ui.KeySignature
 import kotlinx.serialization.Serializable
 
 
+/**
+ * Represents a major scale.
+ */
 @Serializable
 enum class MajorScale : Scale {
     Cb {

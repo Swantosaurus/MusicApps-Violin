@@ -4,6 +4,9 @@ import timber.log.Timber
 import kotlin.math.cos
 import kotlin.math.sin
 
+/**
+ *
+ */
 object FourierTransform {
     fun dft(sampleData : ShortArray) : Array<ComplexNumber> =
         dft(sampleData.map { ComplexNumber(it.toDouble(), 0.0) }.toTypedArray())

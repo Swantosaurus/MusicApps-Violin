@@ -5,7 +5,9 @@ import com.kobera.music.common.notes.TwelveToneNoteNames
 import com.kobera.music.common.notes.TwelvetoneNote
 import kotlin.math.pow
 
-
+/**
+ * Represents a note with a frequency to compare if its in tune or not.
+ */
 class NoteWithFrequency(
     twelveNoteInterpretation: InnerTwelveToneInterpretation,
     val name: String,

@@ -3,6 +3,9 @@ package com.kobera.music.common.notes.scale
 import com.kobera.music.common.notes.sheet.SheetNote
 import com.kobera.music.common.notes.sheet.ui.KeySignature
 
+/**
+ * Represents a minor scale.
+ */
 enum class MinorScale : Scale {
     Ab {
         override fun getKeySignature() = KeySignature.Flats(7)
