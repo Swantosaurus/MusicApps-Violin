@@ -4,9 +4,11 @@ import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -23,10 +25,14 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.kobera.music.common.notes.InnerTwelveToneInterpretation.*
+import com.kobera.music.common.notes.sheet.InnerSheetNote
+import com.kobera.music.common.notes.sheet.SheetNote
+import com.kobera.music.common.notes.sheet.ui.KeySignature
 import com.kobera.music.common.notes.sheet.ui.compose.Sheet
 import com.kobera.music.common.ui.component.HandleAudioPermission
 import com.ramcosta.composedestinations.annotation.Destination
@@ -80,7 +86,25 @@ fun RecognizeNoteScreenBody(
                 }
 
                 is GeneratedNoteState.Ready -> {
-                    DisplaySheet(generatedNoteState.noteAndKeySignature)
+                    if(viewModel != null) {
+                        DisplaySheet(generatedNoteState.noteAndKeySignature)
+                    } else {
+                        Canvas(modifier = Modifier.height(200.dp)){
+                            //TODO()
+                            drawLine(
+                                color = Color.Red,
+                                start = androidx.compose.ui.geometry.Offset(0f, 0f),
+                                end = androidx.compose.ui.geometry.Offset(100f, 100f),
+                                strokeWidth = 10f
+                            )
+                            drawLine(
+                                color = Color.Red,
+                                start = androidx.compose.ui.geometry.Offset(0f, 100f),
+                                end = androidx.compose.ui.geometry.Offset(100f, 0f),
+                                strokeWidth = 10f
+                            )
+                        }
+                    }
                     SensitivitySlider(sensitivity = sensitivity) {
                         viewModel?.setSilenceTreashold(it)
                     }
@@ -211,5 +235,24 @@ private fun DisplaySheet(noteAndKeySignature: NoteAndKeySignature) {
             noteAndKeySignature.note
         ),
         keySignature = noteAndKeySignature.keySignature
+    )
+}
+
+@Preview
+@Composable
+fun RecognizeNotePreview() {
+    RecognizeNoteScreenBody(
+        viewModel = null,
+        generatedNoteState = GeneratedNoteState.Ready(
+            NoteAndKeySignature(
+                note = SheetNote(
+                    innerSheetNote = InnerSheetNote.C,
+                    octave = 4,
+                ),
+                keySignature = KeySignature.Sharps(1)
+            )
+        ),
+        sensitivity = { 0.5f },
+        recognizeNoteState = { RecognizeNoteState.InTune }
     )
 }

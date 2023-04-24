@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kobera.music.common.ui.util.setSystemBarColors
 import com.kobera.music.violin.R
@@ -42,15 +43,15 @@ fun StartingScreen(navigator: DestinationsNavigator) {
 fun StartingScreenBody(modifier: Modifier = Modifier, navigator: DestinationsNavigator?) {
     setSystemBarColors()
     Column(modifier = modifier) {
-        Graphs()
+        Stats()
         Navigation(navigator = navigator)
     }
 }
 
 
 @Composable
-private fun Graphs() {
-
+private fun Stats() {
+    //TODO
 }
 
 
@@ -103,4 +104,15 @@ fun NavigationItem(icon: Painter, title: String, navigate: () -> Unit) {
         Icon(painter = icon, contentDescription = null)
         Text(text = title)
     }
+}
+
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFFFFFFFF,
+    showSystemUi = true,
+    name = "Starting Screen"
+)
+@Composable
+fun StartingScreenPreview(){
+    StartingScreenBody(navigator = null)
 }
