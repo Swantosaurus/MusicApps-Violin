@@ -27,7 +27,7 @@ object Notes {
         return tones
     }
 
-    val defaultA4Frequency = 440.0
+    const val defaultA4Frequency = 440.0
 }
 
 

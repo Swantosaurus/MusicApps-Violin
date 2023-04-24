@@ -42,10 +42,15 @@ class PcmAudioRecorder(private val applicationContext : Context) {
 
     private var job : Job? = null
 
+
     /**
      * starts recording audio
      */
     fun start () {
+        if(_state.value == PcmAudioRecorderState.Recording){
+            return
+        }
+
         _state.value = PcmAudioRecorderState.Recording
 
         job = scope.launch {
@@ -71,6 +76,8 @@ class PcmAudioRecorder(private val applicationContext : Context) {
         audioRecord!!.stop()
         audioRecord!!.release()
         audioRecord = null
+        job!!.cancel()
+        job = null
     }
 
     private fun initializeAudioRecord(){

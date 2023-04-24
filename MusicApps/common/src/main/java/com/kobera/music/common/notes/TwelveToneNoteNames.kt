@@ -4,11 +4,9 @@ import kotlin.math.pow
 
 
 /**
-Twelvetone-represantation of notes
-
-!! names has to be set before using !!
-
-names differ in languages
+ * Twelvetone-represantation of notes
+ *
+ * !! names has to be set before using !! -- names differ in languages
  */
 object TwelveToneNoteNames {
     private var names: Array<String>? = null
