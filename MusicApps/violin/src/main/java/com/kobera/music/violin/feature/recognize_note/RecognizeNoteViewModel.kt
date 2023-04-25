@@ -103,65 +103,64 @@ class RecognizeNoteViewModel(
                     lastNote = null
                 }
                 is FrequencyState.HasFrequency -> {
-                    (_generatedNote.value as? GeneratedNoteState.Ready)?.let { ready ->
-                        if (_recognizeNoteState.value !is RecognizeNoteState.NotEntered) {
-                            return@collect
-                        }
-                        val noteFromFrequency = FrequencyToNote.findClosestNote(
-                            frequency = frequencyState.frequency,
-                            notes = Notes.getNotes(a4Frequency.frequency.value, inTunePrecision = Notes.InTunePrecision.MEDIUM).values
-                        )
-
-                        //playing can ocure in middle of searched sector therefor 1.st note is not correct
-                        if(lastNote == null || ! (lastNote!! sameNoteAs noteFromFrequency)) {
-                            lastNote = noteFromFrequency
-                            return@collect
-                        }
-
-
-                        _recognizeNoteState.value =
-                            if (noteFromFrequency sameNoteAs ready.noteAndKeySignature.note.toTwelveTone()) {
-                                if (noteFromFrequency.isInTune(frequencyState.frequency)) {
-                                    val res = RecognizeNoteState.InTune()
-                                    scoreRepository.insertScore(
-                                        ScoreEntity(
-                                            0,
-                                            ScoreType.RecognizeNote,
-                                            res.scoreAdded,
-                                            now().toEpochMilli()
-                                        )
-                                    )
-                                    res
-                                } else {
-                                    val differenceAngle = noteFromFrequency.getDifferenceAngle(
-                                        frequencyState.frequency,
-                                        180.0
-                                    )
-                                    scoreRepository.insertScore(
-                                        ScoreEntity(
-                                            0,
-                                            ScoreType.RecognizeNote,
-                                            60,
-                                            now().toEpochMilli()
-                                        )
-                                    )
-                                    if (differenceAngle > 0) {
-                                        RecognizeNoteState.NotInTuneAbove()
-                                    } else {
-                                        RecognizeNoteState.NotInTuneBelow()
-                                    }
-                                }
-                            } else {
-                                RecognizeNoteState.Wrong(SheetNote.fromTwelveTone(noteFromFrequency))
-                            }
-                        resetAnimation()
+                    if(_generatedNote.value !is GeneratedNoteState.Ready) {
+                        return@collect
                     }
+                    if (_recognizeNoteState.value !is RecognizeNoteState.NotEntered) {
+                        return@collect
+                    }
+                    val noteFromFrequency = FrequencyToNote.findClosestNote(
+                        frequency = frequencyState.frequency,
+                        notes = Notes.getNotes(a4Frequency.frequency.value, inTunePrecision = Notes.InTunePrecision.MEDIUM).values
+                    )
+
+                    //playing can ocure in middle of searched sector therefor 1.st note is not correct
+                    if(lastNote == null || ! (lastNote!! sameNoteAs noteFromFrequency)) {
+                        lastNote = noteFromFrequency
+                        return@collect
+                    }
+                    val toShow = newToShowState(
+                        noteFromFrequency = noteFromFrequency,
+                        ready = _generatedNote.value as GeneratedNoteState.Ready,
+                        frequencyState = frequencyState
+                    )
+
+                    _recognizeNoteState.value = toShow
+                    insertScoreToDb(toShow.scoreAdded)
+                    resetAnimation()
                 }
             }
         }
     }
 
-    private fun resetAnimation(){
+
+
+    private  fun newToShowState(
+        noteFromFrequency: NoteWithFrequency,
+        ready: GeneratedNoteState.Ready,
+        frequencyState: FrequencyState.HasFrequency
+    ): RecognizeNoteState.ToShow {
+        return if (noteFromFrequency sameNoteAs ready.noteAndKeySignature.note.toTwelveTone()) {
+            if (noteFromFrequency.isInTune(frequencyState.frequency)) {
+                RecognizeNoteState.InTune()
+            } else {
+                val differenceAngle = noteFromFrequency.getDifferenceAngle(
+                    frequencyState.frequency,
+                    180.0
+                )
+                if (differenceAngle > 0) {
+                    RecognizeNoteState.NotInTuneAbove()
+                } else {
+                    RecognizeNoteState.NotInTuneBelow()
+                }
+            }
+        } else {
+            RecognizeNoteState.Wrong(SheetNote.fromTwelveTone(noteFromFrequency))
+        }
+
+    }
+
+    private fun resetAnimation() {
         viewModelScope.launch {
             delay(3.seconds)
             _recognizeNoteState.value =
@@ -169,7 +168,7 @@ class RecognizeNoteViewModel(
                     visible = false
                 )
             delay(1.seconds)
-            setSilence()
+            resetRecognizeNoteState()
             generateRandomNote()
         }
     }
@@ -191,6 +190,7 @@ class RecognizeNoteViewModel(
         singleFrequencyReader.setSilenceThreshold((to * 15_000_000).toLong())
     }
 
+    //TODO select scales
     fun updateScales(scales: RecognizeNoteScales) {
         viewModelScope.launch {
             scalesDataStore.updateData { scales }
@@ -206,30 +206,38 @@ class RecognizeNoteViewModel(
             is GeneratedNoteState.Ready -> {
                 val generatedNote =
                     (generatedNote.value as GeneratedNoteState.Ready).noteAndKeySignature.note.toTwelveTone()
-                if (generatedNote sameNoteAs input) {
-                    val newState = RecognizeNoteState.InTuneKeyInput()
-                    viewModelScope.launch {
-                        scoreRepository.insertScore(
-                            ScoreEntity(
-                                0,
-                                ScoreType.RecognizeNote,
-                                newState.scoreAdded,
-                                now().toEpochMilli()
-                            )
-                        )
-                    }
-                    _recognizeNoteState.value = newState
+
+                val newState = if (generatedNote sameNoteAs input) {
+                    RecognizeNoteState.InTuneKeyInput()
+                } else {
+                    RecognizeNoteState.Wrong(SheetNote.fromTwelveTone(twelveTone = input), true)
                 }
-                else{
-                    _recognizeNoteState.value = RecognizeNoteState.Wrong(SheetNote.fromTwelveTone(twelveTone = input), true )
-                }
+
+                insertScoreToDb(newState.scoreAdded)
+
+                _recognizeNoteState.value = newState
+
                 viewModelScope.launch {
-                   resetAnimation()
+                    resetAnimation()
                 }
             }
         }
     }
 
+    private fun insertScoreToDb(score: Int) {
+        viewModelScope.launch {
+            scoreRepository.insertScore(
+                ScoreEntity(
+                    0,
+                    ScoreType.RecognizeNote,
+                    score,
+                    now().toEpochMilli()
+                )
+            )
+        }
+    }
+
+    //TODO selectScales
     private fun generateRandomNote() {
         when (_scales.value) {
             is RecognizeNoteScaleState.Loading -> {}
@@ -250,7 +258,7 @@ class RecognizeNoteViewModel(
         }
     }
 
-    private fun setSilence() {
+    private fun resetRecognizeNoteState() {
         _recognizeNoteState.value = RecognizeNoteState.NotEntered
     }
 }
