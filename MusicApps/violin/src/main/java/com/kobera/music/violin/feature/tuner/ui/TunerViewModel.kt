@@ -9,7 +9,6 @@ import com.kobera.music.common.notes.Notes
 import com.kobera.music.common.notes.TwelveToneNoteNames
 import com.kobera.music.common.notes.frequency.FrequencyToNote
 import com.kobera.music.common.notes.frequency.NoteWithFrequency
-import com.kobera.music.common.resource.ResourceProvider
 import com.kobera.music.common.sound.SingleFrequencyReader
 import com.kobera.music.common.sound.frequency_baseline.A4Frequency
 import com.kobera.music.violin.feature.tuner.model.TunerSensitivityStorage
@@ -26,7 +25,6 @@ import kotlin.math.pow
 
 class TunerViewModel(
     applicationContext: Context,
-    private val resourceProvider: ResourceProvider,
     private val frequencyReader: SingleFrequencyReader,
     val a4Frequency: A4Frequency,
     val tunerSensitivityStorage : TunerSensitivityStorage

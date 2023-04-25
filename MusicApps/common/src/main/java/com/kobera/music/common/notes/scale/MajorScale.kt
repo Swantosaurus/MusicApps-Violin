@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 
 
 /**
- * Represents a major scale.
+ * List of MajorScales
  */
 @Serializable
 enum class MajorScale : Scale {

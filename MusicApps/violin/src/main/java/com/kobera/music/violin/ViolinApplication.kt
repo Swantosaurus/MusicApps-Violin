@@ -5,7 +5,9 @@ import com.kobera.music.common.model.gamesSensitivityModule
 import com.kobera.music.common.notes.TwelveToneNoteNames
 import com.kobera.music.common.notes.sheet.ui.compose.sheetModule
 import com.kobera.music.common.resource.di.resourcesModule
+import com.kobera.music.common.score.di.scoreModule
 import com.kobera.music.common.sound.di.soundModule
+import com.kobera.music.violin.feature.main_screen.di.startingScreenModule
 import com.kobera.music.violin.feature.recognize_note.di.recognizeNoteModule
 import com.kobera.music.violin.feature.tuner.di.tunerModule
 import org.koin.android.ext.koin.androidContext
@@ -38,7 +40,7 @@ class ViolinApplication: Application() {
             androidContext(this@ViolinApplication)
             modules(
                 tunerModule + soundModule + resourcesModule + recognizeNoteModule +
-                        gamesSensitivityModule + sheetModule
+                        gamesSensitivityModule + sheetModule + scoreModule + startingScreenModule
             )
         }
     }

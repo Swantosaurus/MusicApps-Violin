@@ -26,6 +26,9 @@ import com.kobera.music.common.notes.scale.Scale
 import timber.log.Timber
 
 
+/**
+ * FingerboardInput
+ */
 @OptIn(ExperimentalTextApi::class)
 @Composable
 fun FingerboardInputView(scale: Scale, keyboardClicked: (TwelvetoneNote) -> Unit) {

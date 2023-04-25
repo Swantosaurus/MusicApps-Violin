@@ -7,6 +7,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -18,8 +19,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
@@ -29,8 +32,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.kobera.music.common.notes.InnerTwelveToneInterpretation.*
@@ -53,7 +58,7 @@ import kotlin.math.absoluteValue
 @Composable
 fun RecognizeNoteScreen(
     viewModel: RecognizeNoteViewModel = getViewModel(),
-    navigator: DestinationsNavigator
+    navigator: DestinationsNavigator,
 ) {
     val generatedNoteState by viewModel.generatedNote.collectAsStateWithLifecycle()
     val sensitivity by viewModel.sensitivity.collectAsStateWithLifecycle()
@@ -116,7 +121,7 @@ fun RecognizeNoteScreenBody(
                         FingerboardInputView(
                             scale = generatedNoteState.noteAndKeySignature.keySignature.getMajorScale()
                         ){
-                            viewModel?.keyboardInoput(it)
+                            viewModel?.keyboardInput(it)
                         }
                     }
                 }
@@ -165,24 +170,10 @@ private fun HandleInputOverlay(
                     .fillMaxSize()
                     .background(recognizeNoteState.iconAndColor.color.copy(alpha = 0.5f)),
                 color = Color.White,
-                painter = painterResource(id = recognizeNoteState.iconAndColor.icon)
+                painter = painterResource(id = recognizeNoteState.iconAndColor.icon),
+                score = recognizeNoteState.scoreAdded
             )
         }
-    }
-}
-
-@Composable
-private fun AnimateFailure(visibility: Boolean) {
-    AnimatedVisibility(
-        visible = visibility,
-        enter = fadeIn(),
-        exit = fadeOut()
-    ) {
-        Box(
-            modifier = Modifier
-                .size(100.dp)
-                .border(5.dp, Color.Red, CircleShape)
-        )
     }
 }
 
@@ -191,18 +182,31 @@ private fun InputStatusContent(
     modifier: Modifier,
     color: Color,
     painter: Painter,
+    score: Int
 ) {
     Box(
         modifier = modifier,
         contentAlignment = Alignment.Center
     ) {
-        Box(
-            modifier = Modifier
-                .size(200.dp)
-                .border(10.dp, color, CircleShape),
-            contentAlignment = Alignment.Center
+        Column(
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Icon(painter = painter, contentDescription = null, Modifier.size(150.dp), tint = color)
+            Box(
+                modifier = Modifier
+                    .size(200.dp)
+                    .border(10.dp, color, CircleShape),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    painter = painter,
+                    contentDescription = null,
+                    Modifier.size(150.dp),
+                    tint = color
+                )
+            }
+            Spacer(modifier = Modifier.height(50.dp))
+            Text(text = "+$score", style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.Bold, fontSize = 70.sp), color = color)
         }
     }
 }

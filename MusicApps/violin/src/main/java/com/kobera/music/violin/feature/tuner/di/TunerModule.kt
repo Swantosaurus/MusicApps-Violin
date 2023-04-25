@@ -12,7 +12,6 @@ val tunerModule = module {
     viewModel {
         TunerViewModel(
             applicationContext = get(),
-            resourceProvider = get(),
             frequencyReader = get(),
             a4Frequency = get(),
             tunerSensitivityStorage = get()

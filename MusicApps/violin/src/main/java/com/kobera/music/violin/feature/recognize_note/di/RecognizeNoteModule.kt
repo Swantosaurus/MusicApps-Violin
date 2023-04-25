@@ -10,8 +10,8 @@ val recognizeNoteModule = module {
             singleFrequencyReader = get(),
             applicationContext = get(),
             a4Frequency = get(),
-            resourceProvider = get(),
             gamesAudioSensitivityStorage = get(),
+            scoreRepository = get(),
         )
     }
 }

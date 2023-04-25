@@ -9,6 +9,7 @@ lifeccle            = "2.6.1"
 koin                = "3.2.0"
 datastore           = "1.0.0"
 accompanist         = "0.30.0"
+room_version        = "2.5.1"
 
 [libraries]
 accompanist-systemuicontroller    = { group = "com.google.accompanist",                     name = "accompanist-systemuicontroller",version.ref = "accompanist" }
@@ -29,6 +30,9 @@ androidx-compose-material3-bom    = { group = "androidx.compose.material3",     
 androidx-compose-navigaiton-bom   = { group = "androidx.navigation",                        name = "navigation-compose",            version     = "2.5.3"}
 androidx-datastore                = { group = "androidx.datastore",                         name = "datastore",                     version.ref = "datastore" }
 androidx-datastore-preferences    = { group = "androidx.datastore",                         name = "datastore-preferences",         version.ref = "datastore" }
+androidx-room                     = { group = "androidx.room",                              name = "room-ktx",                      version.ref = "room_version" }
+androidx-room-ksp                 = { group = "androidx.room",                              name = "room-compiler",                 version.ref = "room_version" }
+
 
 firebase-bom                      = { group = "com.google.firebase",                        name = "firebase-bom",                  version     = "31.5.0" }
 firebase-analitics-bom            = { group = "com.google.firebase",                        name = "firebase-analytics-ktx" }

@@ -4,7 +4,7 @@ import com.kobera.music.common.notes.sheet.SheetNote
 import com.kobera.music.common.notes.sheet.ui.KeySignature
 
 /**
- * Represents a minor scale.
+ * List of minor scales
  */
 enum class MinorScale : Scale {
     Ab {

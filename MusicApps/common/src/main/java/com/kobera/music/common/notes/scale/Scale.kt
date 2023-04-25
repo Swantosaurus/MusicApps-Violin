@@ -3,12 +3,14 @@ package com.kobera.music.common.notes.scale
 import com.kobera.music.common.notes.sheet.SheetNote
 import com.kobera.music.common.notes.sheet.ui.KeySignature
 
-
 interface Scale {
     fun getKeySignature() : KeySignature
     fun getNotes(): List<SheetNote>
 }
 
+/**
+ * Returns the major scale corresponding given key signature
+ */
 fun KeySignature.getMajorScale(): Scale =
     when(this) {
         is KeySignature.Sharps ->  this.getMajorScale()

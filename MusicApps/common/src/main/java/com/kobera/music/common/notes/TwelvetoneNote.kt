@@ -1,7 +1,7 @@
 package com.kobera.music.common.notes
 
 /**
- * Represents a note in a octave in twelve tone notation.
+ * Represents a tone in a octave in twelve tone notation.
  */
 open class TwelvetoneNote(
     val twelveNoteInterpretation: InnerTwelveToneInterpretation,
