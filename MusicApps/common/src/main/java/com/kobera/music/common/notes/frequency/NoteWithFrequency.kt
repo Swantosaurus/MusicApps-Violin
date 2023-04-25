@@ -25,10 +25,6 @@ class NoteWithFrequency(
         return diff <= inTuneInterval
     }
 
-    fun isInTune() =
-        isInTune(compareFreq = this.frequency)
-
-
     fun isInRange(compareFreq: Double): Boolean {
         val diff = if (compareFreq > frequency) compareFreq / frequency else frequency / compareFreq
         return diff < rangeInterval

@@ -17,4 +17,5 @@
     <string name="note_a">A</string>
     <string name="note_a_sharp">A#</string>
     <string name="note_b">B</string>
+    <string name="play_note_you_see">Play note you see</string>
 </resources>

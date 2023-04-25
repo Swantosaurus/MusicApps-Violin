@@ -13,6 +13,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.Black
+import androidx.compose.ui.graphics.Color.Companion.Red
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.translate
@@ -33,18 +37,16 @@ import com.kobera.music.common.notes.sheet.ui.KeySignature
 import com.kobera.music.common.notes.sheet.ui.NotePath
 import com.kobera.music.common.notes.sheet.ui.PathAndCenterOffset
 import org.koin.androidx.compose.getViewModel
-import timber.log.Timber
-
-
 
 
 @Composable
 fun Sheet(
     modifier: Modifier = Modifier,
     notes: List<SheetNote>,
+    extraNotes: List<SheetNote> = listOf(),
     clef: Clef = Clef.Violin,
     keySignature: KeySignature,
-    height : Float = 240f,
+    height: Float = 240f,
     sheetViewModel: SheetViewModel = getViewModel()
 ) {
     val lineHeight = height / 6
@@ -52,8 +54,10 @@ fun Sheet(
     val sheetSpacingFromLeft = 40f
     val clefPainter = painterResource(clef.resource)
     val density = LocalDensity.current
-
     val currentHeight by sheetViewModel.heightFlow.collectAsState()
+
+
+    var leftOffsetForNotes : Float? = null
 
     Box(modifier.height(with(density){currentHeight.toDp()})) {
         Canvas(
@@ -61,10 +65,10 @@ fun Sheet(
         ) {
             var numberOfSheetIndex = 0
             var notesToDraw = notes
-            while (notesToDraw.isNotEmpty()) {
+            var extraNotesToDraw = extraNotes
+            while (notesToDraw.isNotEmpty() || extraNotesToDraw.isNotEmpty()) {
                 var spcacingFromLeft = sheetSpacingFromLeft
                 val topSpacing = numberOfSheetIndex * (height + sheetSpacing) + sheetSpacing
-                Timber.d("topSpacing: $topSpacing notesToDraw: $notesToDraw")
                 translate(top = topSpacing) {
                     drawSheetLines(lineHeight = lineHeight)
                     spcacingFromLeft = drawClef(
@@ -72,17 +76,27 @@ fun Sheet(
                         spacingFromLeft = spcacingFromLeft,
                         painter = clefPainter
                     )
-                    //spcacingFromLeft = drawTimeSignature(spacingFromLeft = spcacingFromLeft)
                     spcacingFromLeft = drawKeySignature(
                         spacingFromLeft = spcacingFromLeft,
                         keySignature = keySignature,
                         lineHeight = lineHeight
                     )
+                    if(leftOffsetForNotes== null){
+                        leftOffsetForNotes = spcacingFromLeft
+                    }
                     notesToDraw = drawNotes(
                         keySignature = keySignature,
                         notes = notesToDraw,
                         lineHeight = lineHeight,
-                        spacingFromLeft = spcacingFromLeft
+                        spacingFromLeft = spcacingFromLeft,
+                        color = Black
+                    )
+                    extraNotesToDraw = drawNotes(
+                        keySignature = keySignature,
+                        notes = extraNotesToDraw,
+                        lineHeight = lineHeight,
+                        spacingFromLeft = leftOffsetForNotes!!,
+                        color = Red
                     )
                 }
                 numberOfSheetIndex++
@@ -337,7 +351,7 @@ private fun DrawScope.drawKeyFlats(
         }
 
         translate(left = leftSpacing, top = topOffset) {
-            drawFlat(sheetLineHeight = lineHeight)
+            drawFlat(sheetLineHeight = lineHeight, colorFilter = ColorFilter.tint(Black))
         }
 
         leftSpacing += lineHeight
@@ -345,16 +359,17 @@ private fun DrawScope.drawKeyFlats(
     return leftSpacing
 }
 
-private fun DrawScope.drawFlat(sheetLineHeight: Float) {
-    val height = 2*sheetLineHeight
+private fun DrawScope.drawFlat(sheetLineHeight: Float, colorFilter: ColorFilter) {
+    val height = 2 * sheetLineHeight
     val lineWidth = 2.dp.toPx()
 
-    translate(top = -height * 3/4) {
+    translate(top = -height * 3 / 4) {
         drawLine(
             Color.Black,
             start = Offset(0f, 0f),
             end = Offset(0f, height),
-            strokeWidth = lineWidth
+            strokeWidth = lineWidth,
+            colorFilter = colorFilter
         )
 
         drawArc(
@@ -362,18 +377,19 @@ private fun DrawScope.drawFlat(sheetLineHeight: Float) {
             startAngle = -135f,
             sweepAngle = 180f,
             useCenter = false,
-            size = Size(sheetLineHeight/2 + lineWidth, sheetLineHeight/2),
-            topLeft = Offset(-lineWidth, height/2),
-            style = Stroke(width = 2.dp.toPx())
+            size = Size(sheetLineHeight / 2 + lineWidth, sheetLineHeight / 2),
+            topLeft = Offset(-lineWidth, height / 2),
+            style = Stroke(width = 2.dp.toPx()),
+            colorFilter = colorFilter
         )
         drawLine(
             color = Color.Black,
             start = Offset(0f, height),
-            end = Offset(sheetLineHeight/2, height/2 + (sheetLineHeight/4 + lineWidth/2)),
-            strokeWidth = 2.dp.toPx()
+            end = Offset(sheetLineHeight / 2, height / 2 + (sheetLineHeight / 4 + lineWidth / 2)),
+            strokeWidth = 2.dp.toPx(),
+            colorFilter = colorFilter
         )
     }
-
 }
 
 private fun DrawScope.drawKeySharps(
@@ -395,7 +411,7 @@ private fun DrawScope.drawKeySharps(
 
 
         translate(left = spacingLeft, top = translateTop) {
-            drawSharp(lineHeight = lineHeight)
+            drawSharp(lineHeight = lineHeight, colorFilter = ColorFilter.tint(Black))
         }
         spacingLeft += lineHeight
     }
@@ -403,7 +419,7 @@ private fun DrawScope.drawKeySharps(
     return spacingLeft + lineHeight
 }
 
-private fun DrawScope.drawSharp(lineHeight: Float) {
+private fun DrawScope.drawSharp(lineHeight: Float, colorFilter: ColorFilter) {
     //vertical lines
     val height = 3f / 2 * lineHeight
     val width = height
@@ -413,7 +429,8 @@ private fun DrawScope.drawSharp(lineHeight: Float) {
                 color = Color.Black,
                 start = Offset(lineHeight / 2 + it * lineHeight / 2, 0f),
                 end = Offset(lineHeight / 2 + it * lineHeight / 2, height),
-                strokeWidth = 2.dp.toPx()
+                strokeWidth = 2.dp.toPx(),
+                colorFilter = colorFilter
             )
         }
 
@@ -424,7 +441,8 @@ private fun DrawScope.drawSharp(lineHeight: Float) {
                 color = Color.Black,
                 start = Offset(0f, lineHeight / 2 + it * lineHeight / 2 + yModulation),
                 end = Offset(width, lineHeight / 2 + it * lineHeight / 2 - yModulation),
-                strokeWidth = 4.dp.toPx()
+                strokeWidth = 4.dp.toPx(),
+                colorFilter = colorFilter
             )
         }
     }
@@ -471,7 +489,8 @@ private fun DrawScope.drawNotes(
     keySignature: KeySignature,
     notes: List<SheetNote>,
     lineHeight: Float,
-    spacingFromLeft: Float
+    spacingFromLeft: Float,
+    color: Color
 ): List<SheetNote> {
     var leftSpacing = spacingFromLeft
     val notDrawnNotes = mutableListOf<SheetNote>()
@@ -486,14 +505,16 @@ private fun DrawScope.drawNotes(
             note = note,
             keySignature = keySignature,
             spacingFromLeft = leftSpacing,
-            lineHeight = lineHeight
+            lineHeight = lineHeight,
+            colorFilter = ColorFilter.tint(color = color)
         )
 
 
         leftSpacing += drawNote(
             note = note,
             lineHeight = lineHeight,
-            spacingFromLeft = leftSpacing
+            spacingFromLeft = leftSpacing,
+            color = color
         )
     }
     return notDrawnNotes
@@ -503,7 +524,8 @@ private fun DrawScope.drawAccidental(
     note: SheetNote,
     keySignature: KeySignature,
     spacingFromLeft: Float,
-    lineHeight: Float
+    lineHeight: Float,
+    colorFilter: ColorFilter
 ): Float {
     val accidentalToDraw: Accidental? = note.getAccidentalToDraw(keySignature = keySignature)
     val noteSpacing = lineHeight / 2
@@ -513,9 +535,9 @@ private fun DrawScope.drawAccidental(
             top = -noteSpacing * (note.sheetDifference(TwelvetoneNote(G, 5)) - 1)
         ) {
             when (accidentalToDraw) {
-                Accidental.None -> drawNatural(lineHeight = lineHeight)
-                Accidental.Sharp -> drawSharp(lineHeight = lineHeight)
-                Accidental.Flat -> drawFlat(sheetLineHeight = lineHeight)
+                Accidental.None -> drawNatural(lineHeight = lineHeight, colorFilter = colorFilter)
+                Accidental.Sharp -> drawSharp(lineHeight = lineHeight, colorFilter = colorFilter)
+                Accidental.Flat -> drawFlat(sheetLineHeight = lineHeight, colorFilter = colorFilter)
                 else -> TODO()
             }
         }
@@ -587,7 +609,7 @@ private fun SheetNote.getAccidentalToDraw(keySignature: KeySignature): Accidenta
     }
 }
 
-private fun DrawScope.drawNatural(lineHeight: Float): Float {
+private fun DrawScope.drawNatural(lineHeight: Float, colorFilter: ColorFilter): Float {
     val width = lineHeight
     val height = lineHeight * 2
     translate(top = -height / 2) {
@@ -595,25 +617,29 @@ private fun DrawScope.drawNatural(lineHeight: Float): Float {
             Color.Black,
             start = Offset(0f, 0f),
             end = Offset(0f, height * 3 / 4 + 2.dp.toPx()),
-            strokeWidth = 2.dp.toPx()
+            strokeWidth = 2.dp.toPx(),
+            colorFilter = colorFilter
         )
         drawLine(
             Color.Black,
             start = Offset(width, height / 4 - 2.dp.toPx()),
             end = Offset(width, height),
-            strokeWidth = 2.dp.toPx()
+            strokeWidth = 2.dp.toPx(),
+            colorFilter = colorFilter
         )
         drawLine(
             Color.Black,
             start = Offset(0f, height / 2),
             end = Offset(width, height / 4),
-            strokeWidth = 4.dp.toPx()
+            strokeWidth = 4.dp.toPx(),
+            colorFilter = colorFilter
         )
         drawLine(
             Color.Black,
             start = Offset(0f, height * 3 / 4),
             end = Offset(width, height / 2),
-            strokeWidth = 4.dp.toPx()
+            strokeWidth = 4.dp.toPx(),
+            colorFilter = colorFilter
         )
     }
     return width
@@ -626,7 +652,8 @@ private fun SheetNote.isInKeySignature(keySignature: KeySignature): Boolean =
 private fun DrawScope.drawNote(
     note: SheetNote,
     lineHeight: Float,
-    spacingFromLeft: Float
+    spacingFromLeft: Float,
+    color: Color
 ): Float {
     val noteWidth = 100f
     val noteStep = lineHeight / 2
@@ -636,7 +663,7 @@ private fun DrawScope.drawNote(
 
     translate(top = noteStep * (-note.sheetDifference(TwelvetoneNote(G, 5)))) {
         translate(left = spacingFromLeft, top = -notePath.centerOffset.y + noteStep) {
-            drawPath(notePath.path, Color.Black)
+            drawPath(notePath.path, color = color)
         }
     }
 
@@ -647,7 +674,8 @@ private fun getNotePathAndCenterOffset(note: SheetNote, lineHeight: Float): Path
     when (note.noteParams.duration) {
         SheetNote.SheetNoteParams.Duration.Quarter -> {
             if (note > TwelvetoneNote(G, octave = 5) || note < TwelvetoneNote(D, 3)) {
-                TODO()
+                //TODO()
+                PathAndCenterOffset(Path(), Offset.Zero)
             }
 
             NotePath.drawQuarterNote(

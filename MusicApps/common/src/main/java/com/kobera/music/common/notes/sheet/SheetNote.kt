@@ -3,7 +3,7 @@ package com.kobera.music.common.notes.sheet
 import com.kobera.music.common.notes.InnerTwelveToneInterpretation
 import com.kobera.music.common.notes.TwelvetoneNote
 
-/*
+/**
  * Represents a note for sheet music.
  */
 data class SheetNote(
@@ -79,6 +79,14 @@ data class SheetNote(
     }
 
     companion object {
+        fun fromTwelveTone(twelveTone: TwelvetoneNote): SheetNote {
+            return SheetNote(
+                innerSheetNote = InnerSheetNote.fromTwelveTone(twelveTone.twelveNoteInterpretation),
+                noteParams = SheetNoteParams(twelveTone.twelveNoteInterpretation),
+                octave = twelveTone.octave
+            )
+        }
+
         private fun InnerSheetNote.Companion.fromTwelveTone(twelveTone: InnerTwelveToneInterpretation): InnerSheetNote {
             return when (twelveTone) {
                 InnerTwelveToneInterpretation.C -> InnerSheetNote.C
@@ -96,7 +104,7 @@ data class SheetNote(
             }
         }
 
-        private fun InnerTwelveToneInterpretation.Companion.fromSheetNote(
+        fun InnerTwelveToneInterpretation.Companion.fromSheetNote(
             innerSheetNote: InnerSheetNote,
             noteParams: SheetNoteParams
         ): InnerTwelveToneInterpretation {

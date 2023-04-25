@@ -49,4 +49,6 @@ dependencies {
     implementation libs.logging.timber
 
     implementation libs.bundles.datastore
+
+    implementation libs.compose.destinations
 }

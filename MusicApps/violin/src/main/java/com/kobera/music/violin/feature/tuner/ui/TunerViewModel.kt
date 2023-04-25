@@ -12,7 +12,6 @@ import com.kobera.music.common.notes.frequency.NoteWithFrequency
 import com.kobera.music.common.resource.ResourceProvider
 import com.kobera.music.common.sound.SingleFrequencyReader
 import com.kobera.music.common.sound.frequency_baseline.A4Frequency
-import com.kobera.music.violin.R
 import com.kobera.music.violin.feature.tuner.model.TunerSensitivityStorage
 import com.kobera.music.violin.sound.notes.violinStrings
 import kotlinx.coroutines.cancel
@@ -49,24 +48,21 @@ class TunerViewModel(
     fun startRecording() {
         frequencyReader.start()
         viewModelScope.launch {
-            frequencyReader.frequency.collect { it ->
+            frequencyReader.frequency.collect {
                 when(it) {
                     is SingleFrequencyReader.FrequencyState.Silence -> {
                         lastHadNote?.let { lastNote ->
-                            _note.value = LastNoteState.Silence(lastNote.note, lastNote.frequency, lastNote.differenceAngle)
+                            _note.value = LastNoteState.Silence(lastNote.note, lastNote.frequency)
                         }
                     }
                     is SingleFrequencyReader.FrequencyState.HasFrequency -> {
-                        val note = FrequencyToNote.transform(
+                        val note = FrequencyToNote.findClosestNote(
                             frequency = it.frequency,
-                            a4Frequency = a4Frequency.frequency.value,
-                            unknownString = resourceProvider.getString(R.string.unknown),
                             notes = _notesInTuner.value.notes.values
                         )
                         lastHadNote = LastNoteState.HasNote(
                                 note = note,
                                 frequency = it.frequency,
-                                differenceAngle = note.getDifferenceAngle(it.frequency, 180.0 / 2 / 8 * 7)
                             )
                         _note.value = lastHadNote!!
                     }
@@ -146,24 +142,25 @@ abstract class  NotesInTunerState : KoinComponent {
 
         override val notes: Map<String, NoteWithFrequency>
             get() = Notes.getNotesViolin(a4Frequency.frequency.value)
-    }
 
-    fun Notes.getNotesViolin(frequencyA4: Double): Map<String, NoteWithFrequency> {
-        val onlyViolinNotes = getNotes(frequencyA4 = frequencyA4)
-            .filter {
-                for (violinStringNote in violinStrings) {
-                    if (it.value sameNoteAs violinStringNote) {
-                        return@filter true
+        private fun Notes.getNotesViolin(frequencyA4: Double): Map<String, NoteWithFrequency> {
+            val onlyViolinNotes = getNotes(frequencyA4 = frequencyA4)
+                .filter {
+                    for (violinStringNote in violinStrings) {
+                        if (it.value sameNoteAs violinStringNote) {
+                            return@filter true
+                        }
                     }
-                }
-                return@filter false
-            }.toMutableMap()
-        onlyViolinNotes.entries.forEach {
-            it.setValue(it.value.copy(rangeInterval = 2.0.pow(7.0/24)))
-        }
+                    return@filter false
+                }.toMutableMap()
+            onlyViolinNotes.entries.forEach {
+                it.setValue(it.value.copy(rangeInterval = 2.0.pow(7.0/24)))
+            }
 
-        return onlyViolinNotes
+            return onlyViolinNotes
+        }
     }
+    class PreviewNotes(override val notes: Map<String, NoteWithFrequency>) : NotesInTunerState() {}
 }
 
 sealed interface LastNoteState {
@@ -175,18 +172,17 @@ sealed interface LastNoteState {
             frequency = Notes.defaultA4Frequency,
         ),
         frequency: Double = Notes.defaultA4Frequency,
-        differenceAngle: Double = 0.0
     ) : HasNote(
         note = note,
-        frequency = frequency,
-        differenceAngle = differenceAngle
+        frequency = frequency
     )
 
     open class HasNote(
         val note: NoteWithFrequency,
         val frequency: Double,
-        val differenceAngle: Double
     ) : LastNoteState {
+
+        fun getDifferenceAngle() = note.getDifferenceAngle(frequency, 180.0 / 2 / 8 * 7)
         fun isInTune() = note.isInTune(frequency)
     }
 }

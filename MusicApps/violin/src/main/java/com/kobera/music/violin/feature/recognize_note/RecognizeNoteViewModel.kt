@@ -1,12 +1,17 @@
 package com.kobera.music.violin.feature.recognize_note
 
 import android.content.Context
+import androidx.annotation.DrawableRes
+import androidx.compose.ui.graphics.Color
 import androidx.datastore.core.DataStore
 import androidx.datastore.dataStore
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kobera.music.common.model.GamesAudioSensitivityStorage
+import com.kobera.music.common.notes.Notes
+import com.kobera.music.common.notes.TwelvetoneNote
 import com.kobera.music.common.notes.frequency.FrequencyToNote
+import com.kobera.music.common.notes.frequency.NoteWithFrequency
 import com.kobera.music.common.notes.sheet.SheetNote
 import com.kobera.music.common.notes.sheet.ui.KeySignature
 import com.kobera.music.common.resource.ResourceProvider
@@ -17,10 +22,13 @@ import com.kobera.music.violin.R
 import com.kobera.music.violin.feature.recognize_note.model.RecognizeNoteScales
 import com.kobera.music.violin.feature.recognize_note.model.RecognizeNoteSerializer
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import kotlin.random.Random
+import kotlin.time.Duration.Companion.seconds
 
 val Context.recognizeNoteDataStore by dataStore("recognize_note_data_store.json", serializer = RecognizeNoteSerializer)
 class RecognizeNoteViewModel(
@@ -37,11 +45,13 @@ class RecognizeNoteViewModel(
         RecognizeNoteScaleState.Loading
     )
 
+    //val scales = _scales.asStateFlow()
+
     private val _generatedNote: MutableStateFlow<GeneratedNoteState> = MutableStateFlow(
         GeneratedNoteState.Loading
     )
     private val _recognizeNoteState: MutableStateFlow<RecognizeNoteState> =
-        MutableStateFlow(RecognizeNoteState.Silence)
+        MutableStateFlow(RecognizeNoteState.NotEntered)
 
     private val _sensitivity = MutableStateFlow(0.0f)
 
@@ -80,32 +90,69 @@ class RecognizeNoteViewModel(
         }
     }
 
+    private var lastNote: NoteWithFrequency? = null
     private suspend fun readFrequency(a4Frequency: A4Frequency, resourceProvider: ResourceProvider){
         singleFrequencyReader.frequency.collect { frequencyState ->
-            if(_recognizeNoteState.value !is RecognizeNoteState.Silence){
+            if (_recognizeNoteState.value !is RecognizeNoteState.NotEntered) {
                 return@collect
             }
             when (frequencyState) {
-                is FrequencyState.Silence -> {}
+                is FrequencyState.Silence -> {
+                    lastNote = null
+                }
                 is FrequencyState.HasFrequency -> {
                     (_generatedNote.value as? GeneratedNoteState.Ready)?.let { ready ->
-                        val noteFromFrequency = FrequencyToNote.transform(
-                            frequency = frequencyState.frequency,
-                            a4Frequency = a4Frequency.frequency.value,
-                            unknownString = resourceProvider.getString(R.string.unknown)
-                        )
-                        _recognizeNoteState.value = if (noteFromFrequency sameNoteAs ready.noteAndKeySignature.note.toTwelveTone()) {
-                            if(noteFromFrequency.isInTune()){
-                                RecognizeNoteState.InTune
-                            } else {
-                                RecognizeNoteState.CorrectNotInTune
-                            }
-                        } else {
-                            RecognizeNoteState.Wrong
+                        if (_recognizeNoteState.value !is RecognizeNoteState.NotEntered) {
+                            return@collect
                         }
+                        val noteFromFrequency = FrequencyToNote.findClosestNote(
+                            frequency = frequencyState.frequency,
+                            notes = Notes.getNotes(a4Frequency.frequency.value, inTunePrecision = Notes.InTunePrecision.MEDIUM).values
+                        )
+
+                        //playing can ocure in middle of searched sector therefor 1.st note is not correct
+                        if(lastNote == null || ! (lastNote!! sameNoteAs noteFromFrequency)) {
+                            lastNote = noteFromFrequency
+                            return@collect
+                        }
+
+
+                        _recognizeNoteState.value =
+                            if (noteFromFrequency sameNoteAs ready.noteAndKeySignature.note.toTwelveTone()) {
+                                if (noteFromFrequency.isInTune(frequencyState.frequency)) {
+                                    RecognizeNoteState.InTune()
+                                } else {
+                                    val differenceAngle = noteFromFrequency.getDifferenceAngle(
+                                        frequencyState.frequency,
+                                        180.0
+                                    )
+                                    Timber.d("differenceAngle: $differenceAngle, frequency: ${frequencyState.frequency}, reference: ${noteFromFrequency.frequency}")
+                                    if (differenceAngle > 0) {
+                                        RecognizeNoteState.NotInTuneAbove()
+                                    } else {
+                                        RecognizeNoteState.NotInTuneBelow()
+                                    }
+                                }
+                            } else {
+                                RecognizeNoteState.Wrong(SheetNote.fromTwelveTone(noteFromFrequency))
+                            }
+                        resetAnimation()
                     }
                 }
             }
+        }
+    }
+
+    private fun resetAnimation(){
+        viewModelScope.launch {
+            delay(3.seconds)
+            _recognizeNoteState.value =
+                (_recognizeNoteState.value as RecognizeNoteState.ToShow).copy(
+                    visible = false
+                )
+            delay(1.seconds)
+            setSilence()
+            generateRandomNote()
         }
     }
 
@@ -132,8 +179,28 @@ class RecognizeNoteViewModel(
         }
     }
 
-    fun generateRandomNote() {
-        setSilence()
+    fun keyboardInoput(input: TwelvetoneNote){
+        if (_recognizeNoteState.value !is RecognizeNoteState.NotEntered) {
+            return
+        }
+        when(generatedNote.value){
+            is GeneratedNoteState.Loading -> return
+            is GeneratedNoteState.Ready -> {
+                val generatedNote = (generatedNote.value as GeneratedNoteState.Ready).noteAndKeySignature.note.toTwelveTone()
+                if(generatedNote sameNoteAs input){
+                    _recognizeNoteState.value = RecognizeNoteState.InTune()
+                }
+                else{
+                    _recognizeNoteState.value = RecognizeNoteState.Wrong(SheetNote.fromTwelveTone(twelveTone = input), true )
+                }
+                viewModelScope.launch {
+                   resetAnimation()
+                }
+            }
+        }
+    }
+
+    private fun generateRandomNote() {
         when (_scales.value) {
             is RecognizeNoteScaleState.Loading -> {}
             is RecognizeNoteScaleState.Ready -> {
@@ -153,8 +220,8 @@ class RecognizeNoteViewModel(
         }
     }
 
-    fun setSilence() {
-        _recognizeNoteState.value = RecognizeNoteState.Silence
+    private fun setSilence() {
+        _recognizeNoteState.value = RecognizeNoteState.NotEntered
     }
 }
 
@@ -175,9 +242,63 @@ data class NoteAndKeySignature(
 ) {}
 
 sealed interface RecognizeNoteState {
+    sealed interface ToShow : RecognizeNoteState {
+        val visible: Boolean
+        val iconAndColor: IconAndColor
 
-    object InTune : RecognizeNoteState
-    object CorrectNotInTune : RecognizeNoteState
-    object Silence : RecognizeNoteState
-    object Wrong : RecognizeNoteState
+        data class IconAndColor(@DrawableRes val icon: Int, val color: Color)
+
+        fun copy(visible: Boolean): RecognizeNoteState
+    }
+
+    class InTune(
+        override val visible: Boolean = true,
+        override val iconAndColor: ToShow.IconAndColor = ToShow.IconAndColor(
+            R.drawable.baseline_check_24,
+            Color.Green
+        )
+    ) : ToShow {
+        override fun copy(visible: Boolean): RecognizeNoteState {
+            return InTune(visible)
+        }
+    }
+
+    class NotInTuneAbove(
+        override val visible: Boolean = true,
+        override val iconAndColor: ToShow.IconAndColor = ToShow.IconAndColor(
+            R.drawable.baseline_arrow_downward_24,
+            Color.Yellow
+        )
+    ) : ToShow {
+        override fun copy(visible: Boolean): RecognizeNoteState {
+            return NotInTuneAbove(visible)
+        }
+    }
+
+    class NotInTuneBelow(
+        override val visible: Boolean = true,
+        override val iconAndColor: ToShow.IconAndColor = ToShow.IconAndColor(
+            R.drawable.baseline_arrow_upward_24,
+            Color.Yellow
+        )
+    ) : ToShow {
+        override fun copy(visible: Boolean): RecognizeNoteState {
+            return NotInTuneBelow(visible)
+        }
+    }
+
+    object NotEntered : RecognizeNoteState {}
+
+    class Wrong(
+        val wrongNote: SheetNote,
+        override val visible: Boolean = true,
+        override val iconAndColor: ToShow.IconAndColor = ToShow.IconAndColor(
+            R.drawable.baseline_close_24,
+            Color.Red
+        )
+    ) : ToShow {
+        override fun copy(visible: Boolean): RecognizeNoteState {
+            return Wrong(wrongNote, visible)
+        }
+    }
 }

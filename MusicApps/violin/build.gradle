@@ -55,6 +55,7 @@ tasks.withType(Test) {
 
 dependencies {
     implementation project(path: ':common')
+    implementation 'androidx.test.ext:junit-ktx:1.1.5'
 
     def composeBom = platform(libs.androidx.compose.bom)
     implementation(composeBom)

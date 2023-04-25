@@ -62,11 +62,15 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
+import com.kobera.music.common.notes.InnerTwelveToneInterpretation
+import com.kobera.music.common.notes.frequency.NoteWithFrequency
+import com.kobera.music.common.ui.component.CenteredNavigationBarWithNavigateBack
 import com.kobera.music.common.ui.component.HandleAudioPermission
 import com.kobera.music.common.ui.util.lockScreenOrientation
 import com.kobera.music.common.ui.util.setSystemBarColors
@@ -74,6 +78,7 @@ import com.kobera.music.common.util.toStringWithNDecimals
 import com.kobera.music.violin.R
 import com.kobera.music.violin.sound.notes.violinStrings
 import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import org.koin.androidx.compose.getViewModel
 import java.lang.Float.min
 import kotlin.math.absoluteValue
@@ -81,7 +86,10 @@ import kotlin.math.absoluteValue
 @Destination
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun TunerScreen(tunerViewModel: TunerViewModel = getViewModel()) {
+fun TunerScreen(
+    tunerViewModel: TunerViewModel = getViewModel(),
+    navigator: DestinationsNavigator
+) {
     val noteState by tunerViewModel.note.collectAsStateWithLifecycle()
     val sensitivity by tunerViewModel.sensitivity.collectAsStateWithLifecycle(initialValue = 0.2f)
     val a4frequency by tunerViewModel.a4Frequency.frequency.collectAsStateWithLifecycle()
@@ -105,7 +113,8 @@ fun TunerScreen(tunerViewModel: TunerViewModel = getViewModel()) {
                 noteState = { noteState },
                 sensitivity = { sensitivity },
                 a4frequency = { a4frequency },
-                notesInTunerState = { notesInTunerState }
+                notesInTunerState = { notesInTunerState },
+                navigator = navigator
             )
         },
         showRationale = { ShowRationale(permissionState = it) },
@@ -121,6 +130,7 @@ private fun TunerScreenBody(
     sensitivity: () -> Float,
     a4frequency: () -> Double,
     notesInTunerState: () -> NotesInTunerState,
+    navigator: DestinationsNavigator?
 ) {
     setSystemBarColors(darkIconsTopBar = false)
     Scaffold(
@@ -153,11 +163,17 @@ private fun TunerScreenBody(
                     value = MaterialTheme.typography.headlineMedium
                         .copy(color = MaterialTheme.colorScheme.inverseOnSurface)
                 ) {
-                    FrequencySetting(
-                        modifier = Modifier.fillMaxWidth(),
-                        a4frequency = a4frequency().toInt(),
-                        setFrequency = { tunerViewModel?.setA4Frequency(it.toDouble()) }
-                    )
+                    CenteredNavigationBarWithNavigateBack(
+                        navigator = navigator,
+                        backIconColor = MaterialTheme.colorScheme.inverseOnSurface
+                    ) {
+                        FrequencySetting(
+                            modifier = Modifier.fillMaxWidth(),
+                            a4frequency = a4frequency().toInt(),
+                            setFrequency = { tunerViewModel?.setA4Frequency(it.toDouble()) }
+                        )
+                    }
+
                     Divider()
 
                     TunerMeter(
@@ -268,7 +284,11 @@ private fun SensitivitySetting(
 }
 
 @Composable
-private fun FrequencySetting(modifier : Modifier = Modifier, a4frequency: Int, setFrequency: (Int) -> Unit) {
+private fun FrequencySetting(
+    modifier: Modifier = Modifier,
+    a4frequency: Int,
+    setFrequency: (Int) -> Unit
+) {
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
@@ -401,7 +421,7 @@ private fun TunerClock(modifier: Modifier = Modifier, noteState: LastNoteState.H
                     }
 
 
-                    rotate(noteState.differenceAngle.toFloat() - 180) {
+                    rotate(noteState.getDifferenceAngle().toFloat() - 180) {
                         drawLine(
                             color = if (noteState.isInTune()) primary else error,
                             start = center,
@@ -446,4 +466,28 @@ private fun OpenSettingsOrRestartApp() {
         }
     }
 }
+
+@Composable
+@Preview
+fun TunerScreenPreview() {
+    TunerScreenBody(
+        tunerViewModel = null,
+        noteState = {
+            LastNoteState.HasNote(
+                NoteWithFrequency(
+                    InnerTwelveToneInterpretation.A,
+                    name = "A4",
+                    4,
+                    440.0,
+                ),
+                432.66,
+            )
+        },
+        sensitivity = { 0.5f },
+        a4frequency = { 440.0 },
+        notesInTunerState = { NotesInTunerState.PreviewNotes(mapOf()) },
+        navigator = null
+    )
+}
+
 
