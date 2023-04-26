@@ -18,13 +18,16 @@ import kotlin.math.roundToInt
  * @param maxSearchedFrequency The maximum frequency to search for.
  * @param accuracy The accuracy of the frequency search.
  * @param silenceThreshold The silence threshold.
+ * @param fineTuneLookupRange The fine tune lookup range.
  */
 class SingleFrequencyReader(
     private val pcmAudioRecorder: PcmAudioRecorder,
     minSearchedFrequency: Frequency = Frequency(150.0),
     maxSearchedFrequency: Frequency = Frequency(2000.0),
     private val accuracy: Double = 0.01,
-    silenceThreshold: Long = 3_000_000L
+    silenceThreshold: Long = 3_000_000L,
+    private val fineTuneLookupRange: Int = 1,
+    private val hpsIterations: Int = 4
 ) {
     private val _frequency : MutableStateFlow<FrequencyState> = MutableStateFlow(
         FrequencyState.Silence
@@ -40,7 +43,7 @@ class SingleFrequencyReader(
     private val minFourierIndexSearched = minSearchedFrequency.toFourierIndexIntRoundDown()
 
 
-    private var _silenceThreshold : MutableStateFlow<Long> = MutableStateFlow(silenceThreshold)
+    private var _silenceThreshold: MutableStateFlow<Long> = MutableStateFlow(silenceThreshold)
 
     private val _state: MutableStateFlow<FrequencyReaderState> =
         MutableStateFlow(
@@ -49,11 +52,17 @@ class SingleFrequencyReader(
 
     private val scope = CoroutineScope(Dispatchers.IO + Job())
 
-    private var job : Job? = null
+    private var job: Job? = null
+
+    private val hpsActive = hpsIterations > 1
+
+    init {
+        check(fineTuneLookupRange > 0) { "fineTuneLookupRange has to be greater than zero" }
+    }
 
     fun stop() {
         _frequency.value = FrequencyState.Silence
-        if(_state.value == FrequencyReaderState.Stopped) {
+        if (_state.value == FrequencyReaderState.Stopped) {
             Timber.w(TAG, "Already stopped")
             return
         }
@@ -82,67 +91,32 @@ class SingleFrequencyReader(
     private fun startTransformOnNewThread() {
         job = scope.launch {
             pcmAudioRecorder.pcmAudioDataFlow.collect { pcmAudioData ->
-                val frequencyDomain: MutableList<Double> =
+                var frequencyDomain: List<Double> =
                     FourierTransform.fft(pcmAudioData).map { complexNumber ->
                         complexNumber!!.magnitude()
-                    }.toMutableList()
+                    }.toList()
 
-
-                var indexFromBottom = -1
-                var maxValue = _silenceThreshold.value.toDouble()
-                var counter: Int? = null // to skip rest of indexes when we fond result
-
-                for (index in minFourierIndexSearched until maxFourierIndexSearched) {
-                    var currentThreshold = maxValue
-                    if (maxValue == _silenceThreshold.value.toDouble()) {
-                        if (Frequency.fromFourierIndex(index = index.toDouble()).value < 240) {
-                            currentThreshold *= 0.6
-                        }
-                    }
-
-                    if (frequencyDomain[index] > currentThreshold) {
-                        if (counter == null) {
-                            counter = (index * 0.2).roundToInt()
-                        }
-                        counter += 1
-                        indexFromBottom = index
-                        maxValue = frequencyDomain[index]
-                    }
-                    if (counter != null) {
-                        counter -= 1
-                        if (counter <= 0) {
-                            break
-                        }
-                    }
+                if (hpsActive) {
+                    frequencyDomain = cleanupUsingHPS(frequencyDomain)
                 }
 
-                if (indexFromBottom <= 0) {
+                var fftIndexAndRelevancy = lookupFrequencyDomain(
+                    frequencyDomain = frequencyDomain,
+                    threashold = _silenceThreshold.value.toDouble()
+                )
+
+                if (fftIndexAndRelevancy is RelevancyAndIndex.NotFound) {
                     _frequency.value = FrequencyState.Silence
                     return@collect
                 }
 
-                val resultIndexes =
-                    FourierTransform.fineTuneDFT(
-                        pcmAudioData,
-                        from = indexFromBottom - 1,
-                        to = indexFromBottom + 1,
-                        accuracy
-                    ).map { it.magnitude() }
+                fftIndexAndRelevancy = fftIndexAndRelevancy as RelevancyAndIndex.Found
 
-                var finalIndex = -1
-                var finalMaxValue = -1.0
-
-                for (i in resultIndexes.indices) {
-                    if (resultIndexes[i] > finalMaxValue) {
-                        finalMaxValue = resultIndexes[i]
-                        finalIndex = i
-                    }
-                }
-
-                val resultIndex: Double = (indexFromBottom - 1) + finalIndex * accuracy
+                val fineTuneIndexAndRelevancy =
+                    fineTuneLookup(pcmAudioData, fftIndexAndRelevancy.index.toInt(), accuracy)
 
                 val mostRelevantFrequency: Double =
-                    resultIndex * (PcmAudioRecorder.sampleRate.toDouble() / PcmAudioRecorder.readSize.toDouble())
+                    fineTuneIndexAndRelevancy.index * (PcmAudioRecorder.sampleRate.toDouble() / PcmAudioRecorder.readSize.toDouble())
 
                 //Timber.d("Result Index: $resultIndex Result Frequency: $mostRelevantFrequency")
                 _frequency.value = FrequencyState.HasFrequency(mostRelevantFrequency)
@@ -150,8 +124,114 @@ class SingleFrequencyReader(
         }
     }
 
+    private fun cleanupUsingHPS(fftFrequencyDomain: List<Double>): List<Double> =
+        HarmonyProductSpectrum.hps(fftFrequencyDomain, hpsIterations)
+
+    private fun lookupFrequencyDomainAfterHPS(
+        frequencyDomain: List<Double>,
+        threashold: Double
+    ): RelevancyAndIndex {
+        var maxValue = threashold
+        var indexFromBottom = -1
+        for (index in minFourierIndexSearched until maxFourierIndexSearched) {
+            var currentThreshold = maxValue
+
+            if (frequencyDomain[index] > currentThreshold) {
+                indexFromBottom = index
+                maxValue = frequencyDomain[index]
+            }
+        }
+        return if (indexFromBottom == -1) {
+            RelevancyAndIndex.NotFound
+        } else {
+            RelevancyAndIndex.Found(maxValue, indexFromBottom)
+        }
+    }
+
+    private fun lookupFrequencyDomain(
+        frequencyDomain: List<Double>,
+        threashold: Double
+    ): RelevancyAndIndex {
+        if (hpsActive) return lookupFrequencyDomainAfterHPS(frequencyDomain, threashold)
+
+        var maxValue = threashold
+        var counter: Int? = null // to skip rest of indexes when we fond result
+        var indexFromBottom = -1
+        for (index in minFourierIndexSearched until maxFourierIndexSearched) {
+            var currentThreshold = maxValue
+            if (maxValue == _silenceThreshold.value.toDouble()) {
+                if (Frequency.fromFourierIndex(index = index.toDouble()).value < 240) {
+                    currentThreshold *= 0.6
+                }
+            }
+
+            if (frequencyDomain[index] > currentThreshold) {
+                if (counter == null) {
+                    counter = (index * 0.2).roundToInt()
+                }
+                counter += 1 * /
+                indexFromBottom = index
+                maxValue = frequencyDomain[index]
+            }
+
+            if (counter != null) {
+                counter -= 1
+                if (counter <= 0) {
+                    break
+                }
+            }
+        }
+        return if (indexFromBottom == -1) {
+            RelevancyAndIndex.NotFound
+        } else {
+            RelevancyAndIndex.Found(maxValue, indexFromBottom)
+        }
+    }
+
+
+    private fun fineTuneLookup(
+        pcmAudioData: ShortArray,
+        fftMostRelevantIndex: Int,
+        accuracy: Double
+    ): RelevancyAndIndex.Found {
+        val fineTuneDomain =
+            FourierTransform.fineTuneDFT(
+                pcmAudioData,
+                from = fftMostRelevantIndex - fineTuneLookupRange,
+                to = fftMostRelevantIndex + fineTuneLookupRange,
+                accuracy
+            ).map { it.magnitude() }
+
+        var fineTuneIndex = -1
+        var finalMaxValue = -1.0
+
+        for (i in fineTuneDomain.indices) {
+            if (fineTuneDomain[i] > finalMaxValue) {
+                finalMaxValue = fineTuneDomain[i]
+                fineTuneIndex = i
+            }
+        }
+        if (fineTuneIndex == -1) throw IllegalStateException("Fine tune index is -1. This should not happen.")
+
+        return RelevancyAndIndex.Found(
+            finalMaxValue,
+            fftMostRelevantIndex - fineTuneLookupRange + fineTuneIndex * accuracy
+        )
+    }
+
+    sealed interface RelevancyAndIndex {
+        object NotFound : RelevancyAndIndex
+        data class Found(val relevancy: Double, val index: Double) : RelevancyAndIndex {
+            constructor(relevancy: Double, indexFromBottom: Int) : this(
+                relevancy,
+                indexFromBottom.toDouble()
+            )
+        }
+    }
+
+
     sealed interface FrequencyState {
-        object Silence: FrequencyState
+        object Silence : FrequencyState
         class HasFrequency(val frequency: Double) : FrequencyState
     }
 
