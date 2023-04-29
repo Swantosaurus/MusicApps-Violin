@@ -5,12 +5,13 @@ import android.content.SharedPreferences
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kobera.music.common.notes.InnerTwelveToneInterpretation
-import com.kobera.music.common.notes.Notes
-import com.kobera.music.common.notes.TwelveToneNoteNames
+import com.kobera.music.common.notes.Tones
+import com.kobera.music.common.notes.TwelveToneNames
 import com.kobera.music.common.notes.frequency.FrequencyToNote
-import com.kobera.music.common.notes.frequency.NoteWithFrequency
+import com.kobera.music.common.notes.frequency.InRangePrecision
+import com.kobera.music.common.notes.frequency.ToneWithFrequency
 import com.kobera.music.common.sound.SingleFrequencyReader
-import com.kobera.music.common.sound.frequency_baseline.A4Frequency
+import com.kobera.music.common.sound.frequency.A4Frequency
 import com.kobera.music.violin.feature.tuner.model.TunerSensitivityStorage
 import com.kobera.music.violin.sound.notes.violinStrings
 import kotlinx.coroutines.cancel
@@ -20,7 +21,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import kotlin.math.pow
 
 
 class TunerViewModel(
@@ -100,7 +100,7 @@ class TunerViewModel(
 }
 
 abstract class  NotesInTunerState : KoinComponent {
-    abstract val notes: Map<String, NoteWithFrequency>
+    abstract val notes: Map<String, ToneWithFrequency>
     protected val a4Frequency: A4Frequency by inject()
 
     companion object {
@@ -126,8 +126,8 @@ abstract class  NotesInTunerState : KoinComponent {
             }
         }
 
-        override val notes: Map<String, NoteWithFrequency>
-            get() = Notes.getNotes(frequencyA4 = a4Frequency.frequency.value)
+        override val notes: Map<String, ToneWithFrequency>
+            get() = Tones.getTones(frequencyA4 = a4Frequency.frequency.value)
     }
 
     class ViolinNotes() : NotesInTunerState() {
@@ -138,11 +138,11 @@ abstract class  NotesInTunerState : KoinComponent {
             }
         }
 
-        override val notes: Map<String, NoteWithFrequency>
-            get() = Notes.getNotesViolin(a4Frequency.frequency.value)
+        override val notes: Map<String, ToneWithFrequency>
+            get() = Tones.getNotesViolin(a4Frequency.frequency.value)
 
-        private fun Notes.getNotesViolin(frequencyA4: Double): Map<String, NoteWithFrequency> {
-            val onlyViolinNotes = getNotes(frequencyA4 = frequencyA4)
+        private fun Tones.getNotesViolin(frequencyA4: Double): Map<String, ToneWithFrequency> {
+            val onlyViolinNotes = getTones(frequencyA4 = frequencyA4)
                 .filter {
                     for (violinStringNote in violinStrings) {
                         if (it.value sameNoteAs violinStringNote) {
@@ -152,31 +152,31 @@ abstract class  NotesInTunerState : KoinComponent {
                     return@filter false
                 }.toMutableMap()
             onlyViolinNotes.entries.forEach {
-                it.setValue(it.value.copy(rangeInterval = 2.0.pow(7.0/24)))
+                it.setValue(it.value.copy(rangeInterval = InRangePrecision.MEDIUM))
             }
 
             return onlyViolinNotes
         }
     }
-    class PreviewNotes(override val notes: Map<String, NoteWithFrequency>) : NotesInTunerState() {}
+    class PreviewNotes(override val notes: Map<String, ToneWithFrequency>) : NotesInTunerState() {}
 }
 
 sealed interface LastNoteState {
     class Silence(
-        note: NoteWithFrequency = NoteWithFrequency(
+        note: ToneWithFrequency = ToneWithFrequency(
             twelveNoteInterpretation = InnerTwelveToneInterpretation.A,
-            name = TwelveToneNoteNames.getName(InnerTwelveToneInterpretation.A),
+            name = TwelveToneNames.getName(InnerTwelveToneInterpretation.A),
             octave = 4,
-            frequency = Notes.defaultA4Frequency,
+            frequency = Tones.defaultA4Frequency,
         ),
-        frequency: Double = Notes.defaultA4Frequency,
+        frequency: Double = Tones.defaultA4Frequency,
     ) : HasNote(
         note = note,
         frequency = frequency
     )
 
     open class HasNote(
-        val note: NoteWithFrequency,
+        val note: ToneWithFrequency,
         val frequency: Double,
     ) : LastNoteState {
 

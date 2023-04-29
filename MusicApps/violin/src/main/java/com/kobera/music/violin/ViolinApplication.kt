@@ -1,9 +1,9 @@
 package com.kobera.music.violin
 
 import android.app.Application
+import com.kobera.music.common.metronome.di.metronomeModule
 import com.kobera.music.common.model.gamesSensitivityModule
-import com.kobera.music.common.notes.TwelveToneNoteNames
-import com.kobera.music.common.notes.sheet.ui.compose.sheetModule
+import com.kobera.music.common.notes.TwelveToneNames
 import com.kobera.music.common.resource.di.resourcesModule
 import com.kobera.music.common.score.di.scoreModule
 import com.kobera.music.common.sound.di.soundModule
@@ -15,11 +15,14 @@ import org.koin.core.context.startKoin
 import timber.log.Timber
 import timber.log.Timber.DebugTree
 
+/**
+ * entry point of the application
+ */
 class ViolinApplication: Application() {
     override fun onCreate() {
         super.onCreate()
         Timber.plant(DebugTree())
-        TwelveToneNoteNames.setNamesFromLowestToHighest(
+        TwelveToneNames.setNamesFromLowestToHighest(
             arrayOf(
                 getString(R.string.note_c),
                 getString(R.string.note_c_sharp),
@@ -40,7 +43,8 @@ class ViolinApplication: Application() {
             androidContext(this@ViolinApplication)
             modules(
                 tunerModule + soundModule + resourcesModule + recognizeNoteModule +
-                        gamesSensitivityModule + sheetModule + scoreModule + startingScreenModule
+                        gamesSensitivityModule + scoreModule + startingScreenModule
+                + metronomeModule
             )
         }
     }

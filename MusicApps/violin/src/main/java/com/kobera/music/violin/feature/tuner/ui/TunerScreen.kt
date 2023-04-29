@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -69,7 +70,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
 import com.kobera.music.common.notes.InnerTwelveToneInterpretation
-import com.kobera.music.common.notes.frequency.NoteWithFrequency
+import com.kobera.music.common.notes.frequency.ToneWithFrequency
 import com.kobera.music.common.ui.component.CenteredNavigationBarWithNavigateBack
 import com.kobera.music.common.ui.component.HandleAudioPermission
 import com.kobera.music.common.ui.util.lockScreenOrientation
@@ -154,35 +155,13 @@ private fun TunerScreenBody(
                 .fillMaxSize(),
             horizontalAlignment = CenterHorizontally
         ) {
-            Column(
-                Modifier
-                    .background(MaterialTheme.colorScheme.inverseSurface)
-                    .padding(top = paddingValues.calculateTopPadding())
-            ) {
-                ProvideTextStyle(
-                    value = MaterialTheme.typography.headlineMedium
-                        .copy(color = MaterialTheme.colorScheme.inverseOnSurface)
-                ) {
-                    CenteredNavigationBarWithNavigateBack(
-                        navigator = navigator,
-                        backIconColor = MaterialTheme.colorScheme.inverseOnSurface
-                    ) {
-                        FrequencySetting(
-                            modifier = Modifier.fillMaxWidth(),
-                            a4frequency = a4frequency().toInt(),
-                            setFrequency = { tunerViewModel?.setA4Frequency(it.toDouble()) }
-                        )
-                    }
-
-                    Divider()
-
-                    TunerMeter(
-                        Modifier.aspectRatio(11f / 9),
-                        noteStateLambda = noteState
-                    )
-                }
-            }
-
+            TunerPart(
+                paddingValues = paddingValues,
+                noteState = noteState,
+                navigator = navigator,
+                a4frequency = a4frequency,
+                tunerViewModel = tunerViewModel
+            )
 
             SensitivitySetting(
                 modifier = Modifier
@@ -194,6 +173,45 @@ private fun TunerScreenBody(
             Box(Modifier.fillMaxSize(), contentAlignment = Center) {
                 ViolinStrings(noteStateLambda = noteState)
             }
+        }
+    }
+}
+
+@Composable
+fun TunerPart(
+    paddingValues: PaddingValues,
+    noteState: () -> LastNoteState,
+    navigator: DestinationsNavigator?,
+    a4frequency: () -> Double,
+    tunerViewModel: TunerViewModel?
+) {
+
+    Column(
+        Modifier
+            .background(MaterialTheme.colorScheme.inverseSurface)
+            .padding(top = paddingValues.calculateTopPadding())
+    ) {
+        ProvideTextStyle(
+            value = MaterialTheme.typography.headlineMedium
+                .copy(color = MaterialTheme.colorScheme.inverseOnSurface)
+        ) {
+            CenteredNavigationBarWithNavigateBack(
+                navigator = navigator,
+                backIconColor = MaterialTheme.colorScheme.inverseOnSurface
+            ) {
+                FrequencySetting(
+                    modifier = Modifier.fillMaxWidth(),
+                    a4frequency = a4frequency().toInt(),
+                    setFrequency = { tunerViewModel?.setA4Frequency(it.toDouble()) }
+                )
+            }
+
+            Divider()
+
+            TunerMeter(
+                Modifier.aspectRatio(11f / 9),
+                noteStateLambda = noteState
+            )
         }
     }
 }
@@ -296,7 +314,7 @@ private fun FrequencySetting(
     ) {
         IconButton(onClick = { setFrequency(a4frequency - 1) }) {
             Icon(
-                painter = painterResource(id = R.drawable.baseline_remove_24),
+                painter = painterResource(id = com.kobera.music.common.R.drawable.baseline_remove_24),
                 tint = MaterialTheme.colorScheme.inverseOnSurface,
                 contentDescription = null
             )
@@ -408,10 +426,11 @@ private fun TunerClock(modifier: Modifier = Modifier, noteState: LastNoteState.H
                 scale(2f) {
                     val start = center - Offset(0f, radius)
                     val end = start + Offset(0f, radius / 20f)
-                    repeat(7) {
+                    val numberOfRepeats = 7
+                    repeat(numberOfRepeats) {
                         rotate(it / 14f * 360 - (90f - 90f / 7)) {
                             drawLine(
-                                color = Color.White,
+                                color = if (it == numberOfRepeats / 2) Color.Green else if (it == 0 || it == numberOfRepeats - 1) Color.Gray else Color.White,
                                 start = start,
                                 end = end,
                                 strokeWidth = 5.dp.toPx(),
@@ -474,7 +493,7 @@ fun TunerScreenPreview() {
         tunerViewModel = null,
         noteState = {
             LastNoteState.HasNote(
-                NoteWithFrequency(
+                ToneWithFrequency(
                     InnerTwelveToneInterpretation.A,
                     name = "A4",
                     4,

@@ -1,0 +1,16 @@
+
+comments:
+  UndocumentedPublicClass:
+    active: true
+    excludes: ['**ViewModel**']
+    searchInNestedClass: false
+    searchInInnerClass: false
+    searchInInnerObject: false
+    searchInInnerInterface: false
+naming:
+  FunctionNaming:
+    ignoreAnnotated: ['Composable']
+complexity:
+  LongParameterList:
+    ignoreAnnotated:
+      - 'Composable'

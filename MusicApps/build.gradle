@@ -1,3 +1,5 @@
+import io.gitlab.arturbosch.detekt.Detekt
+
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
     def kotlinCompilerVersion = '1.4.3'
@@ -12,5 +14,21 @@ plugins {
     alias(libs.plugins.kotlin)              apply false
     alias(libs.plugins.ksp)                 apply false
     alias(libs.plugins.serialization)       apply false
+    alias(libs.plugins.detekt)              apply true
 }
 
+detekt {
+    toolVersion = "1.23.0-RC2"
+    config = files("detekt.yml")
+    buildUponDefaultConfig = true
+}
+
+tasks.withType(Detekt).configureEach {
+    reports {
+        xml.required.set(false)
+        html.required.set(true)
+        txt.required.set(false)
+        sarif.required.set(false)
+        md.required.set(false)
+    }
+}

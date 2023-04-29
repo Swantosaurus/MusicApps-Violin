@@ -3,6 +3,9 @@ package com.kobera.music.common.notes.sheet.ui
 import androidx.annotation.DrawableRes
 import com.kobera.music.common.R
 
+/**
+ * Clef drawing resource
+ */
 enum class Clef(@DrawableRes val resource: Int) {
     Violin(R.drawable.violin_key),
     //TODO

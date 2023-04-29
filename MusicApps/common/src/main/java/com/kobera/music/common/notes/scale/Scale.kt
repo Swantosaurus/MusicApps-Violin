@@ -3,6 +3,9 @@ package com.kobera.music.common.notes.scale
 import com.kobera.music.common.notes.sheet.SheetNote
 import com.kobera.music.common.notes.sheet.ui.KeySignature
 
+/**
+* Represents a sheet scale
+*/
 interface Scale {
     fun getKeySignature() : KeySignature
     fun getNotes(): List<SheetNote>
@@ -18,6 +21,7 @@ fun KeySignature.getMajorScale(): Scale =
         else -> throw IllegalArgumentException("Not supported key signature: $this")
     }
 
+@Suppress("MagicNumber")
 fun KeySignature.Flats.getMajorScale(): Scale {
     return when(numberOfFlats){
         0 -> MajorScale.C
@@ -31,6 +35,8 @@ fun KeySignature.Flats.getMajorScale(): Scale {
         else -> throw IllegalArgumentException("Not supported number of flats: $numberOfFlats")
     }
 }
+
+@Suppress("MagicNumber")
 fun KeySignature.Sharps.getMajorScale(): Scale {
     return when(numberOfSharps){
         0 -> MajorScale.C

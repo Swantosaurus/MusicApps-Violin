@@ -3,7 +3,16 @@ plugins {
     alias(libs.plugins.kotlin)          apply true
     alias(libs.plugins.serialization)   apply true
     alias(libs.plugins.ksp)             apply true
+    alias(libs.plugins.detekt)          apply true
 }
+
+detekt {
+    toolVersion = "1.23.0-RC2"
+    config = files("../detekt.yml")
+    buildUponDefaultConfig = true
+}
+
+
 
 android {
     namespace 'com.kobera.music.common'

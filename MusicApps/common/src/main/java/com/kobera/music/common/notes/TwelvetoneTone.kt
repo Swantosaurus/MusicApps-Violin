@@ -3,10 +3,10 @@ package com.kobera.music.common.notes
 /**
  * Represents a tone in a octave in twelve tone notation.
  */
-open class TwelvetoneNote(
+open class TwelvetoneTone(
     val twelveNoteInterpretation: InnerTwelveToneInterpretation,
     val octave: Int
-) : Comparable<TwelvetoneNote> {
+) : Comparable<TwelvetoneTone> {
 
     init {
         assert(octave >= 0) {
@@ -14,15 +14,17 @@ open class TwelvetoneNote(
         }
     }
 
-    open fun difference(other: TwelvetoneNote): Int {
-        return this.twelveNoteInterpretation.ordinal - other.twelveNoteInterpretation.ordinal + (this.octave - other.octave) * 12
+    open fun difference(other: TwelvetoneTone): Int {
+        return this.twelveNoteInterpretation.ordinal - other.twelveNoteInterpretation.ordinal +
+                (this.octave - other.octave) * Tones.numberOfTones
     }
 
     /**
      * Returns true if the note is the same as the other note.
      */
-    infix fun sameNoteAs(other: TwelvetoneNote): Boolean {
-        return this.twelveNoteInterpretation == other.twelveNoteInterpretation && this.octave == other.octave
+    infix fun sameNoteAs(other: TwelvetoneTone): Boolean {
+        return this.twelveNoteInterpretation == other.twelveNoteInterpretation
+                && this.octave == other.octave
     }
 
     /**
@@ -30,7 +32,8 @@ open class TwelvetoneNote(
      * -1 if this note is lower than the other note,
      * 0 if they are the same.
      */
-    override fun compareTo(other: TwelvetoneNote): Int {
+    @Suppress("ReturnCount")
+    override fun compareTo(other: TwelvetoneTone): Int {
         if (this.octave > other.octave) return 1
         if (this.octave < other.octave) return -1
 
@@ -40,10 +43,10 @@ open class TwelvetoneNote(
     /**
      * Returns the next note in the twelve tone system.
      */
-    open fun nextNote(): TwelvetoneNote {
+    open fun nextNote(): TwelvetoneTone {
         return if (twelveNoteInterpretation == InnerTwelveToneInterpretation.B)
-            TwelvetoneNote(InnerTwelveToneInterpretation.C, octave + 1)
+            TwelvetoneTone(InnerTwelveToneInterpretation.C, octave + 1)
         else
-            TwelvetoneNote(twelveNoteInterpretation.nextTone(), octave)
+            TwelvetoneTone(twelveNoteInterpretation.nextTone(), octave)
     }
 }

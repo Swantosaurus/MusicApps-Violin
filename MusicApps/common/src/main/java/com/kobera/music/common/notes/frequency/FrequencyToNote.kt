@@ -12,12 +12,13 @@ object FrequencyToNote {
     fun transform(
         frequency: Double,
         unknownString: String,
-        notes: Collection<NoteWithFrequency>
-    ): NoteWithFrequency {
+        notes: Collection<ToneWithFrequency>
+    ): ToneWithFrequency {
+        @Suppress("SwallowedException")
         return try {
             notes.first { it.isInRange(frequency) }
         } catch (e: NoSuchElementException) {
-            NoteWithFrequency(
+            ToneWithFrequency(
                 twelveNoteInterpretation = InnerTwelveToneInterpretation.C,
                 name = unknownString,
                 octave = 0,
@@ -28,8 +29,8 @@ object FrequencyToNote {
 
     fun findClosestNote(
         frequency: Double,
-        notes: Collection<NoteWithFrequency>
-    ): NoteWithFrequency {
+        notes: Collection<ToneWithFrequency>
+    ): ToneWithFrequency {
         return notes.minBy { abs((frequency / it.frequency ) -1) }
     }
 }

@@ -81,12 +81,12 @@ class PcmAudioRecorder(private val applicationContext : Context) {
     }
 
     private fun initializeAudioRecord(){
-        if (ActivityCompat.checkSelfPermission(
+        check (ActivityCompat.checkSelfPermission(
                 applicationContext,
                 Manifest.permission.RECORD_AUDIO
-            ) != PackageManager.PERMISSION_GRANTED
+            ) == PackageManager.PERMISSION_GRANTED
         ) {
-            throw IllegalStateException("No permission to record audio")
+            "No permission to record audio"
         }
 
         audioRecord = AudioRecord(
@@ -104,6 +104,9 @@ class PcmAudioRecorder(private val applicationContext : Context) {
         const val readSize = 32_768 // 2 pow 15
     }
 
+    /**
+     * The state of the recorder
+     */
     enum class PcmAudioRecorderState {
         Recording,
         Stopped

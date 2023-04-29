@@ -6,6 +6,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 
+/**
+ * provides access to Score data from database
+ */
 class ScoreRepository(
     private val scoreDao: ScoreDao,
 ) {

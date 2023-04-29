@@ -1,7 +1,8 @@
 package com.kobera.music.common.notes.sheet
 
 import com.kobera.music.common.notes.InnerTwelveToneInterpretation
-import com.kobera.music.common.notes.TwelvetoneNote
+import com.kobera.music.common.notes.Tones
+import com.kobera.music.common.notes.TwelvetoneTone
 
 /**
  * Represents a note for sheet music.
@@ -11,36 +12,39 @@ data class SheetNote(
     val noteParams: SheetNoteParams = SheetNoteParams(),
     val octave: Int
 ) {
-    fun toTwelveTone(): TwelvetoneNote {
+    fun toTwelveTone(): TwelvetoneTone {
         val twelveNoteInterpretation = InnerTwelveToneInterpretation.fromSheetNote(
             innerSheetNote = innerSheetNote,
             noteParams = noteParams
         )
         val ordinalWithShift = twelveNoteInterpretation.ordinal + noteParams.accidental.twelveToneShift
         val setOctave = when(true){
-            (ordinalWithShift in 0..11) -> octave
+            (ordinalWithShift in 0 until Tones.numberOfTones) -> octave
             (ordinalWithShift < 0) -> octave - 1
             else -> octave + 1
         }
-        return TwelvetoneNote(
+        return TwelvetoneTone(
             twelveNoteInterpretation = twelveNoteInterpretation,
             octave = setOctave
         )
     }
 
-    operator fun compareTo(other: TwelvetoneNote): Int =
+    operator fun compareTo(other: TwelvetoneTone): Int =
         this.toTwelveTone().compareTo(other)
 
     operator fun compareTo(other: SheetNote): Int =
         compareTo(other.toTwelveTone())
 
 
-    fun sheetDifference(other: TwelvetoneNote): Int {
+    fun sheetDifference(other: TwelvetoneTone): Int {
         return innerSheetNote.difference(
             InnerSheetNote.fromTwelveTone(other.twelveNoteInterpretation)
         ) + (this.octave - other.octave) * InnerSheetNote.numberOfNotes
     }
 
+    /**
+     * params for a sheet note that are not part of the twelve tone system
+     */
     data class SheetNoteParams(
         val duration: Duration = Duration.Quarter,
         val numberOfDots: Int = 0,
@@ -60,6 +64,9 @@ data class SheetNote(
             }
         }
 
+        /**
+         * Duration of a sheet note
+         */
         enum class Duration {
             Whole,
             Half,
@@ -69,6 +76,10 @@ data class SheetNote(
             ThirtySecond
         }
 
+        /**
+         * Accidental of a sheet note
+         */
+        @Suppress("MagicNumber")
         enum class Accidental(val twelveToneShift: Int) {
             None(0),
             Sharp(1),
@@ -79,7 +90,7 @@ data class SheetNote(
     }
 
     companion object {
-        fun fromTwelveTone(twelveTone: TwelvetoneNote): SheetNote {
+        fun fromTwelveTone(twelveTone: TwelvetoneTone): SheetNote {
             return SheetNote(
                 innerSheetNote = InnerSheetNote.fromTwelveTone(twelveTone.twelveNoteInterpretation),
                 noteParams = SheetNoteParams(twelveTone.twelveNoteInterpretation),

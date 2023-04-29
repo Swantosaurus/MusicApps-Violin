@@ -96,3 +96,4 @@ ksp                 = { id = "com.google.devtools.ksp",                     vers
 serialization       = { id = "org.jetbrains.kotlin.plugin.serialization",   version.ref = "kotlin" }
 android-application = { id = "com.android.application",                     version.ref = "androidStudio"}
 android-library     = { id = "com.android.library",                         version.ref = "androidStudio"}
+detekt              = { id = "io.gitlab.arturbosch.detekt",                 version = "1.23.0-RC2" }

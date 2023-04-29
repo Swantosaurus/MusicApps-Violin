@@ -1,3 +1,5 @@
+@file:Suppress("MagicNumber")
+
 package com.kobera.music.common.notes.scale
 
 import com.kobera.music.common.notes.sheet.SheetNote

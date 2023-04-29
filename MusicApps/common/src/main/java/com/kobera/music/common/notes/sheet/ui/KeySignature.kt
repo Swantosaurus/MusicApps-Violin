@@ -2,28 +2,39 @@ package com.kobera.music.common.notes.sheet.ui
 
 import com.kobera.music.common.notes.sheet.InnerSheetNote
 
+/**
+ * Key signature of sheet music
+ */
 interface KeySignature {
+    /**
+     * key signatre of flats in sheet music
+     */
     class Flats(val numberOfFlats: Int) : KeySignature {
         init {
-            if(numberOfFlats >= 8) {
-                throw IllegalStateException("unsupported number of flats. Use its eqvivalent notation with less flats")
+            if(numberOfFlats > maxNumberOfAccidentals) {
+                error("Unsupported number of flats. Use its equivalent notation with less flats")
             }
         }
 
         override fun getKeySignatureNotes(): List<InnerSheetNote> =
             flatsOrder.take(numberOfFlats)
     }
+
+    /**
+     * key signatre of sharps in sheet music
+     */
     class Sharps(val numberOfSharps: Int) : KeySignature {
         init {
-            if(numberOfSharps >= 8) {
-                throw IllegalStateException("unsupported number of sharps. Use its eqvivalent notation with less sharps")
+            if(numberOfSharps > maxNumberOfAccidentals) {
+                error("Unsupported number of sharps. Use its equivalent notation with less sharps")
             }
         }
 
         override fun getKeySignatureNotes(): List<InnerSheetNote> =
-            flatsOrder.take(numberOfSharps)
+            sharpOrder.take(numberOfSharps)
     }
     companion object {
+        private const val maxNumberOfAccidentals = 7
         private val flatsOrder = arrayOf(
             InnerSheetNote.B,
             InnerSheetNote.E,
@@ -34,7 +45,7 @@ interface KeySignature {
             InnerSheetNote.F
         )
 
-        private val sharpOrder = flatsOrder.reverse()
+        private val sharpOrder = flatsOrder.reversed()
     }
-    abstract fun getKeySignatureNotes() : List<InnerSheetNote>
+    fun getKeySignatureNotes() : List<InnerSheetNote>
 }

@@ -1,5 +1,8 @@
 package com.kobera.music.common.notes
 
+/**
+ * Twelve tone interpretation (enum off all tones in a octave)
+ */
 enum class InnerTwelveToneInterpretation {
     C {
         override val isSharp = false
@@ -62,6 +65,7 @@ enum class InnerTwelveToneInterpretation {
         override fun previousTone() = A
     };
 
+    @Suppress("ReturnCount")
     fun move(by :Int): InnerTwelveToneInterpretation{
         when(true){
             (by == 0) -> {
@@ -95,11 +99,13 @@ enum class InnerTwelveToneInterpretation {
     }
 
     companion object {
+        const val numberOfTones = 12
         fun fromIndex(i : Int){
-            assert(i in 0..11) {
+            assert(i in 0 until numberOfTones) {
                 "TwelveToneNotes needs 12 notes!!"
             }
 
+            @Suppress("MagicNumber")
             when(i){
                 0 -> C
                 1 -> CSharp

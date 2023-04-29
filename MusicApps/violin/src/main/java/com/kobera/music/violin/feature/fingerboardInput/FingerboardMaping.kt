@@ -1,30 +1,41 @@
 package com.kobera.music.violin.feature.fingerboardInput
 
 import com.kobera.music.common.notes.InnerTwelveToneInterpretation
-import com.kobera.music.common.notes.TwelvetoneNote
+import com.kobera.music.common.notes.TwelvetoneTone
 import com.kobera.music.common.notes.scale.Scale
 import com.kobera.music.common.notes.sheet.SheetNote.Companion.fromSheetNote
 import com.kobera.music.violin.sound.notes.violinStrings
 
-
+/**
+ * Represents a finger position on a string.
+ */
 data class FingerPosition(
     val positionOffset: Int,
     val fingerNumber: Int,
-    val respondingNote: TwelvetoneNote
+    val respondingNote: TwelvetoneTone
 )
 
+/**
+ *  Represents all finger positions on the string
+ */
 data class SingleStringFingerboard(
     val startPosition: Int,
     val fingerPositions: List<FingerPosition>
 )
 
+/**
+ * Represents all finger positions on the fingerboard
+ */
 data class FingerboardPositions(
     val stringsFirgerboardPosition: List<SingleStringFingerboard>
 )
 
+/**
+ * Maps a scale to a fingerboard positions.
+ */
 class FingerboardMapping {
     companion object {
-        fun toFingerboard(twelvetoneNotes: List<TwelvetoneNote>): FingerboardPositions {
+        fun toFingerboard(twelvetoneNotes: List<TwelvetoneTone>): FingerboardPositions {
             TODO()
         }
 
@@ -45,7 +56,7 @@ class FingerboardMapping {
 
 
         private fun getFingerPositionForString(
-            string: TwelvetoneNote,
+            string: TwelvetoneTone,
             twelvetoneNotes: List<InnerTwelveToneInterpretation>
         ): List<FingerPosition> {
             val result = mutableListOf<FingerPosition>()
@@ -78,12 +89,12 @@ class FingerboardMapping {
                     currentTwelvetoneNoteIndex = 0
 
                 var twelvetoneNote =
-                    TwelvetoneNote(twelvetoneNotes[currentTwelvetoneNoteIndex!!], string.octave)
+                    TwelvetoneTone(twelvetoneNotes[currentTwelvetoneNoteIndex!!], string.octave)
                 var difference = twelvetoneNote.difference(string)
 
                 if (difference < 0) {
                     difference += 12
-                    twelvetoneNote = TwelvetoneNote(
+                    twelvetoneNote = TwelvetoneTone(
                         twelvetoneNotes[currentTwelvetoneNoteIndex!!],
                         string.octave + 1
                     )

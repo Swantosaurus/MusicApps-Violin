@@ -19,15 +19,19 @@ import kotlin.math.roundToInt
  * @param accuracy The accuracy of the frequency search.
  * @param silenceThreshold The silence threshold.
  * @param fineTuneLookupRange The fine tune lookup range.
+ * @param hpsIterations The number of HPS iterations. (if less than 2 HPS is not used)
  */
+
+
+@Suppress("MagicNumber","LongParameterList")
 class SingleFrequencyReader(
     private val pcmAudioRecorder: PcmAudioRecorder,
     minSearchedFrequency: Frequency = Frequency(150.0),
     maxSearchedFrequency: Frequency = Frequency(2000.0),
-    private val accuracy: Double = 0.01,
+    private val accuracy: Frequency = Frequency(0.05),
     silenceThreshold: Long = 3_000_000L,
     private val fineTuneLookupRange: Int = 1,
-    private val hpsIterations: Int = 4
+    private val hpsIterations: Int = 1
 ) {
     private val _frequency : MutableStateFlow<FrequencyState> = MutableStateFlow(
         FrequencyState.Silence
@@ -50,7 +54,7 @@ class SingleFrequencyReader(
             FrequencyReaderState.Stopped
         )
 
-    private val scope = CoroutineScope(Dispatchers.IO + Job())
+    private val scope = CoroutineScope(Dispatchers.Default + Job())
 
     private var job: Job? = null
 
@@ -116,9 +120,11 @@ class SingleFrequencyReader(
                     fineTuneLookup(pcmAudioData, fftIndexAndRelevancy.index.toInt(), accuracy)
 
                 val mostRelevantFrequency: Double =
-                    fineTuneIndexAndRelevancy.index * (PcmAudioRecorder.sampleRate.toDouble() / PcmAudioRecorder.readSize.toDouble())
+                    fineTuneIndexAndRelevancy.index * (PcmAudioRecorder.sampleRate.toDouble()
+                            / PcmAudioRecorder.readSize.toDouble())
 
-                //Timber.d("Result Index: $resultIndex Result Frequency: $mostRelevantFrequency")
+                //Timber.d("Result Index: ${fineTuneIndexAndRelevancy.index} " +
+                //        "Result Frequency: $mostRelevantFrequency")
                 _frequency.value = FrequencyState.HasFrequency(mostRelevantFrequency)
             }
         }
@@ -134,18 +140,18 @@ class SingleFrequencyReader(
         var maxValue = threashold
         var indexFromBottom = -1
         for (index in minFourierIndexSearched until maxFourierIndexSearched) {
-            var currentThreshold = maxValue
-
-            if (frequencyDomain[index] > currentThreshold) {
+            if (frequencyDomain[index] > maxValue) {
                 indexFromBottom = index
                 maxValue = frequencyDomain[index]
             }
         }
+        Timber.d("index$indexFromBottom")
         return if (indexFromBottom == -1) {
             RelevancyAndIndex.NotFound
         } else {
             RelevancyAndIndex.Found(maxValue, indexFromBottom)
         }
+
     }
 
     private fun lookupFrequencyDomain(
@@ -169,7 +175,7 @@ class SingleFrequencyReader(
                 if (counter == null) {
                     counter = (index * 0.2).roundToInt()
                 }
-                counter += 1 * /
+                counter += 1
                 indexFromBottom = index
                 maxValue = frequencyDomain[index]
             }
@@ -192,7 +198,7 @@ class SingleFrequencyReader(
     private fun fineTuneLookup(
         pcmAudioData: ShortArray,
         fftMostRelevantIndex: Int,
-        accuracy: Double
+        accuracy: Frequency
     ): RelevancyAndIndex.Found {
         val fineTuneDomain =
             FourierTransform.fineTuneDFT(
@@ -211,14 +217,18 @@ class SingleFrequencyReader(
                 fineTuneIndex = i
             }
         }
-        if (fineTuneIndex == -1) throw IllegalStateException("Fine tune index is -1. This should not happen.")
+
+        check (fineTuneIndex != -1) { "Fine tune index is -1. This should not happen." }
 
         return RelevancyAndIndex.Found(
             finalMaxValue,
-            fftMostRelevantIndex - fineTuneLookupRange + fineTuneIndex * accuracy
+            fftMostRelevantIndex - fineTuneLookupRange + fineTuneIndex * accuracy.toFourierIndexDouble()
         )
     }
 
+    /**
+     * value in frequency domain with its idnex
+     */
     sealed interface RelevancyAndIndex {
         object NotFound : RelevancyAndIndex
         data class Found(val relevancy: Double, val index: Double) : RelevancyAndIndex {
@@ -240,6 +250,7 @@ class SingleFrequencyReader(
         Recording
     }
 
+    @Suppress("VariableNaming")
     private val TAG = this.javaClass.simpleName
 }
 

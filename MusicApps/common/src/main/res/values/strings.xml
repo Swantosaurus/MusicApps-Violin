@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="metronome">Metronome</string>
+    <string name="start_stop">Start/Stop</string>
+    <string name="beats_per_second">Beats per second</string>
+</resources>

@@ -1,9 +1,14 @@
+@file:Suppress("MagicNumber")
+
 package com.kobera.music.common.notes.sheet.ui
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Path
 
+/**
+ * Path for drawing a note
+ */
 object NotePath {
     fun drawQuarterNote(lineHeightPx: Float, legLength: Float, facingDown: Boolean): PathAndCenterOffset {
         val body = if (facingDown) {
@@ -37,7 +42,7 @@ object NotePath {
         return PathAndCenterOffset(path = path, Offset(body.centerOffset.x, noteBodyCenterY))
     }
 
-    private val legWidth = 5f
+    private const val legWidth = 5f
 
 
     private data class ElementPathInformation(

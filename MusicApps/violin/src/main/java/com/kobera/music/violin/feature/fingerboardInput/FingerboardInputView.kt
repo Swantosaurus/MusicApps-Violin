@@ -1,3 +1,5 @@
+@file:Suppress("LongMethod", "MagicNumber")
+
 package com.kobera.music.violin.feature.fingerboardInput
 
 import androidx.compose.foundation.Canvas
@@ -21,7 +23,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
-import com.kobera.music.common.notes.TwelvetoneNote
+import com.kobera.music.common.notes.TwelvetoneTone
 import com.kobera.music.common.notes.scale.Scale
 import timber.log.Timber
 
@@ -31,7 +33,7 @@ import timber.log.Timber
  */
 @OptIn(ExperimentalTextApi::class)
 @Composable
-fun FingerboardInputView(scale: Scale, keyboardClicked: (TwelvetoneNote) -> Unit) {
+fun FingerboardInputView(scale: Scale, keyboardClicked: (TwelvetoneTone) -> Unit) {
     val fingerPositions = remember{
         FingerboardMapping.toFingerboard(scale = scale).stringsFirgerboardPosition.reversed()
     }

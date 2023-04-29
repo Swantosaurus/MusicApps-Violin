@@ -11,7 +11,9 @@ import com.kobera.music.violin.feature.NavGraphs
 import com.kobera.music.violin.ui.theme.ViolinAppTheme
 import com.ramcosta.composedestinations.DestinationsNavHost
 
-
+/**
+ * entry activity point of the app
+ */
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

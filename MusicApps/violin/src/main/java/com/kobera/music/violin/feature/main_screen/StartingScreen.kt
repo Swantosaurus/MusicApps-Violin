@@ -24,6 +24,7 @@ import com.kobera.music.common.ui.util.setSystemBarColors
 import com.kobera.music.violin.R
 import com.kobera.music.violin.feature.NavGraphs
 import com.kobera.music.violin.feature.destinations.DirectionDestination
+import com.kobera.music.violin.feature.destinations.MetronomeWrapperDestination
 import com.kobera.music.violin.feature.destinations.RecognizeNoteScreenDestination
 import com.kobera.music.violin.feature.destinations.TunerScreenDestination
 import com.ramcosta.composedestinations.annotation.Destination
@@ -34,7 +35,10 @@ import org.koin.androidx.compose.getViewModel
 @Destination
 @RootNavGraph(start = true)
 @Composable
-fun StartingScreen(startingScreenViewModel: StartingScreenViewModel = getViewModel(), navigator: DestinationsNavigator) {
+fun StartingScreen(
+    startingScreenViewModel: StartingScreenViewModel = getViewModel(),
+    navigator: DestinationsNavigator
+) {
     val scoreState by startingScreenViewModel.score.collectAsStateWithLifecycle()
     StartingScreenBody(navigator = navigator, scoreState = scoreState)
 }
@@ -97,10 +101,18 @@ private fun Navigation(navigator: DestinationsNavigator?) {
     }
 }
 
+/**
+ * Navigation item UI description for the starting screen
+ *
+ * @param icon - icon for the navigation item
+ * @param title - title for the navigation item
+ */
 data class NavigationDescription(val icon: Painter, val title: String)
 
 @Composable
-private fun getUiDescriptionForDestination(navigationDestination: com.kobera.music.violin.feature.destinations.Destination): NavigationDescription? {
+private fun getUiDescriptionForDestination(
+    navigationDestination: com.kobera.music.violin.feature.destinations.Destination
+): NavigationDescription? {
     return when (navigationDestination) {
         is RecognizeNoteScreenDestination -> {
             NavigationDescription(
@@ -116,8 +128,15 @@ private fun getUiDescriptionForDestination(navigationDestination: com.kobera.mus
             )
         }
 
+        is MetronomeWrapperDestination -> {
+            NavigationDescription(
+                painterResource(id = R.drawable.ic_violin),
+                stringResource(com.kobera.music.common.R.string.metronome)
+            )
+        }
+
         else -> {
-            null//throw IllegalStateException("Undefined destination UI")
+            null //throw IllegalStateException("Undefined destination UI")
         }
     }
 }

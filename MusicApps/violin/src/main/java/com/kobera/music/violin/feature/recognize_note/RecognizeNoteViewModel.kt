@@ -8,10 +8,11 @@ import androidx.datastore.dataStore
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kobera.music.common.model.GamesAudioSensitivityStorage
-import com.kobera.music.common.notes.Notes
-import com.kobera.music.common.notes.TwelvetoneNote
+import com.kobera.music.common.notes.Tones
+import com.kobera.music.common.notes.TwelvetoneTone
 import com.kobera.music.common.notes.frequency.FrequencyToNote
-import com.kobera.music.common.notes.frequency.NoteWithFrequency
+import com.kobera.music.common.notes.frequency.InTunePrecision
+import com.kobera.music.common.notes.frequency.ToneWithFrequency
 import com.kobera.music.common.notes.sheet.SheetNote
 import com.kobera.music.common.notes.sheet.ui.KeySignature
 import com.kobera.music.common.score.ScoreRepository
@@ -19,7 +20,7 @@ import com.kobera.music.common.score.data.ScoreEntity
 import com.kobera.music.common.score.data.ScoreType
 import com.kobera.music.common.sound.SingleFrequencyReader
 import com.kobera.music.common.sound.SingleFrequencyReader.FrequencyState
-import com.kobera.music.common.sound.frequency_baseline.A4Frequency
+import com.kobera.music.common.sound.frequency.A4Frequency
 import com.kobera.music.violin.R
 import com.kobera.music.violin.feature.recognize_note.model.RecognizeNoteScales
 import com.kobera.music.violin.feature.recognize_note.model.RecognizeNoteSerializer
@@ -92,7 +93,7 @@ class RecognizeNoteViewModel(
         }
     }
 
-    private var lastNote: NoteWithFrequency? = null
+    private var lastNote: ToneWithFrequency? = null
     private suspend fun readFrequency(a4Frequency: A4Frequency){
         singleFrequencyReader.frequency.collect { frequencyState ->
             if (_recognizeNoteState.value !is RecognizeNoteState.NotEntered) {
@@ -111,7 +112,7 @@ class RecognizeNoteViewModel(
                     }
                     val noteFromFrequency = FrequencyToNote.findClosestNote(
                         frequency = frequencyState.frequency,
-                        notes = Notes.getNotes(a4Frequency.frequency.value, inTunePrecision = Notes.InTunePrecision.MEDIUM).values
+                        notes = Tones.getTones(a4Frequency.frequency.value, inTunePrecision = InTunePrecision.MEDIUM).values
                     )
 
                     //playing can ocure in middle of searched sector therefor 1.st note is not correct
@@ -136,7 +137,7 @@ class RecognizeNoteViewModel(
 
 
     private  fun newToShowState(
-        noteFromFrequency: NoteWithFrequency,
+        noteFromFrequency: ToneWithFrequency,
         ready: GeneratedNoteState.Ready,
         frequencyState: FrequencyState.HasFrequency
     ): RecognizeNoteState.ToShow {
@@ -197,7 +198,7 @@ class RecognizeNoteViewModel(
         }
     }
 
-    fun keyboardInput(input: TwelvetoneNote) {
+    fun keyboardInput(input: TwelvetoneTone) {
         if (_recognizeNoteState.value !is RecognizeNoteState.NotEntered) {
             return
         }

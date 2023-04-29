@@ -1,3 +1,4 @@
+@file:Suppress("TooManyFunctions", "MagicNumber")
 package com.kobera.music.common.notes.sheet.ui.compose
 
 import androidx.compose.foundation.Canvas
@@ -28,7 +29,7 @@ import androidx.compose.ui.unit.dp
 import com.kobera.music.common.notes.InnerTwelveToneInterpretation.B
 import com.kobera.music.common.notes.InnerTwelveToneInterpretation.D
 import com.kobera.music.common.notes.InnerTwelveToneInterpretation.G
-import com.kobera.music.common.notes.TwelvetoneNote
+import com.kobera.music.common.notes.TwelvetoneTone
 import com.kobera.music.common.notes.sheet.InnerSheetNote
 import com.kobera.music.common.notes.sheet.SheetNote
 import com.kobera.music.common.notes.sheet.SheetNote.SheetNoteParams.Accidental
@@ -36,20 +37,21 @@ import com.kobera.music.common.notes.sheet.ui.Clef
 import com.kobera.music.common.notes.sheet.ui.KeySignature
 import com.kobera.music.common.notes.sheet.ui.NotePath
 import com.kobera.music.common.notes.sheet.ui.PathAndCenterOffset
-import org.koin.androidx.compose.getViewModel
 
 
+@Suppress("LongParameterList")
 @Composable
 fun Sheet(
     modifier: Modifier = Modifier,
     notes: List<SheetNote>,
     extraNotes: List<SheetNote> = listOf(),
-    clef: Clef = Clef.Violin,
     keySignature: KeySignature,
+    clef: Clef = Clef.Violin,
     height: Float = 240f,
-    sheetViewModel: SheetViewModel = getViewModel()
+    sheetViewModel: SheetViewModel = SheetViewModel()
 ) {
-    val lineHeight = height / 6
+    val numebrOfLines = 5
+    val lineHeight = height / numebrOfLines + 1
     val sheetSpacing = 100f
     val sheetSpacingFromLeft = 40f
     val clefPainter = painterResource(clef.resource)
@@ -108,6 +110,7 @@ fun Sheet(
 
 @Composable
 @Preview
+@Suppress("LongMethod")
 fun SheetPreview2() {
     Box(
         Modifier
@@ -197,6 +200,8 @@ fun SheetPreview2() {
     }
 }
 
+
+@Suppress("ReturnCount")
 private fun DrawScope.drawKeySignature(
     spacingFromLeft: Float,
     keySignature: KeySignature,
@@ -226,13 +231,14 @@ private fun DrawScope.drawKeySignature(
         }
 
         else -> {
-            throw IllegalStateException()
+            error("Unsupported key signature")
         }
     }
 }
 
 @Composable
 @Preview
+@Suppress("LongMethod")
 fun SheetPreview() {
     Box(
         Modifier
@@ -448,6 +454,7 @@ private fun DrawScope.drawSharp(lineHeight: Float, colorFilter: ColorFilter) {
     }
 }
 
+@Suppress("unused")
 private fun DrawScope.drawTimeSignature(spacingFromLeft: Float): Float {
     TODO()
 }
@@ -529,24 +536,25 @@ private fun DrawScope.drawAccidental(
 ): Float {
     val accidentalToDraw: Accidental? = note.getAccidentalToDraw(keySignature = keySignature)
     val noteSpacing = lineHeight / 2
-    accidentalToDraw?.let {
-        translate(
-            left = spacingFromLeft,
-            top = -noteSpacing * (note.sheetDifference(TwelvetoneNote(G, 5)) - 1)
-        ) {
-            when (accidentalToDraw) {
-                Accidental.None -> drawNatural(lineHeight = lineHeight, colorFilter = colorFilter)
-                Accidental.Sharp -> drawSharp(lineHeight = lineHeight, colorFilter = colorFilter)
-                Accidental.Flat -> drawFlat(sheetLineHeight = lineHeight, colorFilter = colorFilter)
-                else -> TODO()
-            }
-        }
-        return 75f
+    if(accidentalToDraw == null) {
+        return 0f
     }
-    return 0f
+    translate(
+        left = spacingFromLeft,
+        top = -noteSpacing * (note.sheetDifference(TwelvetoneTone(G, 5)) - 1)
+    ) {
+        when (accidentalToDraw) {
+            Accidental.None -> drawNatural(lineHeight = lineHeight, colorFilter = colorFilter)
+            Accidental.Sharp -> drawSharp(lineHeight = lineHeight, colorFilter = colorFilter)
+            Accidental.Flat -> drawFlat(sheetLineHeight = lineHeight, colorFilter = colorFilter)
+            else -> TODO()
+        }
+    }
+    return 75f
 }
 
 
+@Suppress("CyclomaticComplexMethod")
 private fun SheetNote.getAccidentalToDraw(keySignature: KeySignature): Accidental? {
     if (!isInKeySignature(keySignature)) {
         return when (noteParams.accidental) {
@@ -605,7 +613,7 @@ private fun SheetNote.getAccidentalToDraw(keySignature: KeySignature): Accidenta
             }
         }
 
-        else -> throw java.lang.IllegalStateException()
+        else -> error("Unsupported key signature")
     }
 }
 
@@ -661,7 +669,7 @@ private fun DrawScope.drawNote(
         getNotePathAndCenterOffset(note = note, lineHeight = lineHeight)
 
 
-    translate(top = noteStep * (-note.sheetDifference(TwelvetoneNote(G, 5)))) {
+    translate(top = noteStep * (-note.sheetDifference(TwelvetoneTone(G, 5)))) {
         translate(left = spacingFromLeft, top = -notePath.centerOffset.y + noteStep) {
             drawPath(notePath.path, color = color)
         }
@@ -673,7 +681,7 @@ private fun DrawScope.drawNote(
 private fun getNotePathAndCenterOffset(note: SheetNote, lineHeight: Float): PathAndCenterOffset =
     when (note.noteParams.duration) {
         SheetNote.SheetNoteParams.Duration.Quarter -> {
-            if (note > TwelvetoneNote(G, octave = 5) || note < TwelvetoneNote(D, 3)) {
+            if (note > TwelvetoneTone(G, octave = 5) || note < TwelvetoneTone(D, 3)) {
                 //TODO()
                 PathAndCenterOffset(Path(), Offset.Zero)
             }
@@ -681,7 +689,7 @@ private fun getNotePathAndCenterOffset(note: SheetNote, lineHeight: Float): Path
             NotePath.drawQuarterNote(
                 lineHeightPx = lineHeight,
                 legLength = lineHeight * 3,
-                facingDown = note > TwelvetoneNote(B, 4)
+                facingDown = note > TwelvetoneTone(B, 4)
             )
         }
 

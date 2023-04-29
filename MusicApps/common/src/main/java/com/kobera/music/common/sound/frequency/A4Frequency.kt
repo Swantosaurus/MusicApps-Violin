@@ -1,4 +1,4 @@
-package com.kobera.music.common.sound.frequency_baseline
+package com.kobera.music.common.sound.frequency
 
 import android.content.Context
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,6 +15,7 @@ class A4Frequency(applicationContext: Context) {
     private val frequencyKey = "frequency"
 
     init {
+        @Suppress("MagicNumber")
         _frequency = MutableStateFlow(
             preferences.getFloat(frequencyKey, 440.0f).toDouble()
         )

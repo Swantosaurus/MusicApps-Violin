@@ -133,7 +133,11 @@ fun RecognizeNoteScreenBody(
     }
 }
 
+@Suppress("MagicNumber")
 @Composable
+/**
+ * just for preview draws X
+ */
 private fun SheetInPreview() {
     Canvas(modifier = Modifier.height(200.dp)) {
         //TODO()

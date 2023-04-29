@@ -17,5 +17,4 @@ val scoreModule = module {
     single {
         Room.databaseBuilder(androidContext(), ScoreDatabase::class.java, "stats").build()
     }
-
 }

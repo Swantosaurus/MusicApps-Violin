@@ -1,8 +1,9 @@
 package com.kobera.music.common.notes.frequency
 
 import com.kobera.music.common.notes.InnerTwelveToneInterpretation
-import com.kobera.music.common.notes.TwelveToneNoteNames
-import com.kobera.music.common.notes.TwelvetoneNote
+import com.kobera.music.common.notes.Tones
+import com.kobera.music.common.notes.TwelveToneNames
+import com.kobera.music.common.notes.TwelvetoneTone
 import kotlin.math.pow
 
 /**
@@ -12,21 +13,22 @@ import kotlin.math.pow
  * @param name the name of the note
  * @param octave the octave of the note
  * @param frequency the reference tone frequency of the note
- * @param rangeInterval the interval that is used to determine if a frequency is in close range of the tone that note represents
+ * @param rangeInterval the interval that is used to determine if a frequency is in close range
+ * of the tone that note represents
  * @param inTuneInterval the interval that is used to determine if a frequency is in tune of the note
  */
-class NoteWithFrequency(
+class ToneWithFrequency(
     twelveNoteInterpretation: InnerTwelveToneInterpretation,
     val name: String,
     octave: Int,
     val frequency: Double,
-    private val rangeInterval: Double = 2.0.pow(1.0 / 24.0),
-    private val inTuneInterval: Double = 2.0.pow(1.0 / 240.0),
-) : TwelvetoneNote(
+    private val rangeInterval: InRangePrecision = InRangePrecision.MEDIUM,
+    private val inTuneInterval: InTunePrecision = InTunePrecision.HIGH,
+) : TwelvetoneTone(
     twelveNoteInterpretation = twelveNoteInterpretation,
     octave = octave
 ) {
-    private val twelveToneNoteNames = TwelveToneNoteNames.getNames()
+    private val twelveToneNoteNames = TwelveToneNames.getNames()
 
     /**
      * Returns true if the given frequency is in tune of tone responding to the note.
@@ -35,7 +37,7 @@ class NoteWithFrequency(
      */
     fun isInTune(compareFreq: Double): Boolean {
         val diff = if (compareFreq > frequency) compareFreq / frequency else frequency / compareFreq
-        return diff <= inTuneInterval
+        return diff <= inTuneInterval.oneWayDistance
     }
 
     /**
@@ -45,7 +47,7 @@ class NoteWithFrequency(
      */
     fun isInRange(compareFreq: Double): Boolean {
         val diff = if (compareFreq > frequency) compareFreq / frequency else frequency / compareFreq
-        return diff < rangeInterval
+        return diff < rangeInterval.oneWayDistance
     }
 
 
@@ -53,10 +55,10 @@ class NoteWithFrequency(
      * Returns the difference angle of the given frequency to the frequency of the note.
      */
     fun getDifferenceAngle(compareFreq: Double, maxAngle: Double): Double {
-        val angle = if (rangeInterval > maxRangeIntervalForAngle) {
+        val angle = if (rangeInterval.oneWayDistance > maxRangeIntervalForAngle) {
             ((compareFreq / frequency) - 1) / (maxRangeIntervalForAngle - 1) * maxAngle
         } else {
-            ((compareFreq / frequency) - 1) / (rangeInterval - 1) * maxAngle
+            ((compareFreq / frequency) - 1) / (rangeInterval.oneWayDistance - 1) * maxAngle
         }
         return if (angle > maxAngle) {
             maxAngle
@@ -69,7 +71,7 @@ class NoteWithFrequency(
     /**
      * Returns the next note in the twelve tone system.
      */
-    override fun nextNote(): NoteWithFrequency {
+    override fun nextNote(): ToneWithFrequency {
         val index = twelveToneNoteNames.indexOf(name)
         var newOctave = this.octave
         val nextIndex = if (twelveToneNoteNames.size == index) {
@@ -77,8 +79,8 @@ class NoteWithFrequency(
             0
         } else index + 1
         val nextNoteName = twelveToneNoteNames[nextIndex]
-        val nextFrequency = frequency * 2.0.pow(1.0 / 12.0)
-        return NoteWithFrequency(
+        val nextFrequency = frequency * Tones.twelvtoneStep
+        return ToneWithFrequency(
             twelveNoteInterpretation.nextTone(),
             nextNoteName,
             newOctave,
@@ -89,15 +91,16 @@ class NoteWithFrequency(
     /**
      * Returns clone of this object with possivle changes in values
      */
+    @Suppress("LongParameterList")
     fun copy(
         twelveNoteInterpretation: InnerTwelveToneInterpretation = this.twelveNoteInterpretation,
         name : String = this.name,
         octave: Int = this.octave,
         frequency: Double = this.frequency,
-        rangeInterval: Double = this.rangeInterval,
-        inTuneInterval: Double = this.inTuneInterval
-    ): NoteWithFrequency =
-        NoteWithFrequency(
+        rangeInterval: InRangePrecision = this.rangeInterval,
+        inTuneInterval: InTunePrecision = this.inTuneInterval
+    ): ToneWithFrequency =
+        ToneWithFrequency(
             twelveNoteInterpretation,
             name,
             octave,
@@ -107,9 +110,38 @@ class NoteWithFrequency(
         )
 
     companion object {
-        // The max range interval for angle is the interval that is used to determine if a frequency is in close range of the tone that note represents
+        // The max range interval for angle is the interval that is used to determine
+        // if a frequency is in close range of the tone that note represents
         private val maxRangeIntervalForAngle = 2.0.pow(1.0 / 12)
     }
+}
+
+/**
+ * Represents a range of a frequency
+ */
+sealed interface Range{
+    val oneWayDistance: Double
+}
+
+
+/**
+ * Represents a range of a frequency to be considered close to the frequency of a note
+ */
+@Suppress("MagicNumber")
+enum class InRangePrecision(override val oneWayDistance: Double): Range {
+    LOW(2.0.pow(Tones.twelvetoneStepExponent)),
+    MEDIUM(2.0.pow(Tones.twelvtoneStep / 2.0)),
+    HIGH(2.0.pow(Tones.twelvtoneStep / 8.0))
+}
+
+/**
+ * Represents a range of a frequency to be considered in tune to the frequency of a note
+ */
+@Suppress("MagicNumber")
+enum class InTunePrecision(override val oneWayDistance: Double): Range {
+    LOW(2.0.pow(Tones.twelvtoneStep / 20.0 * 8.0)),
+    MEDIUM(2.0.pow(Tones.twelvtoneStep / 20.0 * 3.0)),
+    HIGH(2.0.pow(Tones.twelvtoneStep / 20.0))
 }
 
 

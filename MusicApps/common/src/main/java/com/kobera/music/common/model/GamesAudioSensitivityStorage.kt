@@ -17,8 +17,9 @@ class GamesAudioSensitivityStorage(applicationContext: Context) {
     val dataStore = applicationContext.gamesAudioSensitivityStorage
     val key = floatPreferencesKey("sensitivity")
 
+    @Suppress("MagicNumber")
     val sensitivity = dataStore.data.map { preferences ->
-        preferences[key] ?: 0.5f
+         preferences[key] ?: 0.5f
     }
 
 

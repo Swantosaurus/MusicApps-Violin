@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin)              apply true
     alias(libs.plugins.ksp)                 apply true
     alias(libs.plugins.serialization)       apply true
+    alias(libs.plugins.detekt)              apply true
 }
 
 android {
@@ -89,4 +90,9 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.9.2'
     debugImplementation 'androidx.compose.ui:ui-tooling'
     debugImplementation 'androidx.compose.ui:ui-test-manifest'
+}
+detekt {
+    toolVersion = "1.23.0-RC2"
+    config = files("../detekt.yml")
+    buildUponDefaultConfig = true
 }

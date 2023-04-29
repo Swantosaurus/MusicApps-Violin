@@ -1,6 +1,6 @@
 package com.kobera.music.violin.feature.tuner
 
-import com.kobera.music.common.notes.Notes
+import com.kobera.music.common.notes.Tones
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -11,7 +11,7 @@ import kotlin.math.pow
 internal class NotesTest {
     @Test
     fun getNotes() {
-        val notes = Notes.getNotes(440.0)
+        val notes = Tones.getTones(440.0)
 
         assertEquals(220.0, notes["A3"]!!.frequency)
 
