@@ -4,14 +4,13 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.kobera.music.common.notes.InnerTwelveToneInterpretation
 import com.kobera.music.common.notes.Tones
-import com.kobera.music.common.notes.TwelveToneNames
 import com.kobera.music.common.notes.frequency.FrequencyToNote
 import com.kobera.music.common.notes.frequency.InRangePrecision
 import com.kobera.music.common.notes.frequency.ToneWithFrequency
 import com.kobera.music.common.sound.SingleFrequencyReader
 import com.kobera.music.common.sound.frequency.A4Frequency
+import com.kobera.music.common.ui.component.LastNoteState
 import com.kobera.music.violin.feature.tuner.model.TunerSensitivityStorage
 import com.kobera.music.violin.sound.notes.violinStrings
 import kotlinx.coroutines.cancel
@@ -29,7 +28,6 @@ class TunerViewModel(
     val a4Frequency: A4Frequency,
     val tunerSensitivityStorage : TunerSensitivityStorage
 ): ViewModel() {
-
     private val _note : MutableStateFlow<LastNoteState> = MutableStateFlow(LastNoteState.Silence())
 
     val note = _note.asStateFlow()
@@ -118,7 +116,7 @@ abstract class  NotesInTunerState : KoinComponent {
         }
     }
 
-    class AllNotes() : NotesInTunerState() {
+    class AllNotes : NotesInTunerState() {
         init {
             with(preferences!!.edit()) {
                 putInt("notes_in_tuner", 0)
@@ -130,7 +128,7 @@ abstract class  NotesInTunerState : KoinComponent {
             get() = Tones.getTones(frequencyA4 = a4Frequency.frequency.value)
     }
 
-    class ViolinNotes() : NotesInTunerState() {
+    class ViolinNotes : NotesInTunerState() {
         init {
             with(preferences!!.edit()) {
                 putInt("notes_in_tuner", 1)
@@ -158,29 +156,5 @@ abstract class  NotesInTunerState : KoinComponent {
             return onlyViolinNotes
         }
     }
-    class PreviewNotes(override val notes: Map<String, ToneWithFrequency>) : NotesInTunerState() {}
-}
-
-sealed interface LastNoteState {
-    class Silence(
-        note: ToneWithFrequency = ToneWithFrequency(
-            twelveNoteInterpretation = InnerTwelveToneInterpretation.A,
-            name = TwelveToneNames.getName(InnerTwelveToneInterpretation.A),
-            octave = 4,
-            frequency = Tones.defaultA4Frequency,
-        ),
-        frequency: Double = Tones.defaultA4Frequency,
-    ) : HasNote(
-        note = note,
-        frequency = frequency
-    )
-
-    open class HasNote(
-        val note: ToneWithFrequency,
-        val frequency: Double,
-    ) : LastNoteState {
-
-        fun getDifferenceAngle() = note.getDifferenceAngle(frequency, 180.0 / 2 / 8 * 7)
-        fun isInTune() = note.isInTune(frequency)
-    }
+    class PreviewNotes(override val notes: Map<String, ToneWithFrequency>) : NotesInTunerState()
 }

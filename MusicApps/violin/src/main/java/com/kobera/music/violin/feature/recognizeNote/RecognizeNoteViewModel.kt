@@ -1,4 +1,4 @@
-package com.kobera.music.violin.feature.recognize_note
+package com.kobera.music.violin.feature.recognizeNote
 
 import android.content.Context
 import androidx.annotation.DrawableRes
@@ -21,9 +21,10 @@ import com.kobera.music.common.score.data.ScoreType
 import com.kobera.music.common.sound.SingleFrequencyReader
 import com.kobera.music.common.sound.SingleFrequencyReader.FrequencyState
 import com.kobera.music.common.sound.frequency.A4Frequency
+import com.kobera.music.common.ui.component.TUNER_METER_ANGLE
 import com.kobera.music.violin.R
-import com.kobera.music.violin.feature.recognize_note.model.RecognizeNoteScales
-import com.kobera.music.violin.feature.recognize_note.model.RecognizeNoteSerializer
+import com.kobera.music.violin.feature.recognizeNote.model.RecognizeNoteScales
+import com.kobera.music.violin.feature.recognizeNote.model.RecognizeNoteSerializer
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,6 +35,8 @@ import kotlin.random.Random
 import kotlin.time.Duration.Companion.seconds
 
 val Context.recognizeNoteDataStore by dataStore("recognize_note_data_store.json", serializer = RecognizeNoteSerializer)
+
+
 class RecognizeNoteViewModel(
     private val singleFrequencyReader: SingleFrequencyReader,
     applicationContext: Context,
@@ -112,7 +115,10 @@ class RecognizeNoteViewModel(
                     }
                     val noteFromFrequency = FrequencyToNote.findClosestNote(
                         frequency = frequencyState.frequency,
-                        notes = Tones.getTones(a4Frequency.frequency.value, inTunePrecision = InTunePrecision.MEDIUM).values
+                        notes = Tones.getTones(
+                            a4Frequency.frequency.value,
+                            inTunePrecision = InTunePrecision.MEDIUM
+                        ).values
                     )
 
                     //playing can ocure in middle of searched sector therefor 1.st note is not correct
@@ -147,7 +153,7 @@ class RecognizeNoteViewModel(
             } else {
                 val differenceAngle = noteFromFrequency.getDifferenceAngle(
                     frequencyState.frequency,
-                    180.0
+                    TUNER_METER_ANGLE
                 )
                 if (differenceAngle > 0) {
                     RecognizeNoteState.NotInTuneAbove()
@@ -259,6 +265,8 @@ class RecognizeNoteViewModel(
         }
     }
 
+    @Suppress("EmptyClassBlock") // for extension functions
+    companion object {}
     private fun resetRecognizeNoteState() {
         _recognizeNoteState.value = RecognizeNoteState.NotEntered
     }
@@ -278,12 +286,14 @@ sealed interface GeneratedNoteState {
 data class NoteAndKeySignature(
     val note: SheetNote,
     val keySignature: KeySignature
-) {}
+)
+
 
 sealed interface RecognizeNoteState {
     sealed interface ToShow : RecognizeNoteState {
         val visible: Boolean
         val iconAndColor: IconAndColor
+        @Suppress("MagicNumber")
         val scoreAdded: Int
 
         data class IconAndColor(@DrawableRes val icon: Int, val color: Color)
@@ -292,8 +302,7 @@ sealed interface RecognizeNoteState {
     }
 
     class InTuneKeyInput(visible: Boolean = true) : InTune(visible = visible){
-        override val scoreAdded: Int
-            get() = 50
+        override val scoreAdded: Int = 50
 
         override fun copy(visible: Boolean): RecognizeNoteState {
             return InTuneKeyInput(visible)
@@ -337,7 +346,7 @@ sealed interface RecognizeNoteState {
         }
     }
 
-    object NotEntered : RecognizeNoteState {}
+    object NotEntered : RecognizeNoteState
 
     class Wrong(
         val wrongNote: SheetNote,

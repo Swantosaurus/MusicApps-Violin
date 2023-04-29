@@ -1,4 +1,4 @@
-package com.kobera.music.violin.feature.main_screen
+package com.kobera.music.violin.feature.homepage
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

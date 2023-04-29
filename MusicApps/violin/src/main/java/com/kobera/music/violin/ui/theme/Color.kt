@@ -1,3 +1,4 @@
+@file:Suppress("MagicNumber")
 package com.kobera.music.violin.ui.theme
 
 import androidx.compose.ui.graphics.Color

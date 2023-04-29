@@ -1,6 +1,6 @@
-package com.kobera.music.violin.feature.main_screen.di
+package com.kobera.music.violin.feature.homepage.di
 
-import com.kobera.music.violin.feature.main_screen.StartingScreenViewModel
+import com.kobera.music.violin.feature.homepage.StartingScreenViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 

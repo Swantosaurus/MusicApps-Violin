@@ -7,8 +7,8 @@ import com.kobera.music.common.notes.TwelveToneNames
 import com.kobera.music.common.resource.di.resourcesModule
 import com.kobera.music.common.score.di.scoreModule
 import com.kobera.music.common.sound.di.soundModule
-import com.kobera.music.violin.feature.main_screen.di.startingScreenModule
-import com.kobera.music.violin.feature.recognize_note.di.recognizeNoteModule
+import com.kobera.music.violin.feature.homepage.di.startingScreenModule
+import com.kobera.music.violin.feature.recognizeNote.di.recognizeNoteModule
 import com.kobera.music.violin.feature.tuner.di.tunerModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin

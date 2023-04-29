@@ -1,4 +1,4 @@
-package com.kobera.music.violin.feature.recognize_note
+package com.kobera.music.violin.feature.recognizeNote
 
 import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedVisibility
@@ -210,7 +210,10 @@ private fun InputStatusContent(
                 )
             }
             Spacer(modifier = Modifier.height(50.dp))
-            Text(text = "+$score", style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.Bold, fontSize = 70.sp), color = color)
+            Text(
+                text = "+$score", style = MaterialTheme.typography.headlineLarge
+                    .copy(fontWeight = FontWeight.Bold, fontSize = 70.sp), color = color
+            )
         }
     }
 }

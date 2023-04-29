@@ -1,6 +1,6 @@
-package com.kobera.music.violin.feature.recognize_note.di
+package com.kobera.music.violin.feature.recognizeNote.di
 
-import com.kobera.music.violin.feature.recognize_note.RecognizeNoteViewModel
+import com.kobera.music.violin.feature.recognizeNote.RecognizeNoteViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 

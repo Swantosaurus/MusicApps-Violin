@@ -7,6 +7,7 @@ comments:
     searchInInnerClass: false
     searchInInnerObject: false
     searchInInnerInterface: false
+
 naming:
   FunctionNaming:
     ignoreAnnotated: ['Composable']
@@ -14,3 +15,12 @@ complexity:
   LongParameterList:
     ignoreAnnotated:
       - 'Composable'
+  TooManyFunctions:
+    excludes: ['**ViewModel**']
+
+style:
+  MagicNumber:
+    ignoreAnnotated:
+      - 'Preview'
+  WildcardImport:
+    active: false

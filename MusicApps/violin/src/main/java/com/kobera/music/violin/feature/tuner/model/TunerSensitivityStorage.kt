@@ -8,7 +8,8 @@ import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-val Context.tunerSensitivityDataStore : DataStore<androidx.datastore.preferences.core.Preferences> by preferencesDataStore("tunerSensitivity")
+val Context.tunerSensitivityDataStore : DataStore<androidx.datastore.preferences.core.Preferences>
+    by preferencesDataStore("tunerSensitivity")
 
 /**
  * A class that stores the tuner sensitivity to android preferences.
@@ -17,6 +18,7 @@ class TunerSensitivityStorage(applicationContext: Context){
     private val dataStore = applicationContext.tunerSensitivityDataStore
     private val key = floatPreferencesKey("sensitivity_value")
 
+    @Suppress("MagicNumber")
     val sensitivity : Flow<Float> = dataStore.data.map { preferences ->
          preferences[key] ?: 0.2f
     }

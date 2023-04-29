@@ -21,7 +21,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.ExperimentalTextApi
-import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
 import com.kobera.music.common.notes.TwelvetoneTone
 import com.kobera.music.common.notes.scale.Scale
@@ -37,8 +36,6 @@ fun FingerboardInputView(scale: Scale, keyboardClicked: (TwelvetoneTone) -> Unit
     val fingerPositions = remember{
         FingerboardMapping.toFingerboard(scale = scale).stringsFirgerboardPosition.reversed()
     }
-
-    val textMeasurer = rememberTextMeasurer()
 
     BoxWithConstraints() {
         val leftSpacing = remember {
@@ -86,17 +83,22 @@ fun FingerboardInputView(scale: Scale, keyboardClicked: (TwelvetoneTone) -> Unit
                 val start = Offset(0f, leftSpacing.toPx() / 2 + drawStringIndex * leftSpacing.toPx())
                 val end = Offset(maxWidth.toPx() , 0f + drawStringIndex * rightSpacing.toPx())
                 singleStringFingerboard.fingerPositions.forEach { fingerPosition ->
-                    val xbuttonOffset = maxWidth / 9 * fingerPosition.positionOffset
-                    Button(modifier = Modifier
-                        .size(50.dp)
-                        .offset(
-                        x = xbuttonOffset,
-                        y = calculateLineEquationForX(
-                            start,
-                            end,
-                            xbuttonOffset.toPx()
-                        ).toDp() - 25.dp
-                    ), onClick = { keyboardClicked(fingerPosition.respondingNote) }, shape = CircleShape, contentPadding = PaddingValues()) {
+                    val buttonOffset = maxWidth / 9 * fingerPosition.positionOffset
+                    Button(
+                        modifier = Modifier
+                            .size(50.dp)
+                            .offset(
+                                x = buttonOffset,
+                                y = calculateLineEquationForX(
+                                    start,
+                                    end,
+                                    buttonOffset.toPx()
+                                ).toDp() - 25.dp
+                            ),
+                        onClick = { keyboardClicked(fingerPosition.respondingNote) },
+                        shape = CircleShape,
+                        contentPadding = PaddingValues()
+                    ) {
                         Text(fingerPosition.fingerNumber.toString())
                     }
                 }

@@ -1,4 +1,4 @@
-package com.kobera.music.violin.feature.recognize_note.model
+package com.kobera.music.violin.feature.recognizeNote.model
 
 import com.kobera.music.common.notes.scale.MajorScale
 import com.kobera.music.common.notes.scale.MinorScale

@@ -1,4 +1,4 @@
-package com.kobera.music.violin.feature.main_screen
+package com.kobera.music.violin.feature.homepage
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -136,7 +136,7 @@ private fun getUiDescriptionForDestination(
         }
 
         else -> {
-            null //throw IllegalStateException("Undefined destination UI")
+            null
         }
     }
 }

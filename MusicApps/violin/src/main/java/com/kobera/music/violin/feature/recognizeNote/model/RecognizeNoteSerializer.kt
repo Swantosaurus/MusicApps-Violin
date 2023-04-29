@@ -1,4 +1,4 @@
-package com.kobera.music.violin.feature.recognize_note.model
+package com.kobera.music.violin.feature.recognizeNote.model
 
 import androidx.datastore.core.Serializer
 import com.kobera.music.common.notes.scale.MajorScale
