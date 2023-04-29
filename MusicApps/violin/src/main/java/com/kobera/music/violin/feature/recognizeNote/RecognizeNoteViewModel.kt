@@ -194,7 +194,9 @@ class RecognizeNoteViewModel(
                 gamesAudioSensitivityStorage.updateSensitivity(to)
             }
         }
-        singleFrequencyReader.setSilenceThreshold((to * 15_000_000).toLong())
+        singleFrequencyReader.setSilenceThreshold(
+            (to * GamesAudioSensitivityStorage.gamesSensitivityMultiplaier
+        ).toLong())
     }
 
     //TODO select scales
@@ -302,6 +304,7 @@ sealed interface RecognizeNoteState {
     }
 
     class InTuneKeyInput(visible: Boolean = true) : InTune(visible = visible){
+        @Suppress("MagicNumber")
         override val scoreAdded: Int = 50
 
         override fun copy(visible: Boolean): RecognizeNoteState {

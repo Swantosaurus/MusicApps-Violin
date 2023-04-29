@@ -22,6 +22,7 @@ class StartingScreenViewModel(
 
     private fun setScoreListener() =
         viewModelScope.launch {
+            @Suppress("TooGenericExceptionCaught")
             try {
                 scoreRepository.getTotalScore().collect{
                     _score.value = ScoreState.Success(it)

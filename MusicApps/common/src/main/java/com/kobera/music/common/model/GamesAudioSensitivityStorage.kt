@@ -33,4 +33,8 @@ class GamesAudioSensitivityStorage(applicationContext: Context) {
             preferences[key] = sensitivity
         }
     }
+
+    companion object {
+        const val gamesSensitivityMultiplaier = 15_000_000
+    }
 }

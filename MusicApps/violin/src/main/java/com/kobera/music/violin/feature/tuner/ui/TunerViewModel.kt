@@ -85,7 +85,7 @@ class TunerViewModel(
             }
         }
 
-        frequencyReader.setSilenceThreshold((to*10_000_000).toLong())
+        frequencyReader.setSilenceThreshold((to*silenceThresholdMultiplier).toLong())
     }
 
     fun setTunerNotes(to: NotesInTunerState) {
@@ -94,6 +94,9 @@ class TunerViewModel(
 
     fun stopRecording() {
         frequencyReader.stop()
+    }
+    companion object{
+        private const val silenceThresholdMultiplier = 10_000_000
     }
 }
 
