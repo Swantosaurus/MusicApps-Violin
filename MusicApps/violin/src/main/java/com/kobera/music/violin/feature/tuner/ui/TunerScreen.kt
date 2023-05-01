@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -20,12 +19,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledIconToggleButton
@@ -35,7 +31,6 @@ import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -54,7 +49,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -65,7 +59,9 @@ import com.kobera.music.common.notes.InnerTwelveToneInterpretation
 import com.kobera.music.common.notes.frequency.ToneWithFrequency
 import com.kobera.music.common.ui.component.CenteredNavigationBarWithNavigateBack
 import com.kobera.music.common.ui.component.HandleAudioPermission
+import com.kobera.music.common.ui.component.InformationScreenWithSingleButton
 import com.kobera.music.common.ui.component.LastNoteState
+import com.kobera.music.common.ui.component.SensitivitySetting
 import com.kobera.music.common.ui.component.TunerMeter
 import com.kobera.music.common.ui.util.lockScreenOrientation
 import com.kobera.music.common.ui.util.setSystemBarColors
@@ -74,7 +70,6 @@ import com.kobera.music.violin.sound.notes.violinStrings
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import org.koin.androidx.compose.getViewModel
-import kotlin.math.absoluteValue
 
 @Destination
 @OptIn(ExperimentalPermissionsApi::class)
@@ -110,7 +105,9 @@ fun TunerScreen(
                 navigator = navigator
             )
         },
-        showRationale = { ShowRationale(permissionState = it) },
+        showRationale = {
+            ShowRationale(permissionState = it)
+        },
         permissionDenied = { OpenSettingsOrRestartApp() }
     )
 }
@@ -276,27 +273,6 @@ fun ViolinStrings(noteStateLambda: () -> LastNoteState) {
 
 }
 
-@Composable
-private fun SensitivitySetting(
-    modifier: Modifier = Modifier,
-    setSensitivity: (Float) -> Unit,
-    sensitivity: () -> Float
-) {
-    Column(modifier.padding(horizontal = 10.dp)) {
-        Text(modifier = Modifier.fillMaxWidth(), text = "Sensitivity", textAlign = TextAlign.Center)
-        Row(Modifier.verticalScroll(rememberScrollState())) {
-            Text(text = "Low")
-            Spacer(modifier = Modifier.weight(1f))
-            Text(text = "High")
-        }
-        Slider(
-            value = (sensitivity() - 1).absoluteValue,
-            onValueChange = {
-                setSensitivity(((it - 1).absoluteValue))
-            }
-        )
-    }
-}
 
 @Composable
 private fun FrequencySetting(
@@ -368,11 +344,12 @@ private fun OnlyViolinNotes(
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 private fun ShowRationale(permissionState: PermissionState) {
-    Column() {
-        Text(text = "Microphone permission is required to use the tuner")
-        Button(onClick = { permissionState.launchPermissionRequest() }) {
-            Text(text = "Allow")
-        }
+    InformationScreenWithSingleButton(
+        title = stringResource(R.string.permissions_for_tuner),
+        description = stringResource(R.string.we_cannout_tune_your_instrument_without_microphone_access),
+        buttonText = "Allow"
+    ) {
+        permissionState.launchPermissionRequest()
     }
 }
 
@@ -383,11 +360,12 @@ private fun OpenSettingsOrRestartApp() {
     val uri: Uri = Uri.fromParts("package", context.packageName, null)
     intent.data = uri
 
-    Column() {
-        Text(text = "Microphone permission is required to use the tuner")
-        Button(onClick = { context.startActivity(intent) }) {
-            Text(text = "Open settings")
-        }
+    InformationScreenWithSingleButton(
+        title = stringResource(R.string.permissions_for_tuner), description = stringResource(
+            R.string.settings_audio_permission
+        ), buttonText = stringResource(R.string.open_settings)
+    ) {
+        context.startActivity(intent)
     }
 }
 

@@ -56,7 +56,6 @@ tasks.withType(Test) {
 
 dependencies {
     implementation project(path: ':common')
-    implementation 'androidx.test.ext:junit-ktx:1.1.5'
 
     def composeBom = platform(libs.androidx.compose.bom)
     implementation(composeBom)
@@ -90,6 +89,8 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.9.2'
     debugImplementation 'androidx.compose.ui:ui-tooling'
     debugImplementation 'androidx.compose.ui:ui-test-manifest'
+
+    implementation 'androidx.test.ext:junit-ktx:1.1.5'
 }
 detekt {
     toolVersion = "1.23.0-RC2"

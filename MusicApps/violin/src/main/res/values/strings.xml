@@ -18,4 +18,12 @@
     <string name="note_a_sharp">A#</string>
     <string name="note_b">B</string>
     <string name="play_note_you_see">Play note you see</string>
+    <string name="wins">"W: "</string>
+    <string name="total">Total</string>
+    <string name="today">Today</string>
+    <string name="fails">"F: "</string>
+    <string name="permissions_for_tuner">Microphone permission required for tuner</string>
+    <string name="we_cannout_tune_your_instrument_without_microphone_access">We cannout tune your instrument without microphone access</string>
+    <string name="settings_audio_permission">You have to provide microphone permission to tune your instrument go to settings to do so</string>
+    <string name="open_settings">Open phone settings</string>
 </resources>

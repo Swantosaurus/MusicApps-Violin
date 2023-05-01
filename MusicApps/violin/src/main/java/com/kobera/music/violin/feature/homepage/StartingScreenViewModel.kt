@@ -11,31 +11,89 @@ class StartingScreenViewModel(
     private val scoreRepository: ScoreRepository
 ): ViewModel() {
 
-    private val _score = MutableStateFlow<ScoreState>(
+    private val _totalScore = MutableStateFlow<ScoreState>(
         ScoreState.Loading
     )
 
-    val score = _score.asStateFlow()
+    val totalScore = _totalScore.asStateFlow()
+
+    private val _totalWinsAndLoses = MutableStateFlow<WinsAndLosesState>(
+        WinsAndLosesState.Loading
+    )
+
+    val totalWinsAndLoses = _totalWinsAndLoses.asStateFlow()
+
+    private val _scoreToday = MutableStateFlow<ScoreState>(
+        ScoreState.Loading
+    )
+
+    val scoreToday = _scoreToday.asStateFlow()
+
+    private val _winsAndLosesToday = MutableStateFlow<WinsAndLosesState>(
+        WinsAndLosesState.Loading
+    )
+
+    val winsAndLosesToday = _winsAndLosesToday.asStateFlow()
+
     init {
         setScoreListener()
     }
 
-    private fun setScoreListener() =
+
+    @Suppress("TooGenericExceptionCaught")
+    private fun setScoreListener() {
         viewModelScope.launch {
-            @Suppress("TooGenericExceptionCaught")
             try {
-                scoreRepository.getTotalScore().collect{
-                    _score.value = ScoreState.Success(it)
+                scoreRepository.getTotalScore().collect {
+                    _totalScore.value = ScoreState.Success(it)
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
-                _score.value = ScoreState.Error(e)
+                _totalScore.value = ScoreState.Error(e)
             }
         }
+        viewModelScope.launch {
+            try {
+                scoreRepository.getTotalScoreToday().collect {
+                    _scoreToday.value = ScoreState.Success(it)
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                _scoreToday.value = ScoreState.Error(e)
+            }
+        }
+        viewModelScope.launch {
+            try {
+                scoreRepository.getWinsAndLosesToday().collect {
+                    _winsAndLosesToday.value = WinsAndLosesState.Success(it)
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                _winsAndLosesToday.value = WinsAndLosesState.Error(e)
+            }
+        }
+        viewModelScope.launch {
+            try {
+                scoreRepository.getTotalWinsAndLoses().collect {
+                    _totalWinsAndLoses.value = WinsAndLosesState.Success(it)
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                _totalWinsAndLoses.value = WinsAndLosesState.Error(e)
+            }
+        }
+    }
 }
 
 sealed interface ScoreState{
     object Loading: ScoreState
     data class Success(val score: Int): ScoreState
     data class Error(val error: Throwable): ScoreState
+}
+
+sealed interface WinsAndLosesState{
+    object Loading: WinsAndLosesState
+    data class Success(val winsAndLoses: ScoreRepository.WinsAndLoses): WinsAndLosesState
+
+    data class Error(val error: Throwable): WinsAndLosesState
 }
