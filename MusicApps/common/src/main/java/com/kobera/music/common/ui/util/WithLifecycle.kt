@@ -12,6 +12,7 @@ import androidx.lifecycle.LifecycleOwner
 /**
  * activity lifecycle observer in Compose
  */
+@Suppress("TooManyArguments")
 @Composable
 fun withLifecycle(
     lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
