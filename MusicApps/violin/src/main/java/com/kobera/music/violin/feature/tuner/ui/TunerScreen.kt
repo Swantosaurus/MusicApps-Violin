@@ -34,7 +34,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
@@ -65,6 +64,7 @@ import com.kobera.music.common.ui.component.SensitivitySetting
 import com.kobera.music.common.ui.component.TunerMeter
 import com.kobera.music.common.ui.util.lockScreenOrientation
 import com.kobera.music.common.ui.util.setSystemBarColors
+import com.kobera.music.common.ui.util.withLifecycle
 import com.kobera.music.violin.R
 import com.kobera.music.violin.sound.notes.violinStrings
 import com.ramcosta.composedestinations.annotation.Destination
@@ -91,10 +91,14 @@ fun TunerScreen(
 
     HandleAudioPermission(
         permissionGranted = {
-            DisposableEffect(key1 = Unit) {
-                tunerViewModel.startRecording()
-                onDispose { tunerViewModel.stopRecording() }
-            }
+            withLifecycle(
+                onStart = {
+                    tunerViewModel.startRecording()
+                },
+                onStop = {
+                    tunerViewModel.stopRecording()
+                }
+            )
 
             TunerScreenBody(
                 tunerViewModel = tunerViewModel,

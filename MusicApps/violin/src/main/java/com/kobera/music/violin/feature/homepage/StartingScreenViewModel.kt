@@ -93,7 +93,12 @@ sealed interface ScoreState{
 
 sealed interface WinsAndLosesState{
     object Loading: WinsAndLosesState
-    data class Success(val winsAndLoses: ScoreRepository.WinsAndLoses): WinsAndLosesState
+    data class Success(val winsAndLoses: ScoreRepository.WinsAndLoses): WinsAndLosesState {
+
+        @Suppress("MagicNumber")
+        val successRate
+            get() = winsAndLoses.wins.toDouble() * 100 /  (winsAndLoses.loses + winsAndLoses.wins)
+    }
 
     data class Error(val error: Throwable): WinsAndLosesState
 }

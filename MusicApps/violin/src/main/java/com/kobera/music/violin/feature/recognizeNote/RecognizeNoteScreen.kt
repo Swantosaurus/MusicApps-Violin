@@ -21,10 +21,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,12 +44,13 @@ import com.kobera.music.common.notes.sheet.ui.KeySignature
 import com.kobera.music.common.notes.sheet.ui.compose.Sheet
 import com.kobera.music.common.ui.component.CenteredNavigationBarWithNavigateBack
 import com.kobera.music.common.ui.component.HandleAudioPermission
+import com.kobera.music.common.ui.component.SensitivitySetting
+import com.kobera.music.common.ui.util.withLifecycle
 import com.kobera.music.violin.R
 import com.kobera.music.violin.feature.fingerboardInput.FingerboardInputView
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import org.koin.androidx.compose.getViewModel
-import kotlin.math.absoluteValue
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Destination
@@ -65,12 +64,14 @@ fun RecognizeNoteScreen(
     val recognizeNoteState by viewModel.recognizeNoteState.collectAsStateWithLifecycle()
     HandleAudioPermission(
         permissionGranted = {
-            DisposableEffect(key1 = Unit) {
-                viewModel.startListeningFrequencies()
-                onDispose {
+            withLifecycle(
+                onStart = {
+                    viewModel.startListeningFrequencies()
+                },
+                onStop = {
                     viewModel.stopListeningResponses()
                 }
-            }
+            )
 
             RecognizeNoteScreenBody(
                 viewModel = viewModel,
@@ -112,9 +113,9 @@ fun RecognizeNoteScreenBody(
                         } else {
                             SheetInPreview()
                         }
-                        SensitivitySlider(sensitivity = sensitivity) {
+                        SensitivitySetting(sensitivity =  sensitivity, setSensitivity = {
                             viewModel?.setSilenceTreashold(it)
-                        }
+                        })
 
                         Spacer(Modifier.height(50.dp))
 
@@ -216,14 +217,6 @@ private fun InputStatusContent(
             )
         }
     }
-}
-
-@Composable
-private fun SensitivitySlider(sensitivity: () -> Float, setSensitivity: (Float) -> Unit) {
-    Slider(
-        value = sensitivity(),
-        onValueChange = { setSensitivity((it).absoluteValue) },
-    )
 }
 
 @Composable

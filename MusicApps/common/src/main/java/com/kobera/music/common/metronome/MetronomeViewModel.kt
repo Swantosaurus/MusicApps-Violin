@@ -1,11 +1,13 @@
 package com.kobera.music.common.metronome
 
 import android.content.Context
+import android.media.MediaPlayer
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kobera.music.common.R
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,9 +20,12 @@ import kotlin.time.Duration.Companion.seconds
 val Context.metronomeDataStore by preferencesDataStore("metronome")
 
 class MetronomeViewModel(applicationContext: Context) : ViewModel() {
-    private val _metronomeState : MutableStateFlow<MetronomeState> = MutableStateFlow(
+    private val _metronomeState: MutableStateFlow<MetronomeState> = MutableStateFlow(
         MetronomeState.Stropped
     )
+
+    private val primaryTickSound = MediaPlayer.create(applicationContext, R.raw.metronome1)
+    private val secondaryTickSound = MediaPlayer.create(applicationContext, R.raw.metronome2)
     private val tickShowDuration = 100.milliseconds
     private val dataStore = applicationContext.metronomeDataStore
     private val speedKey = intPreferencesKey("metronome_speed")
@@ -72,19 +77,25 @@ class MetronomeViewModel(applicationContext: Context) : ViewModel() {
     val tickState = _metronomeState.asStateFlow()
 
     fun startMetronome(){
+        if (metronomeJob?.isActive == true) return
          metronomeJob = viewModelScope.launch {
              while (true){
                  var index = 2
                  _metronomeState.value = MetronomeState.PrimaryTick
+                 primaryTickSound.seekTo(0)
+                 primaryTickSound.start()
                  delay(tickShowDuration)
                  _metronomeState.value = MetronomeState.HideTick
-                 delay( (speed.value.seconds - tickShowDuration) / secondsInMinute )
+                 delay(((60.seconds / speed.value) - tickShowDuration))
 
-                 while(index < _numberOfTicks.value) {
+                 while(index <=_numberOfTicks.value) {
                      _metronomeState.value = MetronomeState.SecondaryTick
+                     secondaryTickSound.seekTo(0)
+                     secondaryTickSound.start()
                      delay(tickShowDuration)
                      _metronomeState.value = MetronomeState.HideTick
-                     delay( (speed.value.seconds - tickShowDuration) / secondsInMinute )
+                     delay(((60.seconds / speed.value) - tickShowDuration))
+                     index++
                  }
              }
         }
@@ -95,16 +106,15 @@ class MetronomeViewModel(applicationContext: Context) : ViewModel() {
         _metronomeState.value = MetronomeState.Stropped
     }
 
-    @Suppress("MagicNumber")
     fun changeNumberOfTicks(to: Int) {
         //to avoid nonsense value sets
-        val setTo = when(true){
-            (to > 8) -> 8
-            (to < 1) -> 1
+        val setTo = when (true) {
+            (to > MAX_NUMBER_OF_TICKS) -> MAX_NUMBER_OF_TICKS
+            (to < MIN_NUMBER_OF_TICKS) -> MIN_NUMBER_OF_TICKS
             else -> to
         }
         viewModelScope.launch {
-            with(dataStore){
+            with(dataStore) {
                 edit { preferences ->
                     preferences[numberOfTicksKey] = setTo
                 }
@@ -112,16 +122,15 @@ class MetronomeViewModel(applicationContext: Context) : ViewModel() {
         }
     }
 
-    @Suppress("MagicNumber")
     fun changeSpeedOfMetronome(to :Int) {
         // to avoid nonsense value sets
-        val setTo = when(true){
-             (to > 400) -> 400
-            (to < 40) -> 40
+        val setTo = when (true) {
+            (to > MAX_SPEED) -> MAX_SPEED
+            (to < MIN_SPEED) -> MIN_SPEED
             else -> to
         }
         viewModelScope.launch {
-            with(dataStore){
+            with(dataStore) {
                 edit { preferences ->
                     preferences[speedKey] = setTo
                 }
@@ -130,7 +139,10 @@ class MetronomeViewModel(applicationContext: Context) : ViewModel() {
     }
 
     companion object {
-        private const val secondsInMinute = 60
+        const val MAX_SPEED = 400
+        const val MIN_SPEED = 40
+        const val MAX_NUMBER_OF_TICKS = 8
+        const val MIN_NUMBER_OF_TICKS = 1
     }
 }
 

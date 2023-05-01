@@ -5,7 +5,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -27,12 +26,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kobera.music.common.score.ScoreRepository
 import com.kobera.music.common.ui.component.AccuracyGraph
 import com.kobera.music.common.ui.util.setSystemBarColors
+import com.kobera.music.common.util.toStringWithNDecimals
 import com.kobera.music.violin.R
 import com.kobera.music.violin.feature.NavGraphs
 import com.kobera.music.violin.feature.destinations.DirectionDestination
@@ -169,12 +170,16 @@ private fun Accuracy(modifier: Modifier, todaysWinsAndLosesState: WinsAndLosesSt
                         .padding(10.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    ProvideTextStyle(value = MaterialTheme.typography.headlineSmall) {
+                    ProvideTextStyle(value = MaterialTheme.typography.labelLarge) {
                         Text(
                             text = stringResource(id = R.string.wins)
                                     + "${todaysWinsAndLosesState.winsAndLoses.wins}"
                         )
-                        Spacer(modifier = Modifier.weight(1f))
+                        Text(
+                            text = "${todaysWinsAndLosesState.successRate.toStringWithNDecimals(1)} %",
+                            modifier = Modifier.weight(1f),
+                            textAlign = TextAlign.Center
+                        )
                         Text(
                             text = stringResource(R.string.fails)
                                     + "${todaysWinsAndLosesState.winsAndLoses.loses}"
