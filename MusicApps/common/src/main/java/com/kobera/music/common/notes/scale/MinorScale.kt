@@ -187,5 +187,9 @@ enum class MinorScale : Scale {
             SheetNote.FSharp,
             SheetNote.GSharp
         )
+    };
+
+    companion object {
+        fun getAll(): List<MinorScale> = values().toList()
     }
 }

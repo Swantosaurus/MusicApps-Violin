@@ -119,7 +119,7 @@ data class SheetNote(
             innerSheetNote: InnerSheetNote,
             noteParams: SheetNoteParams
         ): InnerTwelveToneInterpretation {
-            val twelveToeBase = when (innerSheetNote) {
+            val twelveToBase = when (innerSheetNote) {
                 InnerSheetNote.C -> InnerTwelveToneInterpretation.C
                 InnerSheetNote.D -> InnerTwelveToneInterpretation.D
                 InnerSheetNote.E -> InnerTwelveToneInterpretation.E
@@ -130,7 +130,7 @@ data class SheetNote(
             }
 
 
-            return twelveToeBase.move(noteParams.accidental.twelveToneShift)
+            return twelveToBase.move(noteParams.accidental.twelveToneShift)
         }
 
 
@@ -201,7 +201,7 @@ data class SheetNote(
         )
         val Gb = SheetNote(
             innerSheetNote = InnerSheetNote.G,
-            noteParams = SheetNoteParams(accidental = SheetNoteParams.Accidental.DoubleFlat),
+            noteParams = SheetNoteParams(accidental = SheetNoteParams.Accidental.Flat),
             octave = 4
         )
         val A = SheetNote(

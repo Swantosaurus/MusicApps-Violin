@@ -33,9 +33,8 @@ import timber.log.Timber
 @OptIn(ExperimentalTextApi::class)
 @Composable
 fun FingerboardInputView(scale: Scale, keyboardClicked: (TwelvetoneTone) -> Unit) {
-    val fingerPositions = remember{
-        FingerboardMapping.toFingerboard(scale = scale).stringsFirgerboardPosition.reversed()
-    }
+
+    val fingerPositions = FingerboardMapping.toFingerboard(scale = scale).stringsFirgerboardPosition.reversed()
 
     BoxWithConstraints() {
         val leftSpacing = remember {
@@ -50,7 +49,7 @@ fun FingerboardInputView(scale: Scale, keyboardClicked: (TwelvetoneTone) -> Unit
 
         Canvas(
             modifier = Modifier
-                .height(rightSpacing* 4 + 50.dp)
+                .height(rightSpacing * 4 + 50.dp)
                 .fillMaxWidth()
         ) {
             repeat(times = 4) { drawStringIndex ->

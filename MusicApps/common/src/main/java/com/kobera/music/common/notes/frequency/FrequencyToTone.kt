@@ -6,7 +6,7 @@ import kotlin.math.abs
 /**
  * Transforms a frequency to a NoteWithFrequency that is closest to the given frequency.
  */
-object FrequencyToNote {
+object FrequencyToTone {
 
     @Deprecated("Use findClosestNote(frequency, notes) instead")
     fun transform(
@@ -27,7 +27,7 @@ object FrequencyToNote {
         }
     }
 
-    fun findClosestNote(
+    fun findClosestTone(
         frequency: Double,
         notes: Collection<ToneWithFrequency>
     ): ToneWithFrequency {

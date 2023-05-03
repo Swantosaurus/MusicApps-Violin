@@ -108,7 +108,8 @@ object FingerboardMapping {
     private fun findNextTwelvetone(
         twelvetoneNotes: List<InnerTwelveToneInterpretation>,
         from: InnerTwelveToneInterpretation
-    ): Int =
-        twelvetoneNotes.indexOfFirst { it >= from }.takeIf { it >= 0 } ?: 0
+    ): Int {
+        return twelvetoneNotes.indexOf( twelvetoneNotes.minBy { from.differenceOnlyPositive(it) } )
+    }
 }
 

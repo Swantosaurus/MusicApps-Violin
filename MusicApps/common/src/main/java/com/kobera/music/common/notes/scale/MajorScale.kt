@@ -191,5 +191,9 @@ enum class MajorScale : Scale {
             SheetNote.ASharp,
             SheetNote.BSharp
         )
+    };
+
+    companion object {
+        fun getAll(): List<MajorScale> = values().toList()
     }
 }

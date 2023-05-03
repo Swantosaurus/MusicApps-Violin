@@ -5,7 +5,7 @@ import android.content.SharedPreferences
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kobera.music.common.notes.Tones
-import com.kobera.music.common.notes.frequency.FrequencyToNote
+import com.kobera.music.common.notes.frequency.FrequencyToTone
 import com.kobera.music.common.notes.frequency.InRangePrecision
 import com.kobera.music.common.notes.frequency.ToneWithFrequency
 import com.kobera.music.common.sound.SingleFrequencyReader
@@ -52,7 +52,7 @@ class TunerViewModel(
                         }
                     }
                     is SingleFrequencyReader.FrequencyState.HasFrequency -> {
-                        val note = FrequencyToNote.findClosestNote(
+                        val note = FrequencyToTone.findClosestTone(
                             frequency = it.frequency,
                             notes = _notesInTuner.value.notes.values
                         )

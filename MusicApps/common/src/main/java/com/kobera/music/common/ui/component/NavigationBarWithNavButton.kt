@@ -22,6 +22,90 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.unit.dp
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
+
+
+
+@Composable
+fun CenteredNavigationBarWithNavigateBackAndRightActionButton(
+    modifier: Modifier = Modifier,
+    navIconColor: Color = LocalContentColor.current,
+    navIconPainter: Painter = rememberVectorPainter(image = Icons.Default.ArrowBack),
+    navigator: DestinationsNavigator?,
+    rightActionButtonPainter: Painter,
+    text:String,
+    rightActionButton: () -> Unit,
+){
+    CenteredNavigationBarWithNavigateBackAndRightActionButton(
+        modifier, navIconColor, navIconPainter, navigator, rightActionButtonPainter,
+         rightActionButton
+    ) { Text(text = text, style = MaterialTheme.typography.headlineMedium) }
+}
+
+@Composable
+fun CenteredNavigationBarWithNavigateBackAndRightActionButton(
+    modifier: Modifier = Modifier,
+    navIconColor: Color = LocalContentColor.current,
+    navIconPainter: Painter,
+    navigator: DestinationsNavigator?,
+    rightActionButtonPainter: Painter,
+    rightActionButton: () -> Unit,
+    navContent: @Composable () -> Unit,
+) {
+    CenteredNavigationBarWithNavigateBackAndRightActionButton(modifier,
+        navIconColor,
+        navIconPainter,
+        { navigator?.navigateUp() },
+        {
+            IconButton(onClick =  rightActionButton ) {
+                Icon(
+                    painter = rightActionButtonPainter,
+                    contentDescription = null,
+                    tint = navIconColor
+                )
+            }
+        },
+        navContent
+    )
+}
+
+@Composable
+fun CenteredNavigationBarWithNavigateBackAndRightActionButton(
+    modifier: Modifier = Modifier,
+    navIconColor: Color = LocalContentColor.current,
+    navIconPainter: Painter,
+    navIconAction: () -> Unit,
+    rightActionButton: @Composable () -> Unit,
+    navContent: @Composable () -> Unit
+) {
+    Box(modifier = modifier) {
+        IconButton(onClick = navIconAction) {
+            Icon(
+                painter = navIconPainter,
+                contentDescription = null,
+                tint = navIconColor
+            )
+        }
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .height(48.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            navContent()
+        }
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .height(48.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.End
+        ) {
+            rightActionButton()
+        }
+    }
+}
+
 @Composable
 fun CenteredNavigationBarWithNavigateBack(
     navigator: DestinationsNavigator?,
@@ -77,7 +161,9 @@ fun CenteredNavigationBarWithNavButton(
             )
         }
         Row(
-            Modifier.fillMaxWidth().height(48.dp),
+            Modifier
+                .fillMaxWidth()
+                .height(48.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {

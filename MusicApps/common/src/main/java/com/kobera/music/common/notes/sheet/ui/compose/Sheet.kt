@@ -74,7 +74,7 @@ fun Sheet(
                 translate(top = topSpacing) {
                     drawSheetLines(lineHeight = lineHeight)
                     spcacingFromLeft = drawClef(
-                        notationHeight = height,
+                        notationHeight = lineHeight * 6,
                         spacingFromLeft = spcacingFromLeft,
                         painter = clefPainter
                     )
@@ -476,7 +476,7 @@ private fun DrawScope.drawClef(
         }
     }
 
-    return width + 30f
+    return width + 50f
 }
 
 private fun DrawScope.drawSheetLines(lineHeight: Float) {

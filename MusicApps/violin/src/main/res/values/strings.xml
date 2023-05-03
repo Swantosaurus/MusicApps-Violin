@@ -26,4 +26,10 @@
     <string name="we_cannout_tune_your_instrument_without_microphone_access">We cannout tune your instrument without microphone access</string>
     <string name="settings_audio_permission">You have to provide microphone permission to tune your instrument go to settings to do so</string>
     <string name="open_settings">Open phone settings</string>
+    <string name="allow">Allow</string>
+    <string name="denny">Denny</string>
+    <string name="alert_game_wo_audio">Without audio permission we can\'t recognize notes and you can\'t play the game using your instrument. Instrument input grants way more points so your progress will be faster</string>
+    <string name="alert_game_wo_audio_title">We require audio permission to recognize notes</string>
+    <string name="major_scales">Major</string>
+    <string name="minor">Minor</string>
 </resources>

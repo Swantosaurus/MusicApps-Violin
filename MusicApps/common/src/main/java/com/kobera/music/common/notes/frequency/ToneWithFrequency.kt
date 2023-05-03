@@ -4,6 +4,7 @@ import com.kobera.music.common.notes.InnerTwelveToneInterpretation
 import com.kobera.music.common.notes.Tones
 import com.kobera.music.common.notes.TwelveToneNames
 import com.kobera.music.common.notes.TwelvetoneTone
+import timber.log.Timber
 import kotlin.math.pow
 
 /**
@@ -37,6 +38,7 @@ class ToneWithFrequency(
      */
     fun isInTune(compareFreq: Double): Boolean {
         val diff = if (compareFreq > frequency) compareFreq / frequency else frequency / compareFreq
+        Timber.d("isInTune: $diff, ${inTuneInterval.oneWayDistance}")
         return diff <= inTuneInterval.oneWayDistance
     }
 
@@ -129,9 +131,9 @@ sealed interface Range{
  */
 @Suppress("MagicNumber")
 enum class InRangePrecision(override val oneWayDistance: Double): Range {
-    LOW(2.0.pow(Tones.twelvetoneStepExponent)),
-    MEDIUM(2.0.pow(Tones.twelvtoneStep / 2.0)),
-    HIGH(2.0.pow(Tones.twelvtoneStep / 8.0))
+    LOW(Tones.twelvetoneStepExponent),
+    MEDIUM(Tones.twelvtoneStep.pow(1.0 / 2.0)),
+    HIGH(Tones.twelvtoneStep.pow(1.0 / 8.0))
 }
 
 /**
@@ -139,9 +141,9 @@ enum class InRangePrecision(override val oneWayDistance: Double): Range {
  */
 @Suppress("MagicNumber")
 enum class InTunePrecision(override val oneWayDistance: Double): Range {
-    LOW(2.0.pow(Tones.twelvtoneStep / 20.0 * 8.0)),
-    MEDIUM(2.0.pow(Tones.twelvtoneStep / 20.0 * 3.0)),
-    HIGH(2.0.pow(Tones.twelvtoneStep / 20.0))
+    LOW(Tones.twelvtoneStep.pow(8.0/20)),
+    MEDIUM(Tones.twelvtoneStep.pow( 3.0/20)),
+    HIGH(Tones.twelvtoneStep.pow(1.0 / 20.0))
 }
 
 

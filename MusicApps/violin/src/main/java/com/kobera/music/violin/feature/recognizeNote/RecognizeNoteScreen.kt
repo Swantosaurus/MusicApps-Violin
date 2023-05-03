@@ -1,6 +1,9 @@
 package com.kobera.music.violin.feature.recognizeNote
 
 import android.annotation.SuppressLint
+import android.content.Intent
+import android.net.Uri
+import android.provider.Settings
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -10,24 +13,47 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.add
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DrawerDefaults
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledIconToggleButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalDrawerSheet
+import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -36,20 +62,23 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.PermissionState
 import com.kobera.music.common.notes.InnerTwelveToneInterpretation.*
-import com.kobera.music.common.notes.scale.getMajorScale
+import com.kobera.music.common.notes.scale.MajorScale
+import com.kobera.music.common.notes.scale.MinorScale
 import com.kobera.music.common.notes.sheet.InnerSheetNote
 import com.kobera.music.common.notes.sheet.SheetNote
-import com.kobera.music.common.notes.sheet.ui.KeySignature
 import com.kobera.music.common.notes.sheet.ui.compose.Sheet
-import com.kobera.music.common.ui.component.CenteredNavigationBarWithNavigateBack
+import com.kobera.music.common.ui.component.CenteredNavigationBarWithNavigateBackAndRightActionButton
 import com.kobera.music.common.ui.component.HandleAudioPermission
 import com.kobera.music.common.ui.component.SensitivitySetting
 import com.kobera.music.common.ui.util.withLifecycle
 import com.kobera.music.violin.R
 import com.kobera.music.violin.feature.fingerboardInput.FingerboardInputView
+import com.kobera.music.violin.feature.recognizeNote.model.RecognizeNoteScales
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.getViewModel
 
 @OptIn(ExperimentalPermissionsApi::class)
@@ -62,6 +91,11 @@ fun RecognizeNoteScreen(
     val generatedNoteState by viewModel.generatedNote.collectAsStateWithLifecycle()
     val sensitivity by viewModel.sensitivity.collectAsStateWithLifecycle()
     val recognizeNoteState by viewModel.recognizeNoteState.collectAsStateWithLifecycle()
+    val scales by viewModel.scales.collectAsStateWithLifecycle()
+    val microphoneEnabled by viewModel.microphoneEnabled.collectAsStateWithLifecycle()
+
+
+    var alertVisible by remember { mutableStateOf(true) }
     HandleAudioPermission(
         permissionGranted = {
             withLifecycle(
@@ -72,18 +106,172 @@ fun RecognizeNoteScreen(
                     viewModel.stopListeningResponses()
                 }
             )
-
-            RecognizeNoteScreenBody(
-                viewModel = viewModel,
-                generatedNoteState = generatedNoteState,
-                sensitivity = { sensitivity },
-                recognizeNoteState = { recognizeNoteState },
-                navigator = navigator
-            )
         },
-        showRationale = {},
-        permissionDenied = {}
+        showRationale = {
+            Rationale(it)
+        },
+        permissionDenied = {
+            OpenSettingsDialog(alertVisible) {
+                alertVisible = false
+            }
+        }
     )
+    RecognizeScreenDrawer(
+        viewModel = viewModel,
+        generatedNoteState = generatedNoteState,
+        sensitivity = { sensitivity },
+        recognizeNoteState = { recognizeNoteState },
+        navigator = navigator,
+        scales = when (scales) {
+            is RecognizeNoteScaleState.Ready -> (scales as RecognizeNoteScaleState.Ready).scales
+            else -> RecognizeNoteScales()
+        }
+    )
+
+}
+
+@Composable
+fun OpenSettingsDialog(visible: Boolean, hide: () -> Unit) {
+    val context = LocalContext.current
+    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+    val uri: Uri = Uri.fromParts("package", context.packageName, null)
+    intent.data = uri
+    if (visible) {
+        AlertDialog(
+            title = { Text(text = stringResource(R.string.alert_game_wo_audio_title)) },
+            text = { Text(text = stringResource(R.string.alert_game_wo_audio)) },
+            onDismissRequest = {},
+            confirmButton = {
+                TextButton(onClick = { context.startActivity(intent) }) {
+                    Text(text = stringResource(id = R.string.open_settings))
+                }
+            }, dismissButton = {
+                TextButton(onClick = hide) {
+                    Text(text = stringResource(R.string.denny))
+                }
+            })
+    }
+}
+
+@OptIn(ExperimentalPermissionsApi::class)
+@Composable
+private fun Rationale(permissionState: PermissionState) {
+    var shown by remember { mutableStateOf(true) }
+    if (shown) {
+        AlertDialog(
+            title = { Text(text = stringResource(R.string.alert_game_wo_audio_title)) },
+            text = { Text(text = stringResource(R.string.alert_game_wo_audio)) },
+            onDismissRequest = {},
+            confirmButton = {
+                TextButton(onClick = { permissionState.launchPermissionRequest() }) {
+                    Text(text = stringResource(R.string.allow))
+                }
+            }, dismissButton = {
+                TextButton(onClick = { shown = false }) {
+                    Text(text = stringResource(R.string.denny))
+                }
+            })
+    }
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun RecognizeScreenDrawer(
+    viewModel: RecognizeNoteViewModel?,
+    generatedNoteState: GeneratedNoteState,
+    sensitivity: () -> Float,
+    recognizeNoteState: () -> RecognizeNoteState,
+    navigator: DestinationsNavigator?,
+    scales: RecognizeNoteScales
+) {
+    val coroutinescope = rememberCoroutineScope()
+
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    ModalNavigationDrawer(
+        drawerContent = {
+            ModalDrawerSheet(
+                Modifier.width(240.dp + 16.dp * 3),
+                windowInsets = DrawerDefaults.windowInsets.add((WindowInsets(left = 16.dp)))
+
+            ) {
+                Row(Modifier.fillMaxWidth()) {
+                    Column(
+                        Modifier.weight(1f).verticalScroll(rememberScrollState()),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = stringResource(R.string.major_scales),
+                            style = MaterialTheme.typography.headlineMedium
+                        )
+                        MajorScale.values().forEach {
+                            ScaleToggleButtton(viewModel = viewModel, scales = scales, scale = it)
+                        }
+                    }
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Column(
+                        Modifier.weight(1f),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            stringResource(R.string.minor),
+                            style = MaterialTheme.typography.headlineMedium
+                        )
+                        MinorScale.values().forEach {
+                            ScaleToggleButtton(viewModel = viewModel, scales = scales, scale = it)
+                        }
+                    }
+                    Spacer(modifier = Modifier.width(16.dp))
+                }
+            }
+        },
+        drawerState = drawerState
+    ) {
+        RecognizeNoteScreenBody(
+            viewModel = viewModel,
+            generatedNoteState = generatedNoteState,
+            sensitivity = sensitivity,
+            recognizeNoteState = recognizeNoteState,
+            navigator = navigator,
+            openDrawer = {
+                coroutinescope.launch {
+                    drawerState.open()
+                }
+            }
+        )
+    }
+}
+
+@Composable
+fun ScaleToggleButtton(viewModel: RecognizeNoteViewModel?, scales: RecognizeNoteScales, scale: MinorScale) {
+    FilledIconToggleButton(
+        modifier = Modifier.width(120.dp),
+        checked = scales.minorScales.contains(scale),
+        onCheckedChange = {
+            if(it) {
+                viewModel?.addScale(scale = scale)
+            } else {
+                viewModel?.removeScale(scale = scale)
+            }
+        }) {
+        Text(text = scale.name)
+    }
+}
+
+@Composable
+fun ScaleToggleButtton(viewModel: RecognizeNoteViewModel?, scales: RecognizeNoteScales, scale: MajorScale) {
+    FilledIconToggleButton(
+        modifier = Modifier.width(120.dp),
+        checked = scales.majorScales.contains(scale),
+        onCheckedChange = {
+            if(it) {
+                viewModel?.addScale(scale = scale)
+            } else {
+                viewModel?.removeScale(scale = scale)
+            }
+        }) {
+        Text(text = scale.name)
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -93,38 +281,40 @@ fun RecognizeNoteScreenBody(
     generatedNoteState: GeneratedNoteState,
     sensitivity: () -> Float,
     recognizeNoteState: () -> RecognizeNoteState,
-    navigator: DestinationsNavigator?
+    navigator: DestinationsNavigator?,
+    openDrawer: () -> Unit,
 ) {
-    Box {
-        Scaffold() { paddingValues ->
-            Column(modifier = Modifier.padding(paddingValues)) {
-                when (generatedNoteState) {
-                    is GeneratedNoteState.Loading -> {
-                        CircularProgressIndicator()
+    Scaffold() { paddingValues ->
+        Column(modifier = Modifier.padding(paddingValues)) {
+            when (generatedNoteState) {
+                is GeneratedNoteState.Loading -> {
+                    CircularProgressIndicator()
+                }
+
+                is GeneratedNoteState.Ready -> {
+                    CenteredNavigationBarWithNavigateBackAndRightActionButton(
+                        navigator = navigator,
+                        rightActionButtonPainter = rememberVectorPainter(image = Icons.Default.Settings),
+                        text = stringResource(R.string.play_note_you_see),
+                        rightActionButton = openDrawer,
+                    )
+                    if (viewModel != null) {
+                        DisplaySheet(generatedNoteState.noteAndScale, recognizeNoteState)
+                    } else {
+                        SheetInPreview()
                     }
+                    SensitivitySetting(sensitivity = sensitivity, setSensitivity = {
+                        viewModel?.setSilenceTreashold(it)
+                    })
 
-                    is GeneratedNoteState.Ready -> {
-                        CenteredNavigationBarWithNavigateBack(
-                            navigator = navigator,
-                            label = stringResource(R.string.play_note_you_see)
-                        )
-                        if (viewModel != null) {
-                            DisplaySheet(generatedNoteState.noteAndKeySignature, recognizeNoteState)
-                        } else {
-                            SheetInPreview()
-                        }
-                        SensitivitySetting(sensitivity =  sensitivity, setSensitivity = {
-                            viewModel?.setSilenceTreashold(it)
-                        })
+                    Spacer(Modifier.height(50.dp))
 
-                        Spacer(Modifier.height(50.dp))
-
-                        FingerboardInputView(
-                            scale = generatedNoteState.noteAndKeySignature.keySignature.getMajorScale()
-                        ){
-                            viewModel?.keyboardInput(it)
-                        }
+                    FingerboardInputView(
+                        scale = generatedNoteState.noteAndScale.scale
+                    ) {
+                        viewModel?.keyboardInput(it)
                     }
+                }
                 }
             }
         }
@@ -132,7 +322,7 @@ fun RecognizeNoteScreenBody(
             recognizeNoteStateLambda = recognizeNoteState,
         )
     }
-}
+
 
 @Suppress("MagicNumber")
 @Composable
@@ -220,12 +410,16 @@ private fun InputStatusContent(
 }
 
 @Composable
-private fun DisplaySheet(noteAndKeySignature: NoteAndKeySignature, recognizeNoteState: () -> RecognizeNoteState) {
+private fun DisplaySheet(
+    noteAndKeySignature: NoteAndScale,
+    recognizeNoteState: () -> RecognizeNoteState
+) {
     Sheet(
         notes = listOf(
             noteAndKeySignature.note
         ),
-        extraNotes = (recognizeNoteState() as? RecognizeNoteState.Wrong)?.wrongNote?.let { listOf(it) } ?: listOf(),
+        extraNotes = (recognizeNoteState() as? RecognizeNoteState.Wrong)?.wrongNote?.let { listOf(it) }
+            ?: listOf(),
         keySignature = noteAndKeySignature.keySignature
     )
 }
@@ -236,17 +430,18 @@ fun RecognizeNotePreview() {
     RecognizeNoteScreenBody(
         viewModel = null,
         generatedNoteState = GeneratedNoteState.Ready(
-            NoteAndKeySignature(
+            NoteAndScale(
                 note = SheetNote(
                     innerSheetNote = InnerSheetNote.C,
                     octave = 4,
                 ),
-                keySignature = KeySignature.Sharps(1)
+                scale = MajorScale.D
             )
         ),
         sensitivity = { 0.5f },
         recognizeNoteState = { RecognizeNoteState.InTune() },
-        navigator = null
+        navigator = null,
+        openDrawer = {}
     )
 }
 

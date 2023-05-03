@@ -62,7 +62,7 @@ enum class InnerTwelveToneInterpretation {
     B {
         override val isSharp = false
         override fun nextTone() = C
-        override fun previousTone() = A
+        override fun previousTone() = ASharp
     };
 
     @Suppress("ReturnCount")
@@ -96,6 +96,14 @@ enum class InnerTwelveToneInterpretation {
 
     fun difference(other: InnerTwelveToneInterpretation): Int {
         return this.ordinal - other.ordinal
+    }
+
+    fun differenceOnlyPositive(other: InnerTwelveToneInterpretation): Int {
+        return if (this.ordinal > other.ordinal) {
+            this.ordinal - other.ordinal
+        } else {
+            this.ordinal + numberOfTones - other.ordinal
+        }
     }
 
     companion object {

@@ -10,11 +10,13 @@ import androidx.lifecycle.viewModelScope
 import com.kobera.music.common.model.GamesAudioSensitivityStorage
 import com.kobera.music.common.notes.Tones
 import com.kobera.music.common.notes.TwelvetoneTone
-import com.kobera.music.common.notes.frequency.FrequencyToNote
+import com.kobera.music.common.notes.frequency.FrequencyToTone
 import com.kobera.music.common.notes.frequency.InTunePrecision
 import com.kobera.music.common.notes.frequency.ToneWithFrequency
+import com.kobera.music.common.notes.scale.MajorScale
+import com.kobera.music.common.notes.scale.MinorScale
+import com.kobera.music.common.notes.scale.Scale
 import com.kobera.music.common.notes.sheet.SheetNote
-import com.kobera.music.common.notes.sheet.ui.KeySignature
 import com.kobera.music.common.score.ScoreRepository
 import com.kobera.music.common.score.data.ScoreEntity
 import com.kobera.music.common.score.data.ScoreType
@@ -44,14 +46,17 @@ class RecognizeNoteViewModel(
     private val gamesAudioSensitivityStorage: GamesAudioSensitivityStorage,
     private val scoreRepository: ScoreRepository
 ) : ViewModel() {
-
     private val scalesDataStore : DataStore<RecognizeNoteScales> = applicationContext.recognizeNoteDataStore
 
     private val _scales: MutableStateFlow<RecognizeNoteScaleState> = MutableStateFlow(
         RecognizeNoteScaleState.Loading
     )
 
-    //val scales = _scales.asStateFlow()
+    val scales = _scales.asStateFlow()
+
+    private val _microphoneEnabled : MutableStateFlow<Boolean> = MutableStateFlow(false)
+
+    val microphoneEnabled = _microphoneEnabled.asStateFlow()
 
     private val _generatedNote: MutableStateFlow<GeneratedNoteState> = MutableStateFlow(
         GeneratedNoteState.Loading
@@ -70,11 +75,8 @@ class RecognizeNoteViewModel(
     init {
         viewModelScope.launch {
             scalesDataStore.data.collect {
-                val first = _scales.value is RecognizeNoteScaleState.Loading
                 _scales.value = RecognizeNoteScaleState.Ready(it)
-                if (first) {
-                    generateRandomNote()
-                }
+                generateRandomNote()
             }
         }
 
@@ -113,7 +115,7 @@ class RecognizeNoteViewModel(
                     if (_recognizeNoteState.value !is RecognizeNoteState.NotEntered) {
                         return@collect
                     }
-                    val noteFromFrequency = FrequencyToNote.findClosestNote(
+                    val noteFromFrequency = FrequencyToTone.findClosestTone(
                         frequency = frequencyState.frequency,
                         notes = Tones.getTones(
                             a4Frequency.frequency.value,
@@ -142,12 +144,12 @@ class RecognizeNoteViewModel(
 
 
 
-    private  fun newToShowState(
+    private fun newToShowState(
         noteFromFrequency: ToneWithFrequency,
         ready: GeneratedNoteState.Ready,
         frequencyState: FrequencyState.HasFrequency
     ): RecognizeNoteState.ToShow {
-        return if (noteFromFrequency sameNoteAs ready.noteAndKeySignature.note.toTwelveTone()) {
+        return if (noteFromFrequency sameNoteAs ready.noteAndScale.note.toTwelveTone()) {
             if (noteFromFrequency.isInTune(frequencyState.frequency)) {
                 RecognizeNoteState.InTune()
             } else {
@@ -181,11 +183,13 @@ class RecognizeNoteViewModel(
     }
 
     fun startListeningFrequencies() {
+        _microphoneEnabled.value = true
         viewModelScope.launch {
             singleFrequencyReader.start()
         }
     }
     fun stopListeningResponses() {
+        _microphoneEnabled.value = false
         singleFrequencyReader.stop()
     }
     fun setSilenceTreashold(to: Float, init : Boolean = false) {
@@ -199,7 +203,45 @@ class RecognizeNoteViewModel(
         ).toLong())
     }
 
-    //TODO select scales
+    fun addScale(scale: Scale){
+        (scales.value as? RecognizeNoteScaleState.Ready)?.scales?.let {
+            updateScales(
+                when(scale){
+                    is MajorScale -> {
+                        check(!it.majorScales.contains(scale)){ "scale already added"}
+                        it.copy(majorScales = it.majorScales + scale)
+                    }
+                    is MinorScale -> {
+                        check(!it.minorScales.contains(scale)){ "scale already added"}
+                        it.copy(minorScales = it.minorScales + scale)
+                    }
+                    else -> error("not supported scale")
+                }
+            )
+        }
+    }
+
+    fun removeScale(scale: Scale){
+        (scales.value as? RecognizeNoteScaleState.Ready)?.scales?.let {
+            if(it.majorScales.size + it.minorScales.size == 1){
+                return
+            }
+            updateScales(
+                when(scale){
+                    is MajorScale -> {
+                        check(it.majorScales.contains(scale)){ "scale not added"}
+                        it.copy(majorScales = it.majorScales - scale)
+                    }
+                    is MinorScale -> {
+                        check(it.minorScales.contains(scale)){ "scale not added"}
+                        it.copy(minorScales = it.minorScales - scale)
+                    }
+                    else -> error("not supported scale")
+                }
+            )
+        }
+    }
+
     fun updateScales(scales: RecognizeNoteScales) {
         viewModelScope.launch {
             scalesDataStore.updateData { scales }
@@ -214,7 +256,7 @@ class RecognizeNoteViewModel(
             is GeneratedNoteState.Loading -> return
             is GeneratedNoteState.Ready -> {
                 val generatedNote =
-                    (generatedNote.value as GeneratedNoteState.Ready).noteAndKeySignature.note.toTwelveTone()
+                    (generatedNote.value as GeneratedNoteState.Ready).noteAndScale.note.toTwelveTone()
 
                 val newState = if (generatedNote sameNoteAs input) {
                     RecognizeNoteState.InTuneKeyInput()
@@ -262,7 +304,7 @@ class RecognizeNoteViewModel(
                     note = note.copy(octave = note.octave + 1)
                 }
                 _generatedNote.value =
-                    GeneratedNoteState.Ready(NoteAndKeySignature(note, scale.getKeySignature()))
+                    GeneratedNoteState.Ready(NoteAndScale(note, scale))
             }
         }
     }
@@ -281,14 +323,17 @@ sealed interface RecognizeNoteScaleState {
 
 sealed interface GeneratedNoteState {
     object Loading : GeneratedNoteState
-    class Ready(val noteAndKeySignature: NoteAndKeySignature) : GeneratedNoteState
+    class Ready(val noteAndScale: NoteAndScale) : GeneratedNoteState
 }
 
 
-data class NoteAndKeySignature(
+data class NoteAndScale(
     val note: SheetNote,
-    val keySignature: KeySignature
-)
+    val scale: Scale
+) {
+    val keySignature
+        get() = scale.getKeySignature()
+}
 
 
 sealed interface RecognizeNoteState {

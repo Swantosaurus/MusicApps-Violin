@@ -40,8 +40,7 @@ object FourierTransform {
     }
 
     /**
-     * this is not extension of dft because rows in the matrix doesn't make up base
-     * just trying to make biggest scalar sum with vectors and the max is most simular to the
+     * inspired by NDFT returns array of scalar products of the sampleData and the complex sinusoids
      */
     fun fineTuneDFT(sampleData: ShortArray, from: Int, to: Int, accuracy: Frequency): Array<ComplexNumber> =
         fineTuneDFT(

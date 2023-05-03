@@ -7,6 +7,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.core.view.WindowCompat
+import com.kobera.music.common.ui.util.setSystemBarColors
 import com.kobera.music.violin.feature.NavGraphs
 import com.kobera.music.violin.ui.theme.ViolinAppTheme
 import com.ramcosta.composedestinations.DestinationsNavHost
@@ -26,6 +27,7 @@ class MainActivity : ComponentActivity() {
                 Surface(
                     color = MaterialTheme.colorScheme.surface
                 ) {
+                    setSystemBarColors()
                     MainNavigation()
                 }
             }
