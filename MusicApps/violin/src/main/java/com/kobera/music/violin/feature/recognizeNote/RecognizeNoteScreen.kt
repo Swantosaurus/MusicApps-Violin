@@ -1,3 +1,4 @@
+@file:Suppress("TooManyFunctions")
 package com.kobera.music.violin.feature.recognizeNote
 
 import android.annotation.SuppressLint
@@ -196,45 +197,16 @@ fun RecognizeScreenDrawer(
     showDialog: () -> Unit
 ) {
     val coroutineScope = rememberCoroutineScope()
-
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     ModalNavigationDrawer(
         drawerContent = {
             ModalDrawerSheet(
+                @Suppress("MagicNumber")
                 Modifier.width(240.dp + 16.dp * 3),
                 windowInsets = DrawerDefaults.windowInsets.add((WindowInsets(left = 16.dp)))
 
             ) {
-                Row(Modifier.fillMaxWidth()) {
-                    Column(
-                        Modifier
-                            .weight(1f)
-                            .verticalScroll(rememberScrollState()),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(
-                            text = stringResource(R.string.major_scales),
-                            style = MaterialTheme.typography.headlineMedium
-                        )
-                        MajorScale.values().forEach {
-                            ScaleToggleButtton(viewModel = viewModel, scales = scales, scale = it)
-                        }
-                    }
-                    Spacer(modifier = Modifier.width(16.dp))
-                    Column(
-                        Modifier.weight(1f),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(
-                            stringResource(R.string.minor),
-                            style = MaterialTheme.typography.headlineMedium
-                        )
-                        MinorScale.values().forEach {
-                            ScaleToggleButtton(viewModel = viewModel, scales = scales, scale = it)
-                        }
-                    }
-                    Spacer(modifier = Modifier.width(16.dp))
-                }
+                DrawerContent(viewModel = viewModel, scales = scales)
             }
         },
         drawerState = drawerState
@@ -253,6 +225,41 @@ fun RecognizeScreenDrawer(
             },
             showDialog = showDialog
         )
+    }
+}
+
+
+@Composable
+private fun DrawerContent(viewModel: RecognizeNoteViewModel?, scales: () -> RecognizeNoteScales) {
+    Row(Modifier.fillMaxWidth()) {
+        Column(
+            Modifier
+                .weight(1f)
+                .verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = stringResource(R.string.major_scales),
+                style = MaterialTheme.typography.headlineMedium
+            )
+            MajorScale.values().forEach {
+                ScaleToggleButtton(viewModel = viewModel, scales = scales, scale = it)
+            }
+        }
+        Spacer(modifier = Modifier.width(16.dp))
+        Column(
+            Modifier.weight(1f),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                stringResource(R.string.minor),
+                style = MaterialTheme.typography.headlineMedium
+            )
+            MinorScale.values().forEach {
+                ScaleToggleButtton(viewModel = viewModel, scales = scales, scale = it)
+            }
+        }
+        Spacer(modifier = Modifier.width(16.dp))
     }
 }
 

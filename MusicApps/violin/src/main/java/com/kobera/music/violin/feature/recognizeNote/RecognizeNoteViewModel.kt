@@ -104,6 +104,9 @@ class RecognizeNoteViewModel(
     private var lastNote: ToneWithFrequency? = null
     private suspend fun readFrequency(a4Frequency: A4Frequency){
         singleFrequencyReader.frequency.collect { frequencyState ->
+            if(_microphoneEnabled.value.not()) {
+                return@collect
+            }
             if (_recognizeNoteState.value !is RecognizeNoteState.NotEntered) {
                 return@collect
             }

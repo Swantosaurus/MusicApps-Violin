@@ -8,9 +8,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -32,13 +33,12 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kobera.music.common.score.ScoreRepository
 import com.kobera.music.common.ui.component.AccuracyGraph
-import com.kobera.music.common.ui.util.setSystemBarColors
 import com.kobera.music.common.util.toStringWithNDecimals
 import com.kobera.music.violin.R
-import com.kobera.music.violin.feature.NavGraphs
 import com.kobera.music.violin.feature.destinations.DirectionDestination
 import com.kobera.music.violin.feature.destinations.MetronomeWrapperDestination
 import com.kobera.music.violin.feature.destinations.RecognizeNoteScreenDestination
+import com.kobera.music.violin.feature.destinations.SheetMusicListScreenDestination
 import com.kobera.music.violin.feature.destinations.TunerScreenDestination
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
@@ -56,8 +56,6 @@ fun StartingScreen(
     val totalWinsAndLoses by startingScreenViewModel.totalWinsAndLoses.collectAsStateWithLifecycle()
     val todayScoreState by startingScreenViewModel.scoreToday.collectAsStateWithLifecycle()
     val todayWinsAndLoses by startingScreenViewModel.winsAndLosesToday.collectAsStateWithLifecycle()
-
-    setSystemBarColors()
 
     StartingScreenBody(
         navigator = navigator,
@@ -99,7 +97,10 @@ private fun ScoreStats(
     todayWinsAndLoeses: WinsAndLosesState
 ) {
     Row() {
-        Column(Modifier.weight(1f).padding(10.dp)) {
+        Column(
+            Modifier
+                .weight(1f)
+                .padding(10.dp)) {
             ScoreValue(totalScore = totalScoreState, scoreLabel = stringResource(R.string.total))
             Accuracy(
                 modifier = Modifier
@@ -109,7 +110,10 @@ private fun ScoreStats(
                 todaysWinsAndLosesState = totalWinsAndLoses
             )
         }
-        Column(Modifier.weight(1f).padding(10.dp)) {
+        Column(
+            Modifier
+                .weight(1f)
+                .padding(10.dp)) {
             ScoreValue(totalScore = todayScoreState, scoreLabel = stringResource(R.string.today))
             Accuracy(
                 modifier = Modifier
@@ -198,14 +202,24 @@ private fun Accuracy(modifier: Modifier, todaysWinsAndLosesState: WinsAndLosesSt
 
 @Composable
 private fun Navigation(navigator: DestinationsNavigator?) {
-    LazyVerticalGrid(
-        columns = GridCells.Adaptive(50.dp),
+    val sections  = getSections()
+
+    LazyColumn(
+        Modifier
+            .padding(10.dp),
     ) {
-        items(NavGraphs.root.destinations) { destination ->
-            val uiDescription = getUiDescriptionForDestination(navigationDestination = destination)
-            uiDescription?.let {
-                NavigationItem(icon = uiDescription.icon, title = uiDescription.title) {
-                    navigator?.navigate(destination as DirectionDestination)
+        items(sections) { section ->
+            Text(text = section.title, style = MaterialTheme.typography.headlineMedium)
+            LazyRow(
+                Modifier
+                    .padding(10.dp)
+            ) {
+                items(section.destinations) { destination ->
+                    NavigationItem(
+                        icon = destination.icon,
+                        title = destination.title,
+                        navigate = { navigator?.navigate(destination.destination) }
+                    )
                 }
             }
         }
@@ -218,47 +232,53 @@ private fun Navigation(navigator: DestinationsNavigator?) {
  * @param icon - icon for the navigation item
  * @param title - title for the navigation item
  */
-data class NavigationDescription(val icon: Painter, val title: String)
+data class NavigationDescription(val icon: Painter, val title: String, val destination: DirectionDestination)
+
+data class NavigationSection(val title: String, val destinations: List<NavigationDescription>)
 
 @Composable
-private fun getUiDescriptionForDestination(
-    navigationDestination: com.kobera.music.violin.feature.destinations.Destination
-): NavigationDescription? {
-    return when (navigationDestination) {
-        is RecognizeNoteScreenDestination -> {
-            NavigationDescription(
-                painterResource(id = R.drawable.ic_violin),
-                stringResource(R.string.recognize_note)
+private fun getSections(): List<NavigationSection> =
+    listOf(
+        NavigationSection(
+            stringResource(R.string.games),
+            listOf(
+                NavigationDescription(
+                    icon = painterResource(id = R.drawable.baseline_question_mark_24),
+                    title = stringResource(id = R.string.recognize_note),
+                    destination = RecognizeNoteScreenDestination
+                ),
+                NavigationDescription(
+                    icon = painterResource(id = R.drawable.ic_violin),
+                    title = stringResource(R.string.songs),
+                    destination = SheetMusicListScreenDestination
+                )
             )
-        }
-
-        is TunerScreenDestination -> {
-            NavigationDescription(
-                painterResource(id = R.drawable.ic_violin),
-                stringResource(R.string.tuner)
+        ),
+        NavigationSection(
+            title = "Utilities",
+            destinations = listOf(
+                NavigationDescription(
+                    icon = painterResource(id = com.kobera.music.common.R.drawable.tuning_pegs),
+                    title = stringResource(R.string.tuner),
+                    destination = TunerScreenDestination
+                ),
+                NavigationDescription(
+                    icon = painterResource(id = com.kobera.music.common.R.drawable.metronome),
+                    title = stringResource(com.kobera.music.common.R.string.metronome),
+                    destination = MetronomeWrapperDestination
+                )
             )
-        }
+        )
+    )
 
-        is MetronomeWrapperDestination -> {
-            NavigationDescription(
-                painterResource(id = R.drawable.ic_violin),
-                stringResource(com.kobera.music.common.R.string.metronome)
-            )
-        }
-
-        else -> {
-            null
-        }
-    }
-}
 
 @Composable
 fun NavigationItem(icon: Painter, title: String, navigate: () -> Unit) {
     Column(modifier = Modifier.clickable {
         navigate()
     }, horizontalAlignment = Alignment.CenterHorizontally) {
-        Icon(painter = icon, contentDescription = null)
-        Text(text = title)
+        Icon(modifier = Modifier.size(100.dp), painter = icon, contentDescription = null)
+        Text(text = title, style = MaterialTheme.typography.labelLarge)
     }
 }
 
