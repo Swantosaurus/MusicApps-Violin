@@ -1,8 +1,11 @@
 package com.kobera.music.violin.feature.recognizeNote
 
+import android.Manifest
 import android.content.Context
+import android.content.pm.PackageManager
 import androidx.annotation.DrawableRes
 import androidx.compose.ui.graphics.Color
+import androidx.core.content.ContextCompat
 import androidx.datastore.core.DataStore
 import androidx.datastore.dataStore
 import androidx.lifecycle.ViewModel
@@ -274,6 +277,21 @@ class RecognizeNoteViewModel(
             }
         }
     }
+
+
+    fun setMicrophoneEnabled(enabled: Boolean, context: Context): Boolean  {
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO)
+            != PackageManager.PERMISSION_GRANTED
+        ) {
+            if (_microphoneEnabled.value) {
+                _microphoneEnabled.value = false
+            }
+            return false
+        }
+        _microphoneEnabled.value = enabled
+        return true
+    }
+
 
     private fun insertScoreToDb(score: Int) {
         viewModelScope.launch {

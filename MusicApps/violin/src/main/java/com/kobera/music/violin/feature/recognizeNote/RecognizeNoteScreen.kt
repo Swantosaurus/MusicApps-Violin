@@ -95,7 +95,14 @@ fun RecognizeNoteScreen(
     val microphoneEnabled by viewModel.microphoneEnabled.collectAsStateWithLifecycle()
 
 
-    var alertVisible by remember { mutableStateOf(true) }
+    var alertVisible by remember { mutableStateOf(false) }
+    val showDialog = {
+        alertVisible = true
+    }
+    val hideVisible = {
+        alertVisible = false
+    }
+
     HandleAudioPermission(
         permissionGranted = {
             withLifecycle(
@@ -110,22 +117,23 @@ fun RecognizeNoteScreen(
         showRationale = {
             Rationale(it)
         },
-        permissionDenied = {
-            OpenSettingsDialog(alertVisible) {
-                alertVisible = false
-            }
-        }
+        permissionDenied = {}
     )
+    OpenSettingsDialog(alertVisible, hideVisible)
     RecognizeScreenDrawer(
         viewModel = viewModel,
-        generatedNoteState = generatedNoteState,
+        generatedNoteState = { generatedNoteState },
         sensitivity = { sensitivity },
         recognizeNoteState = { recognizeNoteState },
         navigator = navigator,
-        scales = when (scales) {
-            is RecognizeNoteScaleState.Ready -> (scales as RecognizeNoteScaleState.Ready).scales
-            else -> RecognizeNoteScales()
-        }
+        microphoneEnabled = { microphoneEnabled },
+        scales = {
+            when (scales) {
+                is RecognizeNoteScaleState.Ready -> (scales as RecognizeNoteScaleState.Ready).scales
+                else -> RecognizeNoteScales()
+            }
+        },
+        showDialog = showDialog
     )
 
 }
@@ -179,13 +187,15 @@ private fun Rationale(permissionState: PermissionState) {
 @Composable
 fun RecognizeScreenDrawer(
     viewModel: RecognizeNoteViewModel?,
-    generatedNoteState: GeneratedNoteState,
+    generatedNoteState: () -> GeneratedNoteState,
     sensitivity: () -> Float,
     recognizeNoteState: () -> RecognizeNoteState,
+    microphoneEnabled: () -> Boolean,
     navigator: DestinationsNavigator?,
-    scales: RecognizeNoteScales
+    scales: () -> RecognizeNoteScales,
+    showDialog: () -> Unit
 ) {
-    val coroutinescope = rememberCoroutineScope()
+    val coroutineScope = rememberCoroutineScope()
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     ModalNavigationDrawer(
@@ -197,7 +207,9 @@ fun RecognizeScreenDrawer(
             ) {
                 Row(Modifier.fillMaxWidth()) {
                     Column(
-                        Modifier.weight(1f).verticalScroll(rememberScrollState()),
+                        Modifier
+                            .weight(1f)
+                            .verticalScroll(rememberScrollState()),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
@@ -229,24 +241,26 @@ fun RecognizeScreenDrawer(
     ) {
         RecognizeNoteScreenBody(
             viewModel = viewModel,
-            generatedNoteState = generatedNoteState,
+            generatedNoteState = generatedNoteState(),
             sensitivity = sensitivity,
             recognizeNoteState = recognizeNoteState,
             navigator = navigator,
+            microphoneEnabled = microphoneEnabled,
             openDrawer = {
-                coroutinescope.launch {
+                coroutineScope.launch {
                     drawerState.open()
                 }
-            }
+            },
+            showDialog = showDialog
         )
     }
 }
 
 @Composable
-fun ScaleToggleButtton(viewModel: RecognizeNoteViewModel?, scales: RecognizeNoteScales, scale: MinorScale) {
+fun ScaleToggleButtton(viewModel: RecognizeNoteViewModel?, scales: () -> RecognizeNoteScales, scale: MinorScale) {
     FilledIconToggleButton(
         modifier = Modifier.width(120.dp),
-        checked = scales.minorScales.contains(scale),
+        checked = scales().minorScales.contains(scale),
         onCheckedChange = {
             if(it) {
                 viewModel?.addScale(scale = scale)
@@ -259,10 +273,10 @@ fun ScaleToggleButtton(viewModel: RecognizeNoteViewModel?, scales: RecognizeNote
 }
 
 @Composable
-fun ScaleToggleButtton(viewModel: RecognizeNoteViewModel?, scales: RecognizeNoteScales, scale: MajorScale) {
+fun ScaleToggleButtton(viewModel: RecognizeNoteViewModel?, scales: () -> RecognizeNoteScales, scale: MajorScale) {
     FilledIconToggleButton(
         modifier = Modifier.width(120.dp),
-        checked = scales.majorScales.contains(scale),
+        checked = scales().majorScales.contains(scale),
         onCheckedChange = {
             if(it) {
                 viewModel?.addScale(scale = scale)
@@ -281,10 +295,29 @@ fun RecognizeNoteScreenBody(
     generatedNoteState: GeneratedNoteState,
     sensitivity: () -> Float,
     recognizeNoteState: () -> RecognizeNoteState,
+    microphoneEnabled: () -> Boolean,
     navigator: DestinationsNavigator?,
     openDrawer: () -> Unit,
+    showDialog: () -> Unit,
 ) {
-    Scaffold() { paddingValues ->
+    val context = LocalContext.current
+    Scaffold(
+        floatingActionButton = {
+            FilledIconToggleButton(
+                modifier = Modifier.size(48.dp),
+                checked = microphoneEnabled(),
+                onCheckedChange = {
+                    if (viewModel?.setMicrophoneEnabled(it, context = context) == false) {
+                        showDialog()
+                    }
+                }) {
+                Icon(
+                    painter = painterResource(id = R.drawable.baseline_mic_24),
+                    contentDescription = null
+                )
+            }
+        }
+    ) { paddingValues ->
         Column(modifier = Modifier.padding(paddingValues)) {
             when (generatedNoteState) {
                 is GeneratedNoteState.Loading -> {
@@ -441,7 +474,9 @@ fun RecognizeNotePreview() {
         sensitivity = { 0.5f },
         recognizeNoteState = { RecognizeNoteState.InTune() },
         navigator = null,
-        openDrawer = {}
+        openDrawer = {},
+        showDialog = {},
+        microphoneEnabled = { false }
     )
 }
 
