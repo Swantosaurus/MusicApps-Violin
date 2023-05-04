@@ -248,7 +248,8 @@ private fun DrawerContent(viewModel: RecognizeNoteViewModel?, scales: () -> Reco
         }
         Spacer(modifier = Modifier.width(16.dp))
         Column(
-            Modifier.weight(1f),
+            Modifier.weight(1f)
+                .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(

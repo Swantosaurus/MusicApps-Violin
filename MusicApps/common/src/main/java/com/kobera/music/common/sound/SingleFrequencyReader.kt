@@ -24,7 +24,7 @@ import kotlin.math.roundToInt
 
 
 @Suppress("MagicNumber","LongParameterList")
-class SingleFrequencyReader(
+open class SingleFrequencyReader(
     private val pcmAudioRecorder: PcmAudioRecorder,
     minSearchedFrequency: Frequency = Frequency(150.0),
     maxSearchedFrequency: Frequency = Frequency(2000.0),
@@ -255,4 +255,12 @@ class SingleFrequencyReader(
 }
 
 
+class ViolinSingleFrequencyReader(pcmAudioRecorder: PcmAudioRecorder): SingleFrequencyReader(
+    pcmAudioRecorder = pcmAudioRecorder,
+    hpsIterations = 4
+)
 
+class SoundGeneratorFrequencyReader(pcmAudioRecorder: PcmAudioRecorder): SingleFrequencyReader(
+    pcmAudioRecorder = pcmAudioRecorder,
+    hpsIterations = 1
+)
