@@ -2,7 +2,6 @@ package com.kobera.music.common.ui.util
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.Color
 import com.google.accompanist.systemuicontroller.SystemUiController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
@@ -24,11 +23,9 @@ fun setSystemBarColors(
     darkIconsBottomBar: Boolean = !isSystemInDarkTheme(),
     systemUiController: SystemUiController = rememberSystemUiController()
 ) {
-    SideEffect {
-        systemUiController.setStatusBarColor(color = topBarColor, darkIcons = darkIconsTopBar)
-        systemUiController.setNavigationBarColor(
-            color = bottomBarColor,
-            darkIcons = darkIconsBottomBar
-        )
-    }
+    systemUiController.setStatusBarColor(color = topBarColor, darkIcons = darkIconsTopBar)
+    systemUiController.setNavigationBarColor(
+        color = bottomBarColor,
+        darkIcons = darkIconsBottomBar
+    )
 }

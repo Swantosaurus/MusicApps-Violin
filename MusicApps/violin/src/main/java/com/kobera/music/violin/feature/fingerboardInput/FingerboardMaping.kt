@@ -90,7 +90,7 @@ object FingerboardMapping {
 
             var twelvetoneNote =
                 TwelvetoneTone(twelvetoneNotes[currentTwelvetoneNoteIndex!!], string.octave)
-            var difference = twelvetoneNote.difference(string)
+            var difference = twelvetoneNote.differenceFrom(string)
 
             if (difference < 0) {
                 difference += Tones.numberOfTones

@@ -14,10 +14,12 @@ open class TwelvetoneTone(
         }
     }
 
-    open fun difference(other: TwelvetoneTone): Int {
+    open fun differenceFrom(other: TwelvetoneTone): Int {
         return this.twelveNoteInterpretation.ordinal - other.twelveNoteInterpretation.ordinal +
                 (this.octave - other.octave) * Tones.numberOfTones
     }
+
+    open fun differenceTo(other: TwelvetoneTone) = - differenceFrom(other)
 
     /**
      * Returns true if the note is the same as the other note.

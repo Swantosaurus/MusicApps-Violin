@@ -37,6 +37,7 @@ import com.kobera.music.common.notes.sheet.ui.Clef
 import com.kobera.music.common.notes.sheet.ui.KeySignature
 import com.kobera.music.common.notes.sheet.ui.NotePath
 import com.kobera.music.common.notes.sheet.ui.PathAndCenterOffset
+import kotlin.math.ceil
 
 
 @Suppress("LongParameterList")
@@ -550,7 +551,7 @@ private fun DrawScope.drawAccidental(
             else -> TODO()
         }
     }
-    return 75f
+    return 90f
 }
 
 
@@ -675,8 +676,41 @@ private fun DrawScope.drawNote(
         }
     }
 
+
+    val supportingLinesAtTop
+        = ceil(note.sheetDifference(TwelvetoneTone(G, 5)).toDouble() / 2).toInt()
+    repeat(supportingLinesAtTop){
+        translate (
+            left = spacingFromLeft-25f,
+            top = it * (- 2 * noteStep)
+        ){
+            drawSupportingLine(color = color)
+        }
+    }
+    val supportingLinesAtBottom
+        = ceil( - note.sheetDifference(TwelvetoneTone(D, 4)).toDouble() / 2).toInt()
+    repeat(supportingLinesAtBottom){
+        translate (
+            left = spacingFromLeft-25f,
+            top = it * (2 * noteStep) + noteStep * 12
+        ){
+            drawSupportingLine(color = color)
+        }
+    }
+
     return noteWidth
 }
+
+
+private fun DrawScope.drawSupportingLine(color: Color){
+    drawLine(
+        color = color,
+        start = Offset.Zero,
+        end = Offset(115f, 0f),
+        strokeWidth = 1.dp.toPx()
+    )
+}
+
 
 private fun getNotePathAndCenterOffset(note: SheetNote, lineHeight: Float): PathAndCenterOffset =
     when (note.noteParams.duration) {

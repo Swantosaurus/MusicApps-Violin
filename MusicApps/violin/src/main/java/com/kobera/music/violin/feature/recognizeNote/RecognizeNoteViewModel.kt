@@ -205,7 +205,7 @@ class RecognizeNoteViewModel(
             }
         }
         singleFrequencyReader.setSilenceThreshold(
-            (to * GamesAudioSensitivityStorage.gamesSensitivityMultiplaier
+            (to * GamesAudioSensitivityStorage.gamesSensitivityMultiplayer
         ).toLong())
     }
 

@@ -96,7 +96,7 @@ class TunerViewModel(
         frequencyReader.stop()
     }
     companion object{
-        private const val silenceThresholdMultiplier = 10_000_000
+        private const val silenceThresholdMultiplier = 30_000_000
     }
 }
 
