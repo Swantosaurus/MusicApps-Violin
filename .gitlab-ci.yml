@@ -47,6 +47,7 @@ lintDebug:
   script:
     - ./gradlew -Pci --console=plain lintDebug -PbuildDir=lint
   artifacts:
+    paths:
     - ./violin/gradle/reports/lint-results-debug.html
     - ./common/gradle/reports/lint-results-debug.html
 
@@ -56,8 +57,9 @@ detekt:
     script:
       - ./gradlew :detekt
     artifacts:
-      - ./violin/gradle/reports/detekt/detekt.html
-      - ./common/gradle/reports/detekt/detekt.html
+      paths:
+        - ./violin/gradle/reports/detekt/detekt.html
+        - ./common/gradle/reports/detekt/detekt.html
 
  
 # Make Project
@@ -68,7 +70,7 @@ assembleDebug:
     - ./gradlew assembleDebug
   artifacts:
     paths:
-      - app/build/outputs/
+      - ./violin/build/outputs/
 
 # Run all tests, if any fails, interrupt the pipeline(fail it)
 #debugTests:
