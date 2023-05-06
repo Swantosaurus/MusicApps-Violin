@@ -10,7 +10,7 @@
 #script:
 #  -  sudo apt install gitlab-runner
 
-image: cimg/android:2023.05.1
+image: mobiledevops/android-sdk-image:33.0.2
 
 stages:
 - build
