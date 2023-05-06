@@ -7,7 +7,21 @@
 # Read more about this script on this blog post https://about.gitlab.com/2018/10/24/setting-up-gitlab-ci-for-android-projects/, by Jason Lenny
 # If you are interested in using Android with FastLane for publishing take a look at the Android-Fastlane template.
 
+script:
+  -  sudo apt install gitlab-runner
+
 image: cimg/android:2023.05
+#image: jangrewe/gitlab-ci-android
+
+stages:
+- lintDebug
+- detekt
+- assembleDebug
+- debugTests
+
+#before_script:
+#- export GRADLE_USER_HOME=$(pwd)/.gradle
+#- chmod +x ./gradlew
 
 #variables:
 
@@ -58,7 +72,7 @@ before_script:
   #- sdkmanager --sdk_root=${ANDROID_HOME} "build-tools;${ANDROID_BUILD_TOOLS}"
 
   # Not necessary, but just for surity
-  # - chmod +x ./gradlew
+   - chmod +x ./gradlew
   
 
 # Basic android and gradle stuff
@@ -67,21 +81,21 @@ lintDebug:
   interruptible: true
   stage: build
   script:
-    - sudo ./gradlew -Pci --console=plain :app:lintDebug -PbuildDir=lint
+    - ./MusicApps/gradlew -Pci --console=plain :app:lintDebug -PbuildDir=lint
 
 detekt:
     interruptible: true
     stage: build
     script:
-      - sudo ./gradlew :detekt
+      - ./MusicApps/gradlew :detekt
 
-
+ 
 # Make Project
 assembleDebug:
   interruptible: true
   stage: build
   script:
-    - sudo ./gradlew assembleDebug
+    - ./MusicApps/gradlew assembleDebug
   artifacts:
     paths:
       - app/build/outputs/
@@ -91,4 +105,4 @@ debugTests:
   interruptible: true
   stage: test
   script:
-    - sudo ./gradlew -Pci --console=plain :app:testDebug
+    - ./MusicApps/gradlew -Pci --console=plain :app:testDebug
