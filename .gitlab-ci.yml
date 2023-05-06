@@ -71,7 +71,7 @@ detekt:
     script:
       - ./gradlew :violin:detekt
       - ./gradlew :common:detekt
-      - cat violin/build/reports/detekt.html
+      - cat violin/build/reports/detekt/detekt.html
     artifacts:
       paths:
         - ./*.html
