@@ -65,7 +65,7 @@ detekt:
     script:
       - ./gradlew :detekt
       - ls -a
-      - cd ./violin
+      - cd ./.gradle
       - ls -a 
     artifacts:
       paths:
