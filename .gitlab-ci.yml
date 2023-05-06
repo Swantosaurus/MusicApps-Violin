@@ -22,6 +22,8 @@ before_script:
   - ls
   - whereis java
   - ls /lib/jvm/jdk-19
+  - $JAVA_HOME
+  - $CI_PROJECT_DIR
   - ls /opt
   - ls /opt/java
   - ls /opt/java/openjdk
@@ -39,6 +41,7 @@ build:
   stage: build
   script:
   - ./gradlew assembleDebug
+  - 
   artifacts:
     paths:
     - ./violin/build/outputs/apk/app-debug.apk
@@ -61,6 +64,7 @@ detekt:
     stage: build
     script:
       - ./gradlew :detekt
+      - cp ./violin/build/reports/detekt/detekt.html $CI_PROJECT_DIR
     artifacts:
       paths:
         - ./*.html
