@@ -28,7 +28,7 @@ variables:
 
 # Packages installation before running script
 before_script:
-    cd MusicApps
+  -  cd MusicApps
   - apt-get --quiet update --yes
   - apt-get --quiet install --yes wget tar unzip lib32stdc++6 lib32z1
 
@@ -66,6 +66,13 @@ lintDebug:
   stage: build
   script:
     - ./gradlew -Pci --console=plain :app:lintDebug -PbuildDir=lint
+
+detekt:
+    interruptible: true
+    stage: build
+    script:
+      - ./gradlew :detekt
+
 
 # Make Project
 assembleDebug:
