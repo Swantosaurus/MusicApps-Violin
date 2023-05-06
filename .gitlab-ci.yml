@@ -15,6 +15,7 @@ image: saschpe/android-ndk:32-jdk17.0.3_7-ndk23.1.7779620-cmake3.18.1
 
 stages:
 - build
+- test
 
 before_script:
   - wget 	https://download.oracle.com/java/19/archive/jdk-19.0.2_linux-x64_bin.deb
@@ -88,7 +89,7 @@ assembleDebug:
     paths:
       - ./MusicApps/violin/build/outputs/apk/debug/violin-debug.apk
 
- Run all tests, if any fails, interrupt the pipeline(fail it)
+# Run all tests, if any fails, interrupt the pipeline(fail it)
 debugTests:
   interruptible: true
   stage: test
