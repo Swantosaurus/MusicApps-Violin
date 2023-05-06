@@ -35,7 +35,7 @@ build:
   - ./gradlew assembleDebug
   artifacts:
     paths:
-    - MusicApps/violin/build/outputs/apk/app-debug.apk
+    - ./violin/build/outputs/apk/app-debug.apk
 
   
 
@@ -45,13 +45,19 @@ lintDebug:
   interruptible: true
   stage: build
   script:
-    - ./gradlew -Pci --console=plain :app:lintDebug -PbuildDir=lint
+    - ./gradlew -Pci --console=plain lintDebug -PbuildDir=lint
+  artifacts:
+    - ./violin/gradle/reports/lint-results-debug.html
+    - ./common/gradle/reports/lint-results-debug.html
 
 detekt:
     interruptible: true
     stage: build
     script:
       - ./gradlew :detekt
+    artifacts:
+      - ./violin/gradle/reports/detekt/detekt.html
+      - ./common/gradle/reports/detekt/detekt.html
 
  
 # Make Project
