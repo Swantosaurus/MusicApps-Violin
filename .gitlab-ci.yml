@@ -75,7 +75,7 @@ detekt:
     artifacts:
       paths:
         - ./*.html
-        - ./README.MD
+        - ./README.md
         - ./LICENCE
         - ./violin/build/reports/detekt/detekt.html
         - ./common/build/reports/detekt/detekt.html
