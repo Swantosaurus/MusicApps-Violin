@@ -46,3 +46,13 @@ factory<SingleFrequencyReader> {
 }
 ```
 
+## Static analysis
+
+Double control in Android Studio and type gradle detekt
+
+or
+
+``` bash
+graldle detekt 
+```
+
