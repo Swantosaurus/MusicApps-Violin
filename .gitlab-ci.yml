@@ -31,6 +31,13 @@ before_script:
   - cd MusicApps
   - chmod +x ./gradlew
   - java -version
+  - export GRADLE_USER_HOME=`pwd`/.gradle
+
+
+cache:
+  paths:
+    - .gradle/wrapper
+    - .gradle/caches
 
 
 #cache:
@@ -64,13 +71,15 @@ detekt:
     stage: build
     script:
       - ./gradlew :detekt
-      - ls -a
+      - ls -la
       - cd ./.gradle
-      - ls -a 
+      - ls -la 
       - cd ./buildOutputCleanup
-      - ls -a
+      - ls -la
+      - cd ./cache.properties
       - cd ../../violin 
-      - ls -a
+      - ls -la
+      
     artifacts:
       paths:
         - ./*.html
