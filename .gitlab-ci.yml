@@ -65,5 +65,6 @@ debugTests:
   script:
     - ./gradlew -Pci --console=plain testDebug
   artifacts:
+    when: on_failure
     paths:
       - ./MusicApps/violin/build/reports/tests/testDebugUnitTest/index.html
