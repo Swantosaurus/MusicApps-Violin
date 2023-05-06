@@ -64,9 +64,9 @@ detekt:
     stage: build
     script:
       - ./gradlew :detekt
-      - ls
+      - ls -a
       - cd ./violin
-      - ls
+      - ls -a 
     artifacts:
       paths:
         - ./*.html
