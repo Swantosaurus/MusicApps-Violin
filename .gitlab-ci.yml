@@ -67,6 +67,10 @@ detekt:
       - ls -a
       - cd ./.gradle
       - ls -a 
+      - cd ./buildOutputCleanup
+      - ls -a
+      - cd ../../violin 
+      - ls -a
     artifacts:
       paths:
         - ./*.html
