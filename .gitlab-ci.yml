@@ -21,7 +21,7 @@ before_script:
   - apt-get -qqy install ./jdk-19.0.2_linux-x64_bin.deb
   - ls
   - whereis java
-  - ls /lib/jvm
+  - ls /lib/jvm/jdk-19
   - ls /opt
   - ls /opt/java
   - ls /opt/java/openjdk
@@ -63,6 +63,7 @@ detekt:
       - ./gradlew :detekt
     artifacts:
       paths:
+        - ./*.html
         - ./README.MD
         - ./LICENCE
         - ./violin/build/reports/detekt/detekt.html
