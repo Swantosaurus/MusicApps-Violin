@@ -63,7 +63,8 @@ lintDebug:
     - ./gradlew -Pci --console=plain lintDebug -PbuildDir=lint
   artifacts:
     paths:
-    - ./*.html
+    - ./MusicApps/common/build/reports/lint-result-debug.html
+    - ./MusicApps/violin/build/reports/lint-result-debug.html
 
 detekt:
     interruptible: true
@@ -71,14 +72,10 @@ detekt:
     script:
       - ./gradlew :violin:detekt
       - ./gradlew :common:detekt
-      - cat violin/build/reports/detekt/detekt.html
     artifacts:
       paths:
-        - ./*.html
-        - ./README.md
-        - ./LICENCE
-        - ./violin/build/reports/detekt/detekt.html
-        - ./common/build/reports/detekt/detekt.html
+        - ./MusicApps/violin/build/reports/detekt/detekt.html
+        - ./MusicApps/common/build/reports/detekt/detekt.html
 
  
 # Make Project
@@ -89,11 +86,11 @@ assembleDebug:
     - ./gradlew assembleDebug
   artifacts:
     paths:
-      - ./violin/build/outputs/
+      - ./MusicApps/violin/build/outputs/apk/debug/violin-debug.apk
 
-# Run all tests, if any fails, interrupt the pipeline(fail it)
-#debugTests:
-#  interruptible: true
-#  stage: test
-#  script:
-#    - ./MusicApps/gradlew -Pci --console=plain :app:testDebug
+ Run all tests, if any fails, interrupt the pipeline(fail it)
+debugTests:
+  interruptible: true
+  stage: test
+  script:
+    - ./MusicApps/gradlew -Pci --console=plain :app:testDebug
