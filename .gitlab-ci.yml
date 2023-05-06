@@ -21,7 +21,10 @@ before_script:
   - apt-get -qqy install ./jdk-19.0.2_linux-x64_bin.deb
   - ls
   - whereis java
+  - ls /
+  - ls /opt
   - ls /opt/java
+  - ls /opt/java/openjdk
   - cd MusicApps
   - chmod +x ./gradlew
   - java -version
@@ -61,8 +64,10 @@ detekt:
       - ./gradlew :detekt
     artifacts:
       paths:
-        - ./MusicApps/violin/build/reports/detekt/detekt.html
-        - ./MusicApps/common/build/reports/detekt/detekt.html
+        - README.MD
+        - LICENCE
+        - ./violin/build/reports/detekt/detekt.html
+        - ./common/build/reports/detekt/detekt.html
 
  
 # Make Project
