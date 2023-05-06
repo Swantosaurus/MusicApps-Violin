@@ -76,7 +76,7 @@ detekt:
       - ls -la 
       - cd ./buildOutputCleanup
       - ls -la
-      - cd ./cache.properties
+      #- cd ./cache.properties
       - cd ../../violin 
       - ls -la
       
