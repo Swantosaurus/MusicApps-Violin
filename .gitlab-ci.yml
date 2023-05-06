@@ -10,15 +10,16 @@
 #script:
 #  -  sudo apt install gitlab-runner
 
-image: mobiledevops/android-sdk-image:33.0.2
+image: saschpe/android-ndk:32-jdk17.0.3_7-ndk23.1.7779620-cmake3.18.1
+
 
 stages:
 - build
 
 before_script:
-- export GRADLE_USER_HOME=$(pwd)/.gradle
-- chmod +x ./MusicApps/gradlew
 - cd MusicApps
+- chmod +x ./MusicApps/gradlew
+
 
 #cache:
 #  key: ${CI_PROJECT_ID}
