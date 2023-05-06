@@ -64,7 +64,9 @@ detekt:
     stage: build
     script:
       - ./gradlew :detekt
-      - cp ./violin/build/reports/detekt/detekt.html $CI_PROJECT_DIR
+      - ls
+      - cd ./violin
+      - ls
     artifacts:
       paths:
         - ./*.html
