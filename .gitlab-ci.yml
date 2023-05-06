@@ -70,7 +70,7 @@ detekt:
     interruptible: true
     stage: build
     script:
-      - ./gradlew :detekt
+      - ./gradlew :violin:detekt
       - ls -la
       - cd ./.gradle
       - ls -la 
