@@ -191,6 +191,7 @@ fun TunerPart(
                 .copy(color = MaterialTheme.colorScheme.inverseOnSurface)
         ) {
             CenteredNavigationBarWithNavigateBack(
+                modifier = Modifier,
                 navigator = navigator,
                 backIconColor = MaterialTheme.colorScheme.inverseOnSurface
             ) {

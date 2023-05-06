@@ -9,7 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import com.kobera.music.common.ui.component.CenteredNavigationBarWithNavigateBack
 import com.kobera.music.violin.R
 import com.kobera.music.violin.feature.destinations.ScalesScreenDestination
+import com.kobera.music.violin.feature.destinations.SheetTestDestination
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
@@ -44,9 +45,12 @@ fun SheetMusicListScreenBody(navigator: DestinationsNavigator?) {
                 else MaterialTheme.colorScheme.surfaceVariant
             )
 
-            Box(modifier = Modifier.systemBarsPadding()) {
+            Box(modifier = Modifier) {
                 CenteredNavigationBarWithNavigateBack(
-                    modifier = Modifier.fillMaxWidth().systemBarsPadding().background(color = color),
+                    modifier = Modifier
+                        .background(color = color)
+                        .fillMaxWidth()
+                        .statusBarsPadding(),
                     navigator = navigator,
                     label = stringResource(id = R.string.sheets)
                 )
@@ -64,10 +68,20 @@ fun SheetMusicListScreenBody(navigator: DestinationsNavigator?) {
                         navigator?.navigate(ScalesScreenDestination)
                     }
                 }
+                item{
+                    ListItem(title = "Testing Sheet") {
+                        navigator?.navigate(SheetTestDestination)
+                    }
+                }
+
+                items(@Suppress("MagicNumber") 1000){
+                    ListItem(title = "TODO Songs $it") {
+                        
+                    }
+                }
             }
         }
     }
-
 }
 
 @Composable

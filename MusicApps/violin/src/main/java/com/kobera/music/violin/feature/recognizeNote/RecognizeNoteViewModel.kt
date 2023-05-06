@@ -36,7 +36,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import java.time.Instant.now
+import java.util.Calendar
 import kotlin.random.Random
 import kotlin.time.Duration.Companion.seconds
 
@@ -304,7 +304,7 @@ class RecognizeNoteViewModel(
                     0,
                     ScoreType.RecognizeNote,
                     score,
-                    now().toEpochMilli()
+                    Calendar.getInstance().timeInMillis
                 )
             )
         }

@@ -16,7 +16,7 @@ import timber.log.Timber
 @Composable
 fun lockScreenOrientation(
     orientation: Int = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT,
-     unlockAfterExitingScreen: Boolean = false
+     unlockAfterExitingScreen: Boolean = true
 ) {
     val context = LocalContext.current
     DisposableEffect(Unit) {

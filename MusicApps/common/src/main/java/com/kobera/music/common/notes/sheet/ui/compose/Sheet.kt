@@ -62,49 +62,53 @@ fun Sheet(
 
     var leftOffsetForNotes : Float? = null
 
-    Box(modifier.height(with(density){currentHeight.toDp()})) {
-        Canvas(
-            modifier = Modifier.fillMaxWidth()
+    Box(modifier) {
+        Box(
+            Modifier.height(with(density) { currentHeight.toDp() })
         ) {
-            var numberOfSheetIndex = 0
-            var notesToDraw = notes
-            var extraNotesToDraw = extraNotes
-            while (notesToDraw.isNotEmpty() || extraNotesToDraw.isNotEmpty()) {
-                var spcacingFromLeft = sheetSpacingFromLeft
-                val topSpacing = numberOfSheetIndex * (height + sheetSpacing) + sheetSpacing
-                translate(top = topSpacing) {
-                    drawSheetLines(lineHeight = lineHeight)
-                    spcacingFromLeft = drawClef(
-                        notationHeight = lineHeight * 6,
-                        spacingFromLeft = spcacingFromLeft,
-                        painter = clefPainter
-                    )
-                    spcacingFromLeft = drawKeySignature(
-                        spacingFromLeft = spcacingFromLeft,
-                        keySignature = keySignature,
-                        lineHeight = lineHeight
-                    )
-                    if(leftOffsetForNotes== null){
-                        leftOffsetForNotes = spcacingFromLeft
+            Canvas(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                var numberOfSheetIndex = 0
+                var notesToDraw = notes
+                var extraNotesToDraw = extraNotes
+                while (notesToDraw.isNotEmpty() || extraNotesToDraw.isNotEmpty()) {
+                    var spcacingFromLeft = sheetSpacingFromLeft
+                    val topSpacing = numberOfSheetIndex * (height + sheetSpacing) + sheetSpacing
+                    translate(top = topSpacing) {
+                        drawSheetLines(lineHeight = lineHeight)
+                        spcacingFromLeft = drawClef(
+                            notationHeight = lineHeight * 6,
+                            spacingFromLeft = spcacingFromLeft,
+                            painter = clefPainter
+                        )
+                        spcacingFromLeft = drawKeySignature(
+                            spacingFromLeft = spcacingFromLeft,
+                            keySignature = keySignature,
+                            lineHeight = lineHeight
+                        )
+                        if (leftOffsetForNotes == null) {
+                            leftOffsetForNotes = spcacingFromLeft
+                        }
+                        notesToDraw = drawNotes(
+                            keySignature = keySignature,
+                            notes = notesToDraw,
+                            lineHeight = lineHeight,
+                            spacingFromLeft = spcacingFromLeft,
+                            color = Black
+                        )
+                        extraNotesToDraw = drawNotes(
+                            keySignature = keySignature,
+                            notes = extraNotesToDraw,
+                            lineHeight = lineHeight,
+                            spacingFromLeft = leftOffsetForNotes!!,
+                            color = Red
+                        )
                     }
-                    notesToDraw = drawNotes(
-                        keySignature = keySignature,
-                        notes = notesToDraw,
-                        lineHeight = lineHeight,
-                        spacingFromLeft = spcacingFromLeft,
-                        color = Black
-                    )
-                    extraNotesToDraw = drawNotes(
-                        keySignature = keySignature,
-                        notes = extraNotesToDraw,
-                        lineHeight = lineHeight,
-                        spacingFromLeft = leftOffsetForNotes!!,
-                        color = Red
-                    )
+                    numberOfSheetIndex++
                 }
-                numberOfSheetIndex++
+                sheetViewModel.setHeight(numberOfSheetIndex * (height + sheetSpacing) + sheetSpacing)
             }
-            sheetViewModel.setHeight(numberOfSheetIndex * (height + sheetSpacing) + sheetSpacing)
         }
     }
 }
@@ -456,7 +460,7 @@ private fun DrawScope.drawSharp(lineHeight: Float, colorFilter: ColorFilter) {
 }
 
 @Suppress("unused")
-private fun DrawScope.drawTimeSignature(spacingFromLeft: Float): Float {
+private fun DrawScope.drawTimeSignature(@Suppress("unused") spacingFromLeft: Float): Float {
     TODO()
 }
 @Suppress("unused")

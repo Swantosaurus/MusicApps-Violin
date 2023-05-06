@@ -2,7 +2,6 @@ package com.kobera.music.common.metronome
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -100,13 +99,14 @@ fun MetronomeScreenBody(
     start: () -> Unit,
     stop: () -> Unit
 ) {
-    Scaffold(Modifier.fillMaxSize()) {
-        MetronomeBackground(tickStateLambda = tickState)
-        Box(modifier = Modifier.padding(it)) {
+    Scaffold(Modifier.fillMaxSize(),
+        topBar = {
             MetronomeScreenTopBar(navigator = navigator)
         }
+    ) {
+        MetronomeBackground(tickStateLambda = tickState)
         Column(
-            Modifier.fillMaxSize(),
+            Modifier.fillMaxSize().padding(it),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(Modifier.weight(1f))

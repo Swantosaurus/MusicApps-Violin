@@ -6,6 +6,7 @@ import com.kobera.music.common.notes.sheet.InnerSheetNote
  * Key signature of sheet music
  */
 interface KeySignature {
+    object None : Sharps(0)
     /**
      * key signatre of flats in sheet music
      */
@@ -23,7 +24,7 @@ interface KeySignature {
     /**
      * key signatre of sharps in sheet music
      */
-    class Sharps(val numberOfSharps: Int) : KeySignature {
+    open class Sharps(val numberOfSharps: Int) : KeySignature {
         init {
             if(numberOfSharps > maxNumberOfAccidentals) {
                 error("Unsupported number of sharps. Use its equivalent notation with less sharps")

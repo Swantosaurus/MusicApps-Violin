@@ -5,7 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Icon
@@ -108,7 +108,7 @@ fun CenteredNavigationBarWithNavigateBackAndRightActionButton(
 
 @Composable
 fun CenteredNavigationBarWithNavigateBack(
-    modifier: Modifier = Modifier.fillMaxWidth().systemBarsPadding(),
+    modifier: Modifier = Modifier.fillMaxWidth().statusBarsPadding(),
     navigator: DestinationsNavigator?,
     backIconColor: Color = LocalContentColor.current,
     label: String
@@ -124,7 +124,7 @@ fun CenteredNavigationBarWithNavigateBack(
 
 @Composable
 fun CenteredNavigationBarWithNavigateBack(
-    modifier: Modifier = Modifier.fillMaxWidth().systemBarsPadding(),
+    modifier: Modifier = Modifier.fillMaxWidth().statusBarsPadding(),
     navigator: DestinationsNavigator?,
     backIconColor: Color = LocalContentColor.current,
     content: @Composable () -> Unit
@@ -139,7 +139,7 @@ fun CenteredNavigationBarWithNavigateBack(
 
 @Composable
 fun CenteredNavigationBarWithNavigateBack(
-    modifier: Modifier = Modifier.fillMaxWidth().systemBarsPadding(),
+    modifier: Modifier = Modifier.fillMaxWidth().statusBarsPadding(),
     navigateBack: () -> Unit,
     backIconColor: Color = LocalContentColor.current,
     content: @Composable () -> Unit
@@ -155,7 +155,7 @@ fun CenteredNavigationBarWithNavigateBack(
 
 @Composable
 fun CenteredNavigationBarWithNavButton(
-    modifier: Modifier = Modifier.fillMaxWidth().systemBarsPadding(),
+    modifier: Modifier = Modifier.fillMaxWidth().statusBarsPadding(),
     navIconPainter: Painter,
     navIconColor: Color = LocalContentColor.current,
     navIconAction: () -> Unit,
