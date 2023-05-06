@@ -19,7 +19,7 @@ stages:
 before_script:
   - wget 	https://download.oracle.com/java/19/archive/jdk-19.0.2_linux-x64_bin.deb
   - apt-get -qqy install ./jdk-19.0.2_linux-x64_bin.deb
-  - update-alternatives --install /usr/bin/java java /usr/lib/jvm/jdk-19/bin/java 1919
+  - update-alternatives --list java
   - cd MusicApps
   - chmod +x ./gradlew
   - java -version
