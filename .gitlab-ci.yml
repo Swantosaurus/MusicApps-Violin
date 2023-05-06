@@ -64,8 +64,8 @@ lintDebug:
     - ./gradlew -Pci --console=plain lintDebug -PbuildDir=lint
   artifacts:
     paths:
-    - ./MusicApps/common/build/reports/lint-result-debug.html
-    - ./MusicApps/violin/build/reports/lint-result-debug.html
+    - ./MusicApps/violin/lint/reports/lint-results-debug.html
+    - ./MusicApps/violin/lint/reports/lint-results-debug.html
 
 detekt:
     interruptible: true
@@ -94,4 +94,4 @@ debugTests:
   interruptible: true
   stage: test
   script:
-    - ./MusicApps/gradlew -Pci --console=plain :app:testDebug
+    - ./gradlew -Pci --console=plain testDebug
