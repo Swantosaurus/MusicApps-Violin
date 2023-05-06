@@ -264,7 +264,7 @@ private fun getSections(): List<NavigationSection> =
                 ),
                 NavigationDescription(
                     icon = painterResource(id = R.drawable.ic_violin),
-                    title = stringResource(R.string.songs),
+                    title = stringResource(R.string.sheets),
                     destination = SheetMusicListScreenDestination
                 )
             )

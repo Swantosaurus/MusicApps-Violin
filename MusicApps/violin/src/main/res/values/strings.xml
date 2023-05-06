@@ -33,5 +33,5 @@
     <string name="major_scales">Major</string>
     <string name="minor">Minor</string>
     <string name="games">"Games "</string>
-    <string name="songs">Songs</string>
+    <string name="sheets">Sheets</string>
 </resources>

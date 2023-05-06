@@ -20,6 +20,8 @@ import kotlin.math.roundToInt
  * @param silenceThreshold The silence threshold.
  * @param fineTuneLookupRange The fine tune lookup range.
  * @param hpsIterations The number of HPS iterations. (if less than 2 HPS is not used)
+ *
+ * see also [ViolinSingleFrequencyReader] and [SoundGeneratorFrequencyReader]
  */
 
 
@@ -31,7 +33,7 @@ open class SingleFrequencyReader(
     private val accuracy: Frequency = Frequency(0.05),
     silenceThreshold: Long = 3_000_000L,
     private val fineTuneLookupRange: Int = 1,
-    private val hpsIterations: Int = 1
+    private val hpsIterations: Int
 ) {
     private val _frequency : MutableStateFlow<FrequencyState> = MutableStateFlow(
         FrequencyState.Silence
@@ -61,7 +63,9 @@ open class SingleFrequencyReader(
     private val hpsActive = hpsIterations > 1
 
     init {
-        check(fineTuneLookupRange > 0) { "fineTuneLookupRange has to be greater than zero" }
+        check(fineTuneLookupRange > 0) {
+            "fineTuneLookupRange has to be greater than zero"
+        }
     }
 
     fun stop() {

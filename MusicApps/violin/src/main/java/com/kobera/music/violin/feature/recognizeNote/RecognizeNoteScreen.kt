@@ -372,11 +372,11 @@ fun RecognizeNoteScreenBody(
                 }
             }
         }
-        HandleInputOverlay(
-            modifier = Modifier.fillMaxSize(),
-            recognizeNoteStateLambda = recognizeNoteState,
-        )
     }
+    HandleInputOverlay(
+        modifier = Modifier.fillMaxSize(),
+        recognizeNoteStateLambda = recognizeNoteState,
+    )
 }
 
 @Composable
