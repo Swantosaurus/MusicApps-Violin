@@ -22,8 +22,9 @@ before_script:
   - ls
   - whereis java
   - ls /lib/jvm/jdk-19
-  - $JAVA_HOME
-  - $CI_PROJECT_DIR
+  - export JAVA_HOME="/lib/jvm/jdk-19"
+  - echo $JAVA_HOME
+  - echo $CI_PROJECT_DIR
   - ls /opt
   - ls /opt/java
   - ls /opt/java/openjdk
