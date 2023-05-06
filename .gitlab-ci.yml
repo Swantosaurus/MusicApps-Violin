@@ -18,7 +18,7 @@ stages:
 
 before_script:
 - cd MusicApps
-- chmod +x ./MusicApps/gradlew
+- chmod +x ./gradlew
 
 
 #cache:
