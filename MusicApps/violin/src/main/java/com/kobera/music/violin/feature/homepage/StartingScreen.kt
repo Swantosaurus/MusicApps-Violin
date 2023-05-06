@@ -237,6 +237,12 @@ private fun Navigation(navigator: DestinationsNavigator?) {
  */
 data class NavigationDescription(val icon: Painter, val title: String, val destination: DirectionDestination)
 
+/**
+ *  Section of the navigation
+ *
+ *  @param title - title of the section
+ *  @param destinations - list of navigation items in the section
+ */
 data class NavigationSection(val title: String, val destinations: List<NavigationDescription>)
 
 @Composable

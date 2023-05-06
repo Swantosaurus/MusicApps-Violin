@@ -20,6 +20,7 @@ import com.kobera.music.common.notes.scale.MajorScale
 import com.kobera.music.common.notes.scale.MinorScale
 import com.kobera.music.common.notes.scale.Scale
 import com.kobera.music.common.notes.sheet.SheetNote
+import com.kobera.music.common.notes.sheet.SheetNote.Companion.toSheetNote
 import com.kobera.music.common.score.ScoreRepository
 import com.kobera.music.common.score.data.ScoreEntity
 import com.kobera.music.common.score.data.ScoreType
@@ -170,7 +171,7 @@ class RecognizeNoteViewModel(
                 }
             }
         } else {
-            RecognizeNoteState.Wrong(SheetNote.fromTwelveTone(noteFromFrequency))
+            RecognizeNoteState.Wrong(noteFromFrequency.toSheetNote())
         }
 
     }
@@ -267,7 +268,7 @@ class RecognizeNoteViewModel(
                 val newState = if (generatedNote sameNoteAs input) {
                     RecognizeNoteState.InTuneKeyInput()
                 } else {
-                    RecognizeNoteState.Wrong(SheetNote.fromTwelveTone(twelveTone = input), true)
+                    RecognizeNoteState.Wrong(input.toSheetNote(), true)
                 }
 
                 insertScoreToDb(newState.scoreAdded)
