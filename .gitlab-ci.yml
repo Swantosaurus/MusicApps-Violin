@@ -41,7 +41,6 @@ build:
   stage: build
   script:
   - ./gradlew assembleDebug
-  - 
   artifacts:
     paths:
     - ./violin/build/outputs/apk/app-debug.apk
