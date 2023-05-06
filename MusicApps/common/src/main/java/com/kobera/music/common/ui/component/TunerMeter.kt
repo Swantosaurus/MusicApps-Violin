@@ -35,10 +35,7 @@ import com.kobera.music.common.notes.Tones
 import com.kobera.music.common.notes.TwelveToneNames
 import com.kobera.music.common.notes.frequency.ToneWithFrequency
 import com.kobera.music.common.util.toStringWithNDecimals
-import java.lang.Float
-import kotlin.Double
-import kotlin.Suppress
-import kotlin.repeat
+import kotlin.math.min
 
 
 /**
@@ -133,7 +130,7 @@ private fun TunerClock(modifier: Modifier = Modifier, noteState: LastNoteState.H
                 .padding(20.dp)
                 .fillMaxSize()
         ) {
-            val diameter = Float.min(size.width, size.height) * 0.85f
+            val diameter = min(size.width, size.height) * 0.85f
             val radius = diameter / 2
 
 
@@ -178,9 +175,13 @@ private fun TunerClock(modifier: Modifier = Modifier, noteState: LastNoteState.H
 /**
  * This file is part of MusicApps.
  *
- * MusicApps is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation version 3 of the License, or any later version.
+ * MusicApps is free software: you can redistribute it and/or modify it under the terms
+ * of the GNU General Public License as published by the Free Software Foundation version 3 of the License,
+ * or any later version.
  *
- * MusicApps is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * MusicApps is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
  *
  *  Full licence is in LICENSE file in root directory or at https://www.gnu.org/licenses/gpl-3.0.txt
  */

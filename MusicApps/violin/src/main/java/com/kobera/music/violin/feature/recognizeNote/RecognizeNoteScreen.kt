@@ -6,9 +6,11 @@ import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -23,6 +25,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -248,7 +251,8 @@ private fun DrawerContent(viewModel: RecognizeNoteViewModel?, scales: () -> Reco
         }
         Spacer(modifier = Modifier.width(16.dp))
         Column(
-            Modifier.weight(1f)
+            Modifier
+                .weight(1f)
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -309,10 +313,14 @@ fun RecognizeNoteScreenBody(
     showDialog: () -> Unit,
 ) {
     val context = LocalContext.current
+    val scrollState = rememberScrollState()
     Scaffold(
+        topBar = {
+            TopBar(scrollState = scrollState, navigator = navigator, openDrawer = openDrawer)
+        },
         floatingActionButton = {
             FilledIconToggleButton(
-                modifier = Modifier.size(48.dp),
+                modifier = Modifier.size(56.dp),
                 checked = microphoneEnabled(),
                 onCheckedChange = {
                     if (viewModel?.setMicrophoneEnabled(it, context = context) == false) {
@@ -326,19 +334,25 @@ fun RecognizeNoteScreenBody(
             }
         }
     ) { paddingValues ->
-        Column(modifier = Modifier.padding(paddingValues)) {
+        
+        Column(
+            modifier = Modifier
+                .verticalScroll(scrollState)
+                .padding(paddingValues)
+        ) {
             when (generatedNoteState) {
                 is GeneratedNoteState.Loading -> {
                     CircularProgressIndicator()
                 }
 
                 is GeneratedNoteState.Ready -> {
-                    CenteredNavigationBarWithNavigateBackAndRightActionButton(
+                    /*CenteredNavigationBarWithNavigateBackAndRightActionButton(
                         navigator = navigator,
-                        rightActionButtonPainter = rememberVectorPainter(image = Icons.Default.Settings),
+                        rightActionButtonPainter =
+                        rememberVectorPainter(image = Icons.Default.Settings),
                         text = stringResource(R.string.play_note_you_see),
                         rightActionButton = openDrawer,
-                    )
+                    )*/
                     if (viewModel != null) {
                         DisplaySheet(generatedNoteState.noteAndScale, recognizeNoteState)
                     } else {
@@ -356,14 +370,31 @@ fun RecognizeNoteScreenBody(
                         viewModel?.keyboardInput(it)
                     }
                 }
-                }
             }
         }
         HandleInputOverlay(
+            modifier = Modifier.fillMaxSize(),
             recognizeNoteStateLambda = recognizeNoteState,
         )
     }
+}
 
+@Composable
+private fun TopBar(scrollState: ScrollState, navigator: DestinationsNavigator?, openDrawer: () -> Unit) {
+    val color by animateColorAsState(
+        targetValue = if(!scrollState.canScrollBackward) MaterialTheme.colorScheme.surface
+        else MaterialTheme.colorScheme.surfaceVariant)
+    CenteredNavigationBarWithNavigateBackAndRightActionButton(
+        modifier = Modifier
+            .background(color = color)
+            .statusBarsPadding(),
+        navigator = navigator,
+        rightActionButtonPainter =
+        rememberVectorPainter(image = Icons.Default.Settings),
+        text = stringResource(R.string.play_note_you_see),
+        rightActionButton = openDrawer,
+    )
+}
 
 @Suppress("MagicNumber")
 @Composable
@@ -391,6 +422,7 @@ private fun SheetInPreview() {
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 private fun HandleInputOverlay(
+    modifier: Modifier,
     recognizeNoteStateLambda: () -> RecognizeNoteState,
 ) {
     val recognizeNoteState = recognizeNoteStateLambda()
@@ -402,8 +434,7 @@ private fun HandleInputOverlay(
             exit = fadeOut()
         ) {
             InputStatusContent(
-                modifier = Modifier
-                    .fillMaxSize()
+                modifier = modifier
                     .background(recognizeNoteState.iconAndColor.color.copy(alpha = 0.5f)),
                 color = Color.White,
                 painter = painterResource(id = recognizeNoteState.iconAndColor.icon),

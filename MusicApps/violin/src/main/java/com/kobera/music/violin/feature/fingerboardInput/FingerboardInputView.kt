@@ -53,14 +53,10 @@ fun FingerboardInputView(scale: Scale, keyboardClicked: (TwelvetoneTone) -> Unit
                 .fillMaxWidth()
         ) {
             repeat(times = 4) { drawStringIndex ->
-                val singleStringFingerboard =
-                    fingerPositions[drawStringIndex]
-
                 val stringGrowing = 2f
 
                 val start = Offset(0f, leftSpacing.toPx() / 2 + drawStringIndex * leftSpacing.toPx())
                 val end = Offset(size.width, 0f + drawStringIndex * rightSpacing.toPx())
-
 
                 drawLine(
                     brush = Brush.linearGradient(
@@ -75,7 +71,6 @@ fun FingerboardInputView(scale: Scale, keyboardClicked: (TwelvetoneTone) -> Unit
                 )
             }
         }
-
 
         with(ld) {
             fingerPositions.forEachIndexed { drawStringIndex, singleStringFingerboard ->

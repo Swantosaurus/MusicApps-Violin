@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kobera.music.common.score.ScoreRepository
 import com.kobera.music.common.ui.component.AccuracyGraph
+import com.kobera.music.common.ui.util.lockScreenOrientation
 import com.kobera.music.common.ui.util.setSystemBarColors
 import com.kobera.music.common.util.toStringWithNDecimals
 import com.kobera.music.violin.R
@@ -57,8 +58,9 @@ fun StartingScreen(
     val totalWinsAndLoses by startingScreenViewModel.totalWinsAndLoses.collectAsStateWithLifecycle()
     val todayScoreState by startingScreenViewModel.scoreToday.collectAsStateWithLifecycle()
     val todayWinsAndLoses by startingScreenViewModel.winsAndLosesToday.collectAsStateWithLifecycle()
-
     setSystemBarColors()
+
+    lockScreenOrientation()
 
     StartingScreenBody(
         navigator = navigator,
@@ -79,7 +81,11 @@ fun StartingScreenBody(
     todayWinsAndLoeses: WinsAndLosesState
 ) {
     Scaffold() { paddingValues ->
-        Column(Modifier.padding(paddingValues = paddingValues)) {
+        Column(
+            Modifier
+                .padding(paddingValues = paddingValues)
+                //.verticalScroll(rememberScrollState())
+        ) {
             ScoreStats(
                 totalScoreState = totalScoreState,
                 totalWinsAndLoses = totalWinsAndLoses,

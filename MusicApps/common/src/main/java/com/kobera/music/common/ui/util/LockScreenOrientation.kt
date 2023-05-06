@@ -14,7 +14,10 @@ import timber.log.Timber
  * exited.
  */
 @Composable
-fun lockScreenOrientation(orientation: Int, unlockAfterExitingScreen: Boolean = false) {
+fun lockScreenOrientation(
+    orientation: Int = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT,
+     unlockAfterExitingScreen: Boolean = false
+) {
     val context = LocalContext.current
     DisposableEffect(Unit) {
         val activity = context.findActivity() ?: return@DisposableEffect onDispose {}

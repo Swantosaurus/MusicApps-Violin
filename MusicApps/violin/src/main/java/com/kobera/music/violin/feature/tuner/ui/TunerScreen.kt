@@ -27,7 +27,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledIconToggleButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.material3.Scaffold
@@ -325,16 +324,17 @@ private fun OnlyViolinNotes(
                 }
             )
         },
-        colors = IconButtonDefaults.iconToggleButtonColors(
+        /*colors = IconButtonDefaults.iconToggleButtonColors(
             //containerColor = MaterialTheme.colorScheme.surfaceVariant,
-            checkedContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
-        ),
+            //checkedContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
+        ),*/
         modifier = Modifier
-            .size(60.dp)
+            .size(56.dp)
             .clip(CircleShape)
     ) {
         @Suppress("MagicNumber") // centering offset
         Icon(
+            //tint = Color.White,r
             painter = painterResource(id = R.drawable.ic_violin),
             modifier = Modifier.offset(0.dp, (-3).dp),
             contentDescription = stringResource(

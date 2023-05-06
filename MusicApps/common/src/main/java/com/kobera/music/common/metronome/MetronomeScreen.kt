@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kobera.music.common.R
 import com.kobera.music.common.ui.component.CenteredNavigationBarWithNavigateBack
+import com.kobera.music.common.ui.util.lockScreenOrientation
 import com.kobera.music.common.ui.util.withLifecycle
 import com.kobera.music.common.util.filterNonDigits
 import com.ramcosta.composedestinations.annotation.Destination
@@ -57,6 +58,8 @@ fun MetronomeScreen(
     val tickState by viewModel.tickState.collectAsStateWithLifecycle()
     val metronomeSpeed by viewModel.speed.collectAsStateWithLifecycle()
     val numberOfBeats by viewModel.numberOfTicks.collectAsStateWithLifecycle()
+
+    lockScreenOrientation()
 
     withLifecycle(
         onStop = {
