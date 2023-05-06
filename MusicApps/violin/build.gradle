@@ -83,20 +83,24 @@ dependencies {
 
     implementation libs.bundles.datastore
 
-    /*
-       TODO TEST DEPENDENCIES to toml but first decide what testing we will do (ui-testing prolly not worth it)
-    */
-    testImplementation 'junit:junit:4.13.2'
+    implementation libs.androidx.fragment
+
+
+
+
+    implementation libs.test.junit.jupiter
+    testRuntimeOnly libs.test.junit.jupiter.engine
+
+    testImplementation libs.test.mockk
+
+    /*testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
     androidTestImplementation 'androidx.compose.ui:ui-test-junit4'
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.2'
-
-    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.9.2'
     debugImplementation 'androidx.compose.ui:ui-tooling'
     debugImplementation 'androidx.compose.ui:ui-test-manifest'
 
-    implementation 'androidx.test.ext:junit-ktx:1.1.5'
+    implementation 'androidx.test.ext:junit-ktx:1.1.5'*/
 }
 detekt {
     toolVersion = "1.23.0-RC2"
