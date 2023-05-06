@@ -9,7 +9,7 @@
 
 image: cimg/android:2023.05
 
-variables:
+#variables:
 
   # ANDROID_COMPILE_SDK is the version of Android you're compiling with.
   # It should match compileSdkVersion.
@@ -67,13 +67,13 @@ lintDebug:
   interruptible: true
   stage: build
   script:
-    - ./gradlew -Pci --console=plain :app:lintDebug -PbuildDir=lint
+    - sudo ./gradlew -Pci --console=plain :app:lintDebug -PbuildDir=lint
 
 detekt:
     interruptible: true
     stage: build
     script:
-      - ./gradlew :detekt
+      - sudo ./gradlew :detekt
 
 
 # Make Project
@@ -81,7 +81,7 @@ assembleDebug:
   interruptible: true
   stage: build
   script:
-    - ./gradlew assembleDebug
+    - sudo ./gradlew assembleDebug
   artifacts:
     paths:
       - app/build/outputs/
@@ -91,4 +91,4 @@ debugTests:
   interruptible: true
   stage: test
   script:
-    - ./gradlew -Pci --console=plain :app:testDebug
+    - sudo ./gradlew -Pci --console=plain :app:testDebug
