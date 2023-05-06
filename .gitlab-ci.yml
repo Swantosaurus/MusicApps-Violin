@@ -10,7 +10,7 @@
 #script:
 #  -  sudo apt install gitlab-runner
 
-image: jangrewe/gitlab-ci-android
+image: cimg/android:2023.05.1
 
 stages:
 - build
