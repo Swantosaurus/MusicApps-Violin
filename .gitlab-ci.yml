@@ -21,7 +21,7 @@ before_script:
   - apt-get -qqy install ./jdk-19.0.2_linux-x64_bin.deb
   - ls
   - whereis java
-  - ls /lib
+  - ls /lib/jvm
   - ls /opt
   - ls /opt/java
   - ls /opt/java/openjdk
@@ -54,8 +54,7 @@ lintDebug:
     - ./gradlew -Pci --console=plain lintDebug -PbuildDir=lint
   artifacts:
     paths:
-    - ./violin/build/reports/lint-results-debug.html
-    - ./common/build/reports/lint-results-debug.html
+    - ./*.html
 
 detekt:
     interruptible: true
