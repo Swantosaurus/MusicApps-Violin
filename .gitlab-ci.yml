@@ -64,3 +64,6 @@ debugTests:
   stage: test
   script:
     - ./gradlew -Pci --console=plain testDebug
+  artifacts:
+    paths:
+      - ./MusicApps/violin/build/reports/tests/testDebugUnitTest/index.html
