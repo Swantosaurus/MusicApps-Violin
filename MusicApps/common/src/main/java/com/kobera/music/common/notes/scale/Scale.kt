@@ -9,6 +9,8 @@ import com.kobera.music.common.notes.sheet.ui.KeySignature
 interface Scale {
     fun getKeySignature() : KeySignature
     fun getNotes(): List<SheetNote>
+
+    val name: String
 }
 
 /**

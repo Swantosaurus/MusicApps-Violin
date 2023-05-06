@@ -42,6 +42,10 @@ data class SheetNote(
         ) + (this.octave - other.octave) * InnerSheetNote.numberOfNotes
     }
 
+    fun octaveUp(): SheetNote {
+        return copy(octave = octave + 1)
+    }
+
     /**
      * params for a sheet note that are not part of the twelve tone system
      */

@@ -70,6 +70,7 @@ import com.google.accompanist.permissions.PermissionState
 import com.kobera.music.common.notes.InnerTwelveToneInterpretation.*
 import com.kobera.music.common.notes.scale.MajorScale
 import com.kobera.music.common.notes.scale.MinorScale
+import com.kobera.music.common.notes.scale.Scale
 import com.kobera.music.common.notes.sheet.InnerSheetNote
 import com.kobera.music.common.notes.sheet.SheetNote
 import com.kobera.music.common.notes.sheet.ui.compose.Sheet
@@ -207,7 +208,6 @@ fun RecognizeScreenDrawer(
                 @Suppress("MagicNumber")
                 Modifier.width(240.dp + 16.dp * 3),
                 windowInsets = DrawerDefaults.windowInsets.add((WindowInsets(left = 16.dp)))
-
             ) {
                 DrawerContent(viewModel = viewModel, scales = scales)
             }
@@ -269,26 +269,10 @@ private fun DrawerContent(viewModel: RecognizeNoteViewModel?, scales: () -> Reco
 }
 
 @Composable
-fun ScaleToggleButtton(viewModel: RecognizeNoteViewModel?, scales: () -> RecognizeNoteScales, scale: MinorScale) {
+private fun ScaleToggleButtton(viewModel: RecognizeNoteViewModel?, scales: () -> RecognizeNoteScales, scale: Scale) {
     FilledIconToggleButton(
         modifier = Modifier.width(120.dp),
         checked = scales().minorScales.contains(scale),
-        onCheckedChange = {
-            if(it) {
-                viewModel?.addScale(scale = scale)
-            } else {
-                viewModel?.removeScale(scale = scale)
-            }
-        }) {
-        Text(text = scale.name)
-    }
-}
-
-@Composable
-fun ScaleToggleButtton(viewModel: RecognizeNoteViewModel?, scales: () -> RecognizeNoteScales, scale: MajorScale) {
-    FilledIconToggleButton(
-        modifier = Modifier.width(120.dp),
-        checked = scales().majorScales.contains(scale),
         onCheckedChange = {
             if(it) {
                 viewModel?.addScale(scale = scale)
@@ -346,13 +330,6 @@ fun RecognizeNoteScreenBody(
                 }
 
                 is GeneratedNoteState.Ready -> {
-                    /*CenteredNavigationBarWithNavigateBackAndRightActionButton(
-                        navigator = navigator,
-                        rightActionButtonPainter =
-                        rememberVectorPainter(image = Icons.Default.Settings),
-                        text = stringResource(R.string.play_note_you_see),
-                        rightActionButton = openDrawer,
-                    )*/
                     if (viewModel != null) {
                         DisplaySheet(generatedNoteState.noteAndScale, recognizeNoteState)
                     } else {

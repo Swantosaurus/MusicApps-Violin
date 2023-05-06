@@ -2,7 +2,7 @@
 compose-compiler    = "1.4.3"
 compose-bom         = "2023.03.00"
 kotlin              = "1.8.10"
-ksp                 = "1.8.10-1.0.9" # first par of version is kotlin version
+ksp                 = "1.8.10-1.0.9" # first part of version is kotlin version
 androidStudio       = "8.0.0-beta03" # this version depends on android studio version
 raamcosta           = "1.8.38-beta"
 lifeccle            = "2.6.1"

@@ -30,10 +30,10 @@ enum class MajorScale : Scale {
             SheetNote.Gb,
             SheetNote.Ab,
             SheetNote.Bb,
-            SheetNote.Cb,
-            SheetNote.Db,
-            SheetNote.Eb,
-            SheetNote.F
+            SheetNote.Cb.octaveUp(),
+            SheetNote.Db.octaveUp(),
+            SheetNote.Eb.octaveUp(),
+            SheetNote.F.octaveUp()
         )
     },
     Db {
@@ -45,7 +45,7 @@ enum class MajorScale : Scale {
             SheetNote.Gb,
             SheetNote.Ab,
             SheetNote.Bb,
-            SheetNote.C
+            SheetNote.C.octaveUp()
         )
     },
     Ab {
@@ -53,11 +53,11 @@ enum class MajorScale : Scale {
         override fun getNotes(): List<SheetNote> = listOf(
             SheetNote.Ab,
             SheetNote.Bb,
-            SheetNote.C,
-            SheetNote.Db,
-            SheetNote.Eb,
-            SheetNote.F,
-            SheetNote.G
+            SheetNote.C.octaveUp(),
+            SheetNote.Db.octaveUp(),
+            SheetNote.Eb.octaveUp(),
+            SheetNote.F.octaveUp(),
+            SheetNote.G.octaveUp()
         )
     },
     Eb {
@@ -68,20 +68,20 @@ enum class MajorScale : Scale {
             SheetNote.G,
             SheetNote.Ab,
             SheetNote.Bb,
-            SheetNote.C,
-            SheetNote.D
+            SheetNote.C.octaveUp(),
+            SheetNote.D.octaveUp()
         )
     },
     Bb {
         override fun getKeySignature() = KeySignature.Flats(2)
         override fun getNotes(): List<SheetNote> = listOf(
             SheetNote.Bb,
-            SheetNote.C,
-            SheetNote.D,
-            SheetNote.Eb,
-            SheetNote.F,
-            SheetNote.G,
-            SheetNote.A
+            SheetNote.C.octaveUp(),
+            SheetNote.D.octaveUp(),
+            SheetNote.Eb.octaveUp(),
+            SheetNote.F.octaveUp(),
+            SheetNote.G.octaveUp(),
+            SheetNote.A.octaveUp()
         )
     },
     F {
@@ -91,9 +91,9 @@ enum class MajorScale : Scale {
             SheetNote.G,
             SheetNote.A,
             SheetNote.Bb,
-            SheetNote.C,
-            SheetNote.D,
-            SheetNote.E
+            SheetNote.C.octaveUp(),
+            SheetNote.D.octaveUp(),
+            SheetNote.E.octaveUp()
         )
     },
     C {
@@ -114,10 +114,10 @@ enum class MajorScale : Scale {
             SheetNote.G,
             SheetNote.A,
             SheetNote.B,
-            SheetNote.C,
-            SheetNote.D,
-            SheetNote.E,
-            SheetNote.FSharp
+            SheetNote.C.octaveUp(),
+            SheetNote.D.octaveUp(),
+            SheetNote.E.octaveUp(),
+            SheetNote.FSharp.octaveUp()
         )
     },
     D {
@@ -129,7 +129,7 @@ enum class MajorScale : Scale {
             SheetNote.G,
             SheetNote.A,
             SheetNote.B,
-            SheetNote.CSharp
+            SheetNote.CSharp.octaveUp()
         )
     },
     A {
@@ -137,11 +137,11 @@ enum class MajorScale : Scale {
         override fun getNotes(): List<SheetNote> = listOf(
             SheetNote.A,
             SheetNote.B,
-            SheetNote.CSharp,
-            SheetNote.D,
-            SheetNote.E,
-            SheetNote.FSharp,
-            SheetNote.GSharp
+            SheetNote.CSharp.octaveUp(),
+            SheetNote.D.octaveUp(),
+            SheetNote.E.octaveUp(),
+            SheetNote.FSharp.octaveUp(),
+            SheetNote.GSharp.octaveUp()
         )
     },
     E {
@@ -152,20 +152,20 @@ enum class MajorScale : Scale {
             SheetNote.GSharp,
             SheetNote.A,
             SheetNote.B,
-            SheetNote.CSharp,
-            SheetNote.DSharp
+            SheetNote.CSharp.octaveUp(),
+            SheetNote.DSharp.octaveUp()
         )
     },
     B {
         override fun getKeySignature() = KeySignature.Sharps(5)
         override fun getNotes(): List<SheetNote> = listOf(
             SheetNote.B,
-            SheetNote.CSharp,
-            SheetNote.DSharp,
-            SheetNote.E,
-            SheetNote.FSharp,
-            SheetNote.GSharp,
-            SheetNote.ASharp
+            SheetNote.CSharp.octaveUp(),
+            SheetNote.DSharp.octaveUp(),
+            SheetNote.E.octaveUp(),
+            SheetNote.FSharp.octaveUp(),
+            SheetNote.GSharp.octaveUp(),
+            SheetNote.ASharp.octaveUp()
         )
     },
     FSharp {
@@ -175,9 +175,9 @@ enum class MajorScale : Scale {
             SheetNote.GSharp,
             SheetNote.ASharp,
             SheetNote.B,
-            SheetNote.CSharp,
-            SheetNote.DSharp,
-            SheetNote.ESharp
+            SheetNote.CSharp.octaveUp(),
+            SheetNote.DSharp.octaveUp(),
+            SheetNote.ESharp.octaveUp()
         )
     },
     CSharp {

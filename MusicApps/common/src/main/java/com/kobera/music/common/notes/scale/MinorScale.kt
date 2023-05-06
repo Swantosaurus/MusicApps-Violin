@@ -13,11 +13,11 @@ enum class MinorScale : Scale {
         override fun getNotes(): List<SheetNote> = listOf(
             SheetNote.Ab,
             SheetNote.Bb,
-            SheetNote.C,
-            SheetNote.Db,
-            SheetNote.Eb,
-            SheetNote.F,
-            SheetNote.G
+            SheetNote.Cb.octaveUp(),
+            SheetNote.Db.octaveUp(),
+            SheetNote.Eb.octaveUp(),
+            SheetNote.Fb.octaveUp(),
+            SheetNote.Gb.octaveUp()
         )
     },
     Eb {
@@ -28,20 +28,20 @@ enum class MinorScale : Scale {
             SheetNote.Gb,
             SheetNote.Ab,
             SheetNote.Bb,
-            SheetNote.Cb,
-            SheetNote.Db
+            SheetNote.Cb.octaveUp(),
+            SheetNote.Db.octaveUp()
         )
     },
     Bb {
         override fun getKeySignature() = KeySignature.Flats(5)
         override fun getNotes(): List<SheetNote> = listOf(
             SheetNote.Bb,
-            SheetNote.C,
-            SheetNote.Db,
-            SheetNote.Eb,
-            SheetNote.F,
-            SheetNote.Gb,
-            SheetNote.Ab
+            SheetNote.C.octaveUp(),
+            SheetNote.Db.octaveUp(),
+            SheetNote.Eb.octaveUp(),
+            SheetNote.F.octaveUp(),
+            SheetNote.Gb.octaveUp(),
+            SheetNote.Ab.octaveUp()
         )
     },
     F {
@@ -51,9 +51,9 @@ enum class MinorScale : Scale {
             SheetNote.G,
             SheetNote.Ab,
             SheetNote.Bb,
-            SheetNote.C,
-            SheetNote.Db,
-            SheetNote.Eb
+            SheetNote.C.octaveUp(),
+            SheetNote.Db.octaveUp(),
+            SheetNote.Eb.octaveUp()
         )
     },
     C {
@@ -74,10 +74,10 @@ enum class MinorScale : Scale {
             SheetNote.G,
             SheetNote.A,
             SheetNote.Bb,
-            SheetNote.C,
-            SheetNote.D,
-            SheetNote.Eb,
-            SheetNote.F
+            SheetNote.C.octaveUp(),
+            SheetNote.D.octaveUp(),
+            SheetNote.Eb.octaveUp(),
+            SheetNote.F.octaveUp()
         )
     },
     D {
@@ -89,7 +89,7 @@ enum class MinorScale : Scale {
             SheetNote.G,
             SheetNote.A,
             SheetNote.Bb,
-            SheetNote.C
+            SheetNote.C.octaveUp()
         )
     },
     A {
@@ -97,11 +97,11 @@ enum class MinorScale : Scale {
         override fun getNotes(): List<SheetNote> = listOf(
             SheetNote.A,
             SheetNote.B,
-            SheetNote.C,
-            SheetNote.D,
-            SheetNote.E,
-            SheetNote.F,
-            SheetNote.G
+            SheetNote.C.octaveUp(),
+            SheetNote.D.octaveUp(),
+            SheetNote.E.octaveUp(),
+            SheetNote.F.octaveUp(),
+            SheetNote.G.octaveUp()
         )
     },
     E {
@@ -112,20 +112,20 @@ enum class MinorScale : Scale {
             SheetNote.G,
             SheetNote.A,
             SheetNote.B,
-            SheetNote.C,
-            SheetNote.D
+            SheetNote.C.octaveUp(),
+            SheetNote.D.octaveUp()
         )
     },
     B {
         override fun getKeySignature() = KeySignature.Sharps(2)
         override fun getNotes(): List<SheetNote> = listOf(
             SheetNote.B,
-            SheetNote.CSharp,
-            SheetNote.D,
-            SheetNote.E,
-            SheetNote.FSharp,
-            SheetNote.G,
-            SheetNote.A
+            SheetNote.CSharp.octaveUp(),
+            SheetNote.D.octaveUp(),
+            SheetNote.E.octaveUp(),
+            SheetNote.FSharp.octaveUp(),
+            SheetNote.G.octaveUp(),
+            SheetNote.A.octaveUp()
         )
     },
     FSharp {
@@ -135,9 +135,9 @@ enum class MinorScale : Scale {
             SheetNote.GSharp,
             SheetNote.A,
             SheetNote.B,
-            SheetNote.CSharp,
-            SheetNote.D,
-            SheetNote.E
+            SheetNote.CSharp.octaveUp(),
+            SheetNote.D.octaveUp(),
+            SheetNote.E.octaveUp()
         )
     },
     CSharp {
@@ -158,10 +158,10 @@ enum class MinorScale : Scale {
             SheetNote.GSharp,
             SheetNote.ASharp,
             SheetNote.B,
-            SheetNote.CSharp,
-            SheetNote.DSharp,
-            SheetNote.E,
-            SheetNote.FSharp
+            SheetNote.CSharp.octaveUp(),
+            SheetNote.DSharp.octaveUp(),
+            SheetNote.E.octaveUp(),
+            SheetNote.FSharp.octaveUp()
         )
     },
     DSharp {
@@ -173,7 +173,7 @@ enum class MinorScale : Scale {
             SheetNote.GSharp,
             SheetNote.ASharp,
             SheetNote.B,
-            SheetNote.CSharp
+            SheetNote.CSharp.octaveUp()
         )
     },
     ASharp {
@@ -181,11 +181,11 @@ enum class MinorScale : Scale {
         override fun getNotes(): List<SheetNote> = listOf(
             SheetNote.ASharp,
             SheetNote.BSharp,
-            SheetNote.CSharp,
-            SheetNote.DSharp,
-            SheetNote.ESharp,
-            SheetNote.FSharp,
-            SheetNote.GSharp
+            SheetNote.CSharp.octaveUp(),
+            SheetNote.DSharp.octaveUp(),
+            SheetNote.ESharp.octaveUp(),
+            SheetNote.FSharp.octaveUp(),
+            SheetNote.GSharp.octaveUp()
         )
     };
 

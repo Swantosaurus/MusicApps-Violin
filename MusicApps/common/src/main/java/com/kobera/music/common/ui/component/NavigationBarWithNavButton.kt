@@ -1,11 +1,11 @@
 package com.kobera.music.common.ui.component
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Icon
@@ -32,7 +32,7 @@ fun CenteredNavigationBarWithNavigateBackAndRightActionButton(
     navIconPainter: Painter = rememberVectorPainter(image = Icons.Default.ArrowBack),
     navigator: DestinationsNavigator?,
     rightActionButtonPainter: Painter,
-    text:String,
+    text: String,
     rightActionButton: () -> Unit,
 ){
     CenteredNavigationBarWithNavigateBackAndRightActionButton(
@@ -108,22 +108,29 @@ fun CenteredNavigationBarWithNavigateBackAndRightActionButton(
 
 @Composable
 fun CenteredNavigationBarWithNavigateBack(
+    modifier: Modifier = Modifier.fillMaxWidth().systemBarsPadding(),
     navigator: DestinationsNavigator?,
     backIconColor: Color = LocalContentColor.current,
     label: String
 ) {
-    CenteredNavigationBarWithNavigateBack(navigator = navigator, backIconColor = backIconColor) {
+    CenteredNavigationBarWithNavigateBack(
+        modifier = modifier,
+        navigator = navigator,
+        backIconColor = backIconColor
+    ) {
         Text(text = label, style = MaterialTheme.typography.headlineMedium)
     }
 }
 
 @Composable
 fun CenteredNavigationBarWithNavigateBack(
+    modifier: Modifier = Modifier.fillMaxWidth().systemBarsPadding(),
     navigator: DestinationsNavigator?,
-    backIconColor : Color = LocalContentColor.current,
+    backIconColor: Color = LocalContentColor.current,
     content: @Composable () -> Unit
 ) {
     CenteredNavigationBarWithNavigateBack(
+        modifier = modifier,
         navigateBack = { navigator?.navigateUp() },
         backIconColor = backIconColor,
         content = content
@@ -132,11 +139,13 @@ fun CenteredNavigationBarWithNavigateBack(
 
 @Composable
 fun CenteredNavigationBarWithNavigateBack(
+    modifier: Modifier = Modifier.fillMaxWidth().systemBarsPadding(),
     navigateBack: () -> Unit,
-    backIconColor : Color = LocalContentColor.current,
+    backIconColor: Color = LocalContentColor.current,
     content: @Composable () -> Unit
 ) {
     CenteredNavigationBarWithNavButton(
+        modifier = modifier,
         navIconPainter = rememberVectorPainter(image = Icons.Default.ArrowBack),
         navIconColor = backIconColor,
         navIconAction = navigateBack,
@@ -146,13 +155,15 @@ fun CenteredNavigationBarWithNavigateBack(
 
 @Composable
 fun CenteredNavigationBarWithNavButton(
-    @SuppressLint("ModifierParameter") modifier: Modifier = Modifier.fillMaxWidth(),
-    navIconPainter : Painter,
-    navIconColor : Color = LocalContentColor.current,
-    navIconAction : () -> Unit,
+    modifier: Modifier = Modifier.fillMaxWidth().systemBarsPadding(),
+    navIconPainter: Painter,
+    navIconColor: Color = LocalContentColor.current,
+    navIconAction: () -> Unit,
     navContent: @Composable () -> Unit
 ) {
-    Box(modifier = modifier) {
+    Box(
+        modifier = modifier
+    ) {
         IconButton(onClick = navIconAction) {
             Icon(
                 painter = navIconPainter,

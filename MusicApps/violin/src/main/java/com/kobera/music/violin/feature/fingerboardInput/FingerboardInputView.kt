@@ -20,7 +20,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.unit.dp
 import com.kobera.music.common.notes.TwelvetoneTone
 import com.kobera.music.common.notes.scale.Scale
@@ -30,7 +29,6 @@ import timber.log.Timber
 /**
  * FingerboardInput
  */
-@OptIn(ExperimentalTextApi::class)
 @Composable
 fun FingerboardInputView(scale: Scale, keyboardClicked: (TwelvetoneTone) -> Unit) {
 
