@@ -71,15 +71,7 @@ detekt:
     stage: build
     script:
       - ./gradlew :violin:detekt
-      - ls -la
-      - cd ./.gradle
-      - ls -la 
-      - cd ./buildOutputCleanup
-      - ls -la
-      #- cd ./cache.properties
-      - cd ../../violin 
-      - ls -la
-      
+      - ./gradlew :common:detekt
     artifacts:
       paths:
         - ./*.html
