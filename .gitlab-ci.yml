@@ -22,6 +22,7 @@ before_script:
   - update-alternatives --install /usr/bin/java java /usr/lib/jvm/jdk-19/bin/java 1919
   - cd MusicApps
   - chmod +x ./gradlew
+  - java -version
 
 
 #cache:
@@ -58,8 +59,8 @@ detekt:
       - ./gradlew :detekt
     artifacts:
       paths:
-        - .MusicApps/violin/build/reports/detekt/detekt.html
-        - .MusicApps/common/build/reports/detekt/detekt.html
+        - ./MusicApps/violin/build/reports/detekt/detekt.html
+        - ./MusicApps/common/build/reports/detekt/detekt.html
 
  
 # Make Project
