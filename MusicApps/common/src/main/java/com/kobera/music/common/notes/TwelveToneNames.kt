@@ -8,6 +8,10 @@ package com.kobera.music.common.notes
  */
 object TwelveToneNames {
     private var names: Array<String>? = null
+
+    fun setNamesFromLowestToHighestVarArg(vararg names: String) {
+        setNamesFromLowestToHighest(names as Array<String>)
+    }
     fun setNamesFromLowestToHighest(names: Array<String>) {
         assert(names.size == InnerTwelveToneInterpretation.numberOfTones) {
             "TwelveToneNotes needs 12 notes!!"

@@ -6,9 +6,9 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -19,9 +19,11 @@ fun RowScope.AccuracyGraph(success: Int, fails: Int) {
 @Composable
 fun RowScope.AccuracyGraph(success: Double, fails: Double) {
     val defaultValue = @Suppress("MagicNumber") 0.0001f
+    val primary = MaterialTheme.colorScheme.primary
+    val error = MaterialTheme.colorScheme.error
     Box(
         modifier = Modifier
-            .background(Color.Green)
+            .background(primary)
             .fillMaxHeight()//.height(50.dp)
             .weight(
                 success
@@ -37,7 +39,7 @@ fun RowScope.AccuracyGraph(success: Double, fails: Double) {
     )
     Box(
         modifier = Modifier
-            .background(Color.Red)
+            .background(error)
             .height(50.dp)
             .weight(
                 fails

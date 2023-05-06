@@ -48,6 +48,16 @@ android {
     kotlinOptions {
         jvmTarget = '19'
     }
+
+    testOptions {
+        unitTests.all {
+            useJUnitPlatform()
+        }
+    }
+}
+
+tasks.withType(Test) {
+    useJUnitPlatform()
 }
 
 dependencies {
@@ -68,4 +78,10 @@ dependencies {
     implementation libs.androidx.room
 
     ksp libs.androidx.room.ksp
+
+    testImplementation libs.test.junit.jupiter
+    testRuntimeOnly libs.test.junit.jupiter.engine
+
+    testImplementation libs.test.mockk
 }
+
