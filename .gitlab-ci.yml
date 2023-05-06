@@ -21,7 +21,7 @@ before_script:
   - apt-get -qqy install ./jdk-19.0.2_linux-x64_bin.deb
   - ls
   - whereis java
-  -ls /opt/java
+  - ls /opt/java
   - cd MusicApps
   - chmod +x ./gradlew
   - java -version
