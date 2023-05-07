@@ -68,3 +68,4 @@ debugTests:
     when: always
     paths:
       - ./MusicApps/violin/build/reports/tests/testDebugUnitTest/*
+      - ./MusicApps/common/build/reports/tests/testDebugUnitTest/*
