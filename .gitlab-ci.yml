@@ -67,4 +67,4 @@ debugTests:
   artifacts:
     when: on_failure
     paths:
-      - ./MusicApps/violin/build/reports/tests/testDebugUnitTest/index.html
+      - ./MusicApps/violin/build/reports/tests/testDebugUnitTest/*
