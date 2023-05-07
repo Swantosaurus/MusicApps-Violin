@@ -56,3 +56,10 @@ or
 graldle detekt 
 ```
 
+## Following reports are in GitLab CI Pipeline Artefacts
+
+- Lint for Android 
+- Detekt - linter for Kotlin
+- debug.apk
+- release.apk
+- tests-results
