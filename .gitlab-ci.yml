@@ -20,10 +20,10 @@ cache:
 build:
   stage: build
   script:
-  - ./gradlew assembleDebug
+  - ./gradlew assemble
   artifacts:
     paths:
-    - ./MusicApps/violin/build/outputs/apk/app-debug.apk
+    - ./MusicApps/violin/build/outputs/apk/release/violin-release.apk
 
 # Basic android and gradle stuff
 # Check linting
