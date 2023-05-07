@@ -61,5 +61,5 @@ graldle detekt
 - Lint for Android 
 - Detekt - linter for Kotlin
 - debug.apk
-- release.apk
+- release.apk -- had to be turned off for now because server kills it after 20min or running gradle scrpt (prolly school server burned out)
 - tests-results
