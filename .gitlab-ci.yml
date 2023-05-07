@@ -58,9 +58,13 @@ assembleDebug:
     paths:
       - ./MusicApps/violin/build/outputs/apk/debug/violin-debug.apk
 
-# Run all tests, if any fails, interrupt the pipeline(fail it)
+
 debugTests:
-  interruptible: true
+  interruptible: false
   stage: test
   script:
-    - ./gradlew -Pci --console=plain testDebug
+    - ./gradlew testDebug
+  artifacts:
+    when: always
+    paths:
+      - ./MusicApps/violin/build/reports/tests/testDebugUnitTest/*
