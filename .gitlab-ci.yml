@@ -17,13 +17,13 @@ cache:
     - .gradle/wrapper
     - .gradle/caches
 
-build:
-  stage: build
-  script:
-  - ./gradlew assemble
-  artifacts:
-    paths:
-    - ./MusicApps/violin/build/outputs/apk/release/violin-release.apk
+#build:
+#  stage: build
+#  script:
+#  - ./gradlew assemble
+#  artifacts:
+#    paths:
+#    - ./MusicApps/violin/build/outputs/apk/release/violin-release.apk
 
 # Basic android and gradle stuff
 # Check linting
