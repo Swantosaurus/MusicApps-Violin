@@ -23,7 +23,7 @@ build:
   - ./gradlew assembleDebug
   artifacts:
     paths:
-    - ./violin/build/outputs/apk/app-debug.apk
+    - ./MusicApps/violin/build/outputs/apk/app-debug.apk
 
 # Basic android and gradle stuff
 # Check linting
