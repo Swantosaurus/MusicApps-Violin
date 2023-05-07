@@ -63,7 +63,7 @@ debugTests:
   interruptible: false
   stage: test
   script:
-    - ./gradlew -Pci --console=plain testDebug
+    - ./gradlew testDebug
   artifacts:
     when: on_failure
     paths:
