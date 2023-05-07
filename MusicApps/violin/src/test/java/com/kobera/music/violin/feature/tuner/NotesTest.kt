@@ -2,14 +2,16 @@ package com.kobera.music.violin.feature.tuner
 
 import com.kobera.music.common.notes.Tones
 import com.kobera.music.common.notes.TwelveToneNames
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import kotlin.math.abs
 import kotlin.math.pow
 
 
 internal class NotesTest {
+
+    val doubleDelta = 0.000001
     @Test
     fun getNotes() {
         TwelveToneNames.setNamesFromLowestToHighest(
@@ -31,7 +33,9 @@ internal class NotesTest {
         val notes = Tones.getTones(440.0)
 
 
-        assertEquals(220.0, notes["A3"]!!.frequency)
+        assertTrue(abs(220.0- notes["A3"]!!.frequency)< doubleDelta){
+            "A3 should be 220.0 but was ${notes["A3"]!!.frequency}"
+        }
 
         assertTrue(notes["A3"]!!.isInTune(220.0))
         assertTrue(notes["A3"]!!.isInTune(220.0 * 2.0.pow(1.0 / 240.0)))
