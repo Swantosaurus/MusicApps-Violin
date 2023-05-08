@@ -11,7 +11,7 @@ import kotlin.math.pow
 
 internal class NotesTest {
 
-    val doubleDelta = 0.000001
+    private val doubleDelta = 0.000001
     @Test
     fun getNotes() {
         TwelveToneNames.setNamesFromLowestToHighest(

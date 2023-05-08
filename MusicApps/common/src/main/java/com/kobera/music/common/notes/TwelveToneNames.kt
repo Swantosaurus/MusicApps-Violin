@@ -10,6 +10,7 @@ object TwelveToneNames {
     private var names: Array<String>? = null
 
     fun setNamesFromLowestToHighestVarArg(vararg names: String) {
+        @Suppress("unchecked_cast")
         setNamesFromLowestToHighest(names as Array<String>)
     }
     fun setNamesFromLowestToHighest(names: Array<String>) {

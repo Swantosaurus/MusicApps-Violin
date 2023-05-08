@@ -51,8 +51,8 @@ fun Sheet(
     height: Float = 240f,
     sheetViewModel: SheetViewModel = SheetViewModel()
 ) {
-    val numebrOfLines = 5
-    val lineHeight = height / numebrOfLines + 1
+    val numberOfLines = 5
+    val lineHeight = height / numberOfLines + 1
     val sheetSpacing = 100f
     val sheetSpacingFromLeft = 40f
     val clefPainter = painterResource(clef.resource)
