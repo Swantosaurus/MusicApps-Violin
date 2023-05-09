@@ -349,6 +349,7 @@ fun SheetPreviewAccidental() {
     }
 }
 
+@Suppress("LongMethod")
 @Preview
 @Composable
 fun SheetPreviewDurtions() {
@@ -787,6 +788,9 @@ private fun DrawScope.drawSupportingLine(color: Color){
 }
 
 
+/**
+ * Not drawing description
+ */
 data class DrawNoteDescription(
     val path: Path,
     val center: Offset,
