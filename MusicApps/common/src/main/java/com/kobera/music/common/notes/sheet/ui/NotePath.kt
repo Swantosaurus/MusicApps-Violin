@@ -5,42 +5,145 @@ package com.kobera.music.common.notes.sheet.ui
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Path
+import timber.log.Timber
 
 /**
  * Path for drawing a note
+ * returns path with offset of center - user can move it to the right place without handeling its orientation
  */
 object NotePath {
-    fun drawQuarterNote(lineHeightPx: Float, legLength: Float, facingDown: Boolean): PathAndCenterOffset {
+    const val widthToHeightRatio = 1.3f
+
+    fun drawLeglesNote(heightPx: Float): PathAndCenterOffset {
+        val body = getFilledBodyPath(lineHeightPx = heightPx, offset = Offset.Zero)
+        return PathAndCenterOffset(path = body.path, body.center)
+    }
+
+
+    fun drawLegedNote(
+        heightPx: Float,
+        legLength: Float,
+        facingDown: Boolean,
+        flags: Int = 0,
+        filledLeg: Boolean
+    ): PathAndCenterOffset {
         val body = if (facingDown) {
-            getFilledNoteBodyPath(lineHeightPx = lineHeightPx, offset = Offset.Zero)
+            getFilledBodyPath(lineHeightPx = heightPx, offset = Offset.Zero)
         } else {
-            getFilledNoteBodyPath(lineHeightPx = lineHeightPx, Offset(0f, legLength))
+            getFilledBodyPath(lineHeightPx = heightPx, Offset(0f, legLength))
         }
 
-        val noteBodyCenterY = if(facingDown) {
-            body.centerOffset.y
+        val noteBodyCenterY = if (facingDown) {
+            body.center.y
         } else {
-            body.centerOffset.y + legLength
+            body.center.y + legLength
         }
-        val path = body.path.apply {
-            if (facingDown) {
-                addRect(
-                    Rect(
-                        Offset(x = 0f, y = noteBodyCenterY),
-                        Offset(x = legWidth, noteBodyCenterY + legLength)
-                    )
+
+        val path = body.path.addLeg(
+            facingDown = facingDown,
+            notePathWitCenterOffset = body,
+            legLength = legLength,
+            noteBodyCenterY = noteBodyCenterY,
+            filledLeg = filledLeg
+        ).addFlags(
+            facingDown = facingDown,
+            legLength = legLength,
+            noteBody = body,
+            numberOfFlags = flags,
+        )
+
+        return PathAndCenterOffset(
+            path = path,
+            centerOffset = Offset(body.center.x, noteBodyCenterY)
+        )
+    }
+
+    private fun Path.addFlags(
+        facingDown: Boolean,
+        legLength: Float,
+        noteBody: ElementPathInformation,
+        numberOfFlags: Int,
+    ): Path {
+        return this.apply {
+            repeat(numberOfFlags) { index ->
+                val move = index * 40f
+                val positionOffsetY =  if(facingDown) {
+                    legLength - move + noteBody.center.y
+                } else {
+                    move
+                }
+
+
+                val offsetX = if(facingDown) noteBody.start.x + legWidth else noteBody.end.x
+
+                moveTo(
+                    offsetX,
+                    positionOffsetY.plus(if(facingDown) -30f else 30f)
                 )
-            } else {
-                addRect(
-                    Rect(
-                        Offset(x = body.end.x - legWidth, y = 0f),
-                        Offset(x = body.end.x, y = noteBodyCenterY)
-                    )
+                Timber.d("${30f.apply { if(facingDown) unaryMinus() }}")
+
+                val yMove1 = if(facingDown) -20f else 20f
+                val yMove2 = if(facingDown) -50f else 50f
+                val yMove3 = if(facingDown) -70f else 70f
+
+                
+
+                val p1  = Offset(0f  + offsetX, positionOffsetY + yMove1)
+                val p2  = Offset(35f + offsetX, positionOffsetY + yMove2)
+                val end = Offset(30f + offsetX, positionOffsetY + yMove3)
+
+                cubicTo(
+                    p1.x, p1.y,
+                    p2.x, p2.y,
+                    end.x, end.y
+                )
+
+                cubicTo(
+                    p2.x + 10f, if(!facingDown) p2.y - 10f else p2.y + 10f,
+                    p1.x, if(!facingDown) p1.y - 15f else p1.y + 15f,
+                    offsetX, positionOffsetY
                 )
             }
+
         }
-        return PathAndCenterOffset(path = path, Offset(body.centerOffset.x, noteBodyCenterY))
     }
+
+    private fun Path.addLeg(
+        facingDown: Boolean,
+        notePathWitCenterOffset: ElementPathInformation,
+        legLength: Float,
+        noteBodyCenterY: Float,
+        filledLeg: Boolean
+    ) =
+        apply {
+            if (facingDown) {
+                if(!filledLeg) {
+                    moveTo(x = 0f, y = noteBodyCenterY)
+                    lineTo(x = legWidth, noteBodyCenterY + legLength)
+                } else {
+                    addRect(
+                        Rect(
+                            Offset(x = 0f, y = noteBodyCenterY),
+                            Offset(x = legWidth, noteBodyCenterY + legLength)
+                        )
+                    )
+                }
+            } else {
+                if(!filledLeg) {
+                    moveTo(x = notePathWitCenterOffset.end.x - legWidth, y = 0f)
+                    lineTo(x = notePathWitCenterOffset.end.x, y = noteBodyCenterY)
+                } else {
+                    addRect(
+                        Rect(
+                            Offset(x = notePathWitCenterOffset.end.x - legWidth, y = 0f),
+                            Offset(x = notePathWitCenterOffset.end.x, y = noteBodyCenterY)
+                        )
+                    )
+                }
+            }
+        }
+
+
 
     private const val legWidth = 5f
 
@@ -49,10 +152,10 @@ object NotePath {
         val path: Path,
         val start: Offset,
         val end: Offset,
-        val centerOffset: Offset,
+        val center: Offset,
     )
 
-    private fun getFilledNoteBodyPath(lineHeightPx: Float, offset: Offset): ElementPathInformation {
+    private fun getFilledBodyPath(lineHeightPx: Float, offset: Offset): ElementPathInformation {
         val endOffset = offset + Offset(lineHeightPx * 1.3f, lineHeightPx)
         val path = Path().apply {
             addOval(oval = Rect(offset, endOffset))
@@ -64,7 +167,7 @@ object NotePath {
             path = path,
             start = Offset.Zero,
             end = endOffset,
-            centerOffset = (endOffset - offset) / 2f
+            center = (endOffset - offset) / 2f
         )
     }
 }

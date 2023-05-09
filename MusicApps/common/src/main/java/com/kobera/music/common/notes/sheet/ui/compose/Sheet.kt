@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.Color.Companion.Red
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.painter.Painter
@@ -32,11 +33,11 @@ import com.kobera.music.common.notes.InnerTwelveToneInterpretation.G
 import com.kobera.music.common.notes.TwelvetoneTone
 import com.kobera.music.common.notes.sheet.InnerSheetNote
 import com.kobera.music.common.notes.sheet.SheetNote
-import com.kobera.music.common.notes.sheet.SheetNote.SheetNoteParams.Accidental
+import com.kobera.music.common.notes.sheet.SheetNote.Params.Accidental
+import com.kobera.music.common.notes.sheet.SheetNote.Params.Duration
 import com.kobera.music.common.notes.sheet.ui.Clef
 import com.kobera.music.common.notes.sheet.ui.KeySignature
 import com.kobera.music.common.notes.sheet.ui.NotePath
-import com.kobera.music.common.notes.sheet.ui.PathAndCenterOffset
 import kotlin.math.ceil
 
 
@@ -126,77 +127,77 @@ fun SheetPreview2() {
             notes = listOf(
                 SheetNote(
                     innerSheetNote = InnerSheetNote.D,
-                    noteParams = SheetNote.SheetNoteParams(),
+                    noteParams = SheetNote.Params(),
                     octave = 4
                 ),
                 SheetNote(
                     innerSheetNote = InnerSheetNote.E,
-                    noteParams = SheetNote.SheetNoteParams(),
+                    noteParams = SheetNote.Params(),
                     octave = 4
                 ),
                 SheetNote(
                     innerSheetNote = InnerSheetNote.F,
-                    noteParams = SheetNote.SheetNoteParams(),
+                    noteParams = SheetNote.Params(),
                     octave = 4
                 ),
                 SheetNote(
                     innerSheetNote = InnerSheetNote.G,
-                    noteParams = SheetNote.SheetNoteParams(),
+                    noteParams = SheetNote.Params(),
                     octave = 4
                 ),
                 SheetNote(
                     innerSheetNote = InnerSheetNote.A,
-                    noteParams = SheetNote.SheetNoteParams(),
+                    noteParams = SheetNote.Params(),
                     octave = 4
                 ),
                 SheetNote(
                     innerSheetNote = InnerSheetNote.B,
-                    noteParams = SheetNote.SheetNoteParams(),
+                    noteParams = SheetNote.Params(),
                     octave = 4
                 ),
                 SheetNote(
                     innerSheetNote = InnerSheetNote.C,
-                    noteParams = SheetNote.SheetNoteParams(),
+                    noteParams = SheetNote.Params(),
                     octave = 5
                 ),
                 SheetNote(
                     innerSheetNote = InnerSheetNote.D,
-                    noteParams = SheetNote.SheetNoteParams(),
+                    noteParams = SheetNote.Params(),
                     octave = 5
                 ),
                 SheetNote(
                     innerSheetNote = InnerSheetNote.C,
-                    noteParams = SheetNote.SheetNoteParams(),
+                    noteParams = SheetNote.Params(),
                     octave = 5
                 ),
                 SheetNote(
                     innerSheetNote = InnerSheetNote.B,
-                    noteParams = SheetNote.SheetNoteParams(),
+                    noteParams = SheetNote.Params(),
                     octave = 4
                 ),
                 SheetNote(
                     innerSheetNote = InnerSheetNote.A,
-                    noteParams = SheetNote.SheetNoteParams(),
+                    noteParams = SheetNote.Params(),
                     octave = 4
                 ),
                 SheetNote(
                     innerSheetNote = InnerSheetNote.G,
-                    noteParams = SheetNote.SheetNoteParams(),
+                    noteParams = SheetNote.Params(),
                     octave = 4
                 ),
                 SheetNote(
                     innerSheetNote = InnerSheetNote.F,
-                    noteParams = SheetNote.SheetNoteParams(),
+                    noteParams = SheetNote.Params(),
                     octave = 4
                 ),
                 SheetNote(
                     innerSheetNote = InnerSheetNote.E,
-                    noteParams = SheetNote.SheetNoteParams(),
+                    noteParams = SheetNote.Params(),
                     octave = 4
                 ),
                 SheetNote(
                     innerSheetNote = InnerSheetNote.D,
-                    noteParams = SheetNote.SheetNoteParams(),
+                    noteParams = SheetNote.Params(),
                     octave = 4
                 ),
             ),
@@ -253,77 +254,77 @@ fun SheetPreview() {
             notes = listOf(
                 SheetNote(
                     innerSheetNote = InnerSheetNote.D,
-                    noteParams = SheetNote.SheetNoteParams(),
+                    noteParams = SheetNote.Params(),
                     octave = 4
                 ),
                 SheetNote(
                     innerSheetNote = InnerSheetNote.E,
-                    noteParams = SheetNote.SheetNoteParams(),
+                    noteParams = SheetNote.Params(),
                     octave = 4
                 ),
                 SheetNote(
                     innerSheetNote = InnerSheetNote.F,
-                    noteParams = SheetNote.SheetNoteParams(),
+                    noteParams = SheetNote.Params(),
                     octave = 4
                 ),
                 SheetNote(
                     innerSheetNote = InnerSheetNote.G,
-                    noteParams = SheetNote.SheetNoteParams(),
+                    noteParams = SheetNote.Params(),
                     octave = 4
                 ),
                 SheetNote(
                     innerSheetNote = InnerSheetNote.A,
-                    noteParams = SheetNote.SheetNoteParams(),
+                    noteParams = SheetNote.Params(),
                     octave = 4
                 ),
                 SheetNote(
                     innerSheetNote = InnerSheetNote.B,
-                    noteParams = SheetNote.SheetNoteParams(),
+                    noteParams = SheetNote.Params(),
                     octave = 4
                 ),
                 SheetNote(
                     innerSheetNote = InnerSheetNote.C,
-                    noteParams = SheetNote.SheetNoteParams(),
+                    noteParams = SheetNote.Params(),
                     octave = 5
                 ),
                 SheetNote(
                     innerSheetNote = InnerSheetNote.D,
-                    noteParams = SheetNote.SheetNoteParams(),
+                    noteParams = SheetNote.Params(),
                     octave = 5
                 ),
                 SheetNote(
                     innerSheetNote = InnerSheetNote.C,
-                    noteParams = SheetNote.SheetNoteParams(),
+                    noteParams = SheetNote.Params(),
                     octave = 5
                 ),
                 SheetNote(
                     innerSheetNote = InnerSheetNote.B,
-                    noteParams = SheetNote.SheetNoteParams(),
+                    noteParams = SheetNote.Params(),
                     octave = 4
                 ),
                 SheetNote(
                     innerSheetNote = InnerSheetNote.A,
-                    noteParams = SheetNote.SheetNoteParams(),
+                    noteParams = SheetNote.Params(),
                     octave = 4
                 ),
                 SheetNote(
                     innerSheetNote = InnerSheetNote.G,
-                    noteParams = SheetNote.SheetNoteParams(),
+                    noteParams = SheetNote.Params(),
                     octave = 4
                 ),
                 SheetNote(
                     innerSheetNote = InnerSheetNote.F,
-                    noteParams = SheetNote.SheetNoteParams(),
+                    noteParams = SheetNote.Params(),
                     octave = 4
                 ),
                 SheetNote(
                     innerSheetNote = InnerSheetNote.E,
-                    noteParams = SheetNote.SheetNoteParams(),
+                    noteParams = SheetNote.Params(),
                     octave = 4
                 ),
                 SheetNote(
                     innerSheetNote = InnerSheetNote.D,
-                    noteParams = SheetNote.SheetNoteParams(),
+                    noteParams = SheetNote.Params(),
                     octave = 4
                 ),
             ),
@@ -334,17 +335,82 @@ fun SheetPreview() {
 
 @Composable
 @Preview
-fun SheetPreview3() {
+fun SheetPreviewAccidental() {
     Box(
         Modifier
             .fillMaxSize()
             .background(Color.White)) {
         Sheet(
             notes = listOf(
-                SheetNote(InnerSheetNote.D, SheetNote.SheetNoteParams(accidental = Accidental.Flat), 4),
-                SheetNote(InnerSheetNote.D, SheetNote.SheetNoteParams(accidental = Accidental.Sharp), 4),
+                SheetNote(InnerSheetNote.D, SheetNote.Params(accidental = Accidental.Flat), 4),
+                SheetNote(InnerSheetNote.D, SheetNote.Params(accidental = Accidental.Sharp), 4),
             ),
             keySignature = KeySignature.Sharps(0))
+    }
+}
+
+@Preview
+@Composable
+fun SheetPreviewDurtions() {
+    Box(
+        Modifier
+            .fillMaxSize()
+            .background(Color.White)) {
+        Sheet(
+            notes = listOf(
+                SheetNote(
+                    innerSheetNote = InnerSheetNote.A,
+                    noteParams = SheetNote.Params(duration = Duration.Whole),
+                    octave = 4
+                ),
+                SheetNote(
+                    innerSheetNote = InnerSheetNote.A,
+                    noteParams = SheetNote.Params(duration = Duration.Half),
+                    octave = 4
+                ),
+                SheetNote(
+                    innerSheetNote = InnerSheetNote.A,
+                    noteParams = SheetNote.Params(duration = Duration.Quarter),
+                    octave = 4
+                ),
+                SheetNote(
+                    innerSheetNote = InnerSheetNote.A,
+                    noteParams = SheetNote.Params(duration = Duration.Eighth),
+                    octave = 4
+                ),
+                SheetNote(
+                    innerSheetNote = InnerSheetNote.A,
+                    noteParams = SheetNote.Params(duration = Duration.Sixteenth),
+                    octave = 4
+                ),
+                SheetNote(
+                    innerSheetNote = InnerSheetNote.A,
+                    noteParams = SheetNote.Params(duration = Duration.Whole),
+                    octave = 5
+                ),
+                SheetNote(
+                    innerSheetNote = InnerSheetNote.A,
+                    noteParams = SheetNote.Params(duration = Duration.Half),
+                    octave = 5
+                ),
+                SheetNote(
+                    innerSheetNote = InnerSheetNote.A,
+                    noteParams = SheetNote.Params(duration = Duration.Quarter),
+                    octave = 5
+                ),
+                SheetNote(
+                    innerSheetNote = InnerSheetNote.A,
+                    noteParams = SheetNote.Params(duration = Duration.Eighth),
+                    octave = 5
+                ),
+                SheetNote(
+                    innerSheetNote = InnerSheetNote.A,
+                    noteParams = SheetNote.Params(duration = Duration.Sixteenth),
+                    octave = 5
+                )
+            ),
+            keySignature = KeySignature.Sharps(0)
+        )
     }
 }
 
@@ -674,13 +740,14 @@ private fun DrawScope.drawNote(
 ): Float {
     val noteWidth = 100f
     val noteStep = lineHeight / 2
-    var notePath: PathAndCenterOffset =
+    var notePath: DrawNoteDescription =
         getNotePathAndCenterOffset(note = note, lineHeight = lineHeight)
 
 
     translate(top = noteStep * (-note.sheetDifference(TwelvetoneTone(G, 5)))) {
-        translate(left = spacingFromLeft, top = -notePath.centerOffset.y + noteStep) {
-            drawPath(notePath.path, color = color)
+        translate(left = spacingFromLeft, top = -notePath.center.y + noteStep) {
+            drawPath(notePath.path, color = color,
+                style = if(notePath.isFilled) Fill else Stroke(width = 2.dp.toPx()))
         }
     }
 
@@ -720,25 +787,58 @@ private fun DrawScope.drawSupportingLine(color: Color){
 }
 
 
-private fun getNotePathAndCenterOffset(note: SheetNote, lineHeight: Float): PathAndCenterOffset =
-    when (note.noteParams.duration) {
-        SheetNote.SheetNoteParams.Duration.Quarter -> {
-            if (note > TwelvetoneTone(G, octave = 5) || note < TwelvetoneTone(D, 3)) {
-                //TODO()
-                PathAndCenterOffset(Path(), Offset.Zero)
-            }
-
-            NotePath.drawQuarterNote(
-                lineHeightPx = lineHeight,
-                legLength = lineHeight * 3,
-                facingDown = note > TwelvetoneTone(B, 4)
+data class DrawNoteDescription(
+    val path: Path,
+    val center: Offset,
+    val isFilled: Boolean
+)
+private fun getNotePathAndCenterOffset(note: SheetNote, lineHeight: Float): DrawNoteDescription {
+    val legLengthFromLineHeightRatio = 2.8f
+    return when (note.noteParams.duration) {
+        Duration.Sixteenth -> {
+            val pathAndOffset = NotePath.drawLegedNote(
+                heightPx = lineHeight,
+                legLength = lineHeight * legLengthFromLineHeightRatio,
+                facingDown = note > TwelvetoneTone(B, 4),
+                flags = 2,
+                filledLeg = true
             )
+            DrawNoteDescription(pathAndOffset.path, pathAndOffset.centerOffset, true)
+        }
+
+        Duration.Eighth -> {
+            val pathAndOffset = NotePath.drawLegedNote(
+                heightPx = lineHeight,
+                legLength = lineHeight * legLengthFromLineHeightRatio,
+                facingDown = note > TwelvetoneTone(B, 4),
+                flags = 1,
+                filledLeg = true
+            )
+            DrawNoteDescription(pathAndOffset.path, pathAndOffset.centerOffset, true)
+        }
+
+        Duration.Quarter, Duration.Half -> {
+
+            val pathAndOffset = NotePath.drawLegedNote(
+                heightPx = lineHeight,
+                legLength = lineHeight * legLengthFromLineHeightRatio,
+                facingDown = note > TwelvetoneTone(B, 4),
+                filledLeg = note.noteParams.duration == Duration.Quarter
+            )
+            DrawNoteDescription(pathAndOffset.path, pathAndOffset.centerOffset, (
+                    note.noteParams.duration == Duration.Quarter))
+        }
+
+        Duration.Whole -> {
+            val pathAndOffset = NotePath.drawLeglesNote(lineHeight)
+            DrawNoteDescription(pathAndOffset.path, pathAndOffset.centerOffset, false)
         }
 
         else -> {
             TODO()
         }
     }
+}
 
 
 /**

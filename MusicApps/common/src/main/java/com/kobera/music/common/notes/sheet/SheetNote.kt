@@ -9,7 +9,7 @@ import com.kobera.music.common.notes.TwelvetoneTone
  */
 data class SheetNote(
     val innerSheetNote: InnerSheetNote,
-    val noteParams: SheetNoteParams = SheetNoteParams(),
+    val noteParams: Params = Params(),
     val octave: Int
 ) {
     fun toTwelveTone(): TwelvetoneTone {
@@ -49,7 +49,7 @@ data class SheetNote(
     /**
      * params for a sheet note that are not part of the twelve tone system
      */
-    data class SheetNoteParams(
+    data class Params(
         val duration: Duration = Duration.Quarter,
         val numberOfDots: Int = 0,
         val accidental: Accidental = Accidental.None
@@ -99,7 +99,7 @@ data class SheetNote(
         private fun fromTwelveTone(twelveTone: TwelvetoneTone): SheetNote {
             return SheetNote(
                 innerSheetNote = InnerSheetNote.fromTwelveTone(twelveTone.twelveNoteInterpretation),
-                noteParams = SheetNoteParams(twelveTone.twelveNoteInterpretation),
+                noteParams = Params(twelveTone.twelveNoteInterpretation),
                 octave = twelveTone.octave
             )
         }
@@ -123,7 +123,7 @@ data class SheetNote(
 
         fun InnerTwelveToneInterpretation.Companion.fromSheetNote(
             innerSheetNote: InnerSheetNote,
-            noteParams: SheetNoteParams
+            noteParams: Params
         ): InnerTwelveToneInterpretation {
             val twelveToBase = when (innerSheetNote) {
                 InnerSheetNote.C -> InnerTwelveToneInterpretation.C
@@ -146,12 +146,12 @@ data class SheetNote(
         )
         val CSharp = SheetNote(
             innerSheetNote = InnerSheetNote.C,
-            noteParams = SheetNoteParams(accidental = SheetNoteParams.Accidental.Sharp),
+            noteParams = Params(accidental = Params.Accidental.Sharp),
             octave = 4
         )
         val Cb = SheetNote(
             innerSheetNote = InnerSheetNote.C,
-            noteParams = SheetNoteParams(accidental = SheetNoteParams.Accidental.Flat),
+            noteParams = Params(accidental = Params.Accidental.Flat),
             octave = 4
         )
         val D = SheetNote(
@@ -160,12 +160,12 @@ data class SheetNote(
         )
         val DSharp = SheetNote(
             innerSheetNote = InnerSheetNote.D,
-            noteParams = SheetNoteParams(accidental = SheetNoteParams.Accidental.Sharp),
+            noteParams = Params(accidental = Params.Accidental.Sharp),
             octave = 4
         )
         val Db = SheetNote(
             innerSheetNote = InnerSheetNote.D,
-            noteParams = SheetNoteParams(accidental = SheetNoteParams.Accidental.Flat),
+            noteParams = Params(accidental = Params.Accidental.Flat),
             octave = 4
         )
         val E = SheetNote(
@@ -174,12 +174,12 @@ data class SheetNote(
         )
         val ESharp = SheetNote(
             innerSheetNote = InnerSheetNote.E,
-            noteParams = SheetNoteParams(accidental = SheetNoteParams.Accidental.Sharp),
+            noteParams = Params(accidental = Params.Accidental.Sharp),
             octave = 4
         )
         val Eb = SheetNote(
             innerSheetNote = InnerSheetNote.E,
-            noteParams = SheetNoteParams(accidental = SheetNoteParams.Accidental.Flat),
+            noteParams = Params(accidental = Params.Accidental.Flat),
             octave = 4
         )
         val F = SheetNote(
@@ -188,12 +188,12 @@ data class SheetNote(
         )
         val FSharp = SheetNote(
             innerSheetNote = InnerSheetNote.F,
-            noteParams = SheetNoteParams(accidental = SheetNoteParams.Accidental.Sharp),
+            noteParams = Params(accidental = Params.Accidental.Sharp),
             octave = 4
         )
         val Fb = SheetNote(
             innerSheetNote = InnerSheetNote.F,
-            noteParams = SheetNoteParams(accidental = SheetNoteParams.Accidental.Flat),
+            noteParams = Params(accidental = Params.Accidental.Flat),
             octave = 4
         )
         val G = SheetNote(
@@ -202,12 +202,12 @@ data class SheetNote(
         )
         val GSharp = SheetNote(
             innerSheetNote = InnerSheetNote.G,
-            noteParams = SheetNoteParams(accidental = SheetNoteParams.Accidental.Sharp),
+            noteParams = Params(accidental = Params.Accidental.Sharp),
             octave = 4
         )
         val Gb = SheetNote(
             innerSheetNote = InnerSheetNote.G,
-            noteParams = SheetNoteParams(accidental = SheetNoteParams.Accidental.Flat),
+            noteParams = Params(accidental = Params.Accidental.Flat),
             octave = 4
         )
         val A = SheetNote(
@@ -216,12 +216,12 @@ data class SheetNote(
         )
         val ASharp = SheetNote(
             innerSheetNote = InnerSheetNote.A,
-            noteParams = SheetNoteParams(accidental = SheetNoteParams.Accidental.Sharp),
+            noteParams = Params(accidental = Params.Accidental.Sharp),
             octave = 4
         )
         val Ab = SheetNote(
             innerSheetNote = InnerSheetNote.A,
-            noteParams = SheetNoteParams(accidental = SheetNoteParams.Accidental.Flat),
+            noteParams = Params(accidental = Params.Accidental.Flat),
             octave = 4
         )
         val B = SheetNote(
@@ -230,12 +230,12 @@ data class SheetNote(
         )
         val BSharp = SheetNote(
             innerSheetNote = InnerSheetNote.B,
-            noteParams = SheetNoteParams(accidental = SheetNoteParams.Accidental.Sharp),
+            noteParams = Params(accidental = Params.Accidental.Sharp),
             octave = 4
         )
         val Bb = SheetNote(
             innerSheetNote = InnerSheetNote.B,
-            noteParams = SheetNoteParams(accidental = SheetNoteParams.Accidental.Flat),
+            noteParams = Params(accidental = Params.Accidental.Flat),
             octave = 4
         )
     }

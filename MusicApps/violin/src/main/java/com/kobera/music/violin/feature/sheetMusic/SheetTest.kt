@@ -13,8 +13,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import com.kobera.music.common.notes.scale.MajorScale
-import com.kobera.music.common.notes.scale.MinorScale
 import com.kobera.music.common.notes.sheet.SheetNote
 import com.kobera.music.common.notes.sheet.ui.KeySignature
 import com.kobera.music.common.notes.sheet.ui.compose.Sheet
@@ -41,13 +39,17 @@ fun SheetTest(navigator: DestinationsNavigator) {
             )
         }
     ) {
-        val notes: MutableList<SheetNote> = mutableListOf()
-        for (scale in MinorScale.values()) {
+        val notes: MutableList<SheetNote> = mutableListOf(
+            SheetNote.A.copy(octave = 5, noteParams = SheetNote.Params(
+                SheetNote.Params.Duration.Eighth
+            )),
+        )
+        /*for (scale in MinorScale.values()) {
             notes += scale.getNotes()
         }
         for (scale in MajorScale.values()) {
             notes += scale.getNotes()
-        }
+        }*/
         Sheet(
             modifier = Modifier
                 .padding(it)

@@ -18,9 +18,9 @@ internal class MajorScaleTest {
 
                     scale.getNotes().forEach {
                         when(it.noteParams.accidental){
-                            SheetNote.SheetNoteParams.Accidental.Flat -> numberOfFlats++
-                            SheetNote.SheetNoteParams.Accidental.Sharp -> numberOfSharps++
-                            SheetNote.SheetNoteParams.Accidental.None -> {}
+                            SheetNote.Params.Accidental.Flat -> numberOfFlats++
+                            SheetNote.Params.Accidental.Sharp -> numberOfSharps++
+                            SheetNote.Params.Accidental.None -> {}
                             else -> error("Unknown accidental")
                         }
                     }
@@ -36,9 +36,9 @@ internal class MajorScaleTest {
                     var numberOfFlats = 0
                     scale.getNotes().forEach {
                         when(it.noteParams.accidental){
-                            SheetNote.SheetNoteParams.Accidental.Flat -> numberOfFlats++
-                            SheetNote.SheetNoteParams.Accidental.Sharp -> numebrOfSharps++
-                            SheetNote.SheetNoteParams.Accidental.None -> {}
+                            SheetNote.Params.Accidental.Flat -> numberOfFlats++
+                            SheetNote.Params.Accidental.Sharp -> numebrOfSharps++
+                            SheetNote.Params.Accidental.None -> {}
                             else -> error("Unknown accidental")
                         }
                     }
