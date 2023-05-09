@@ -1,6 +1,6 @@
 # Bakalarka
 
-this project is demp application for Android focused on motivateing young violinists. Contails Frequency Analysis using modified FFT and NDFT algorithms and HPS and Window Method to determine final frequency. Works with 
+this project is demo application for Android focused on motivateing young violinists. Contains Frequency Analysis using modified FFT, NDFT, HPS and Window Method to determine final frequency.
 
 ## Install
 
