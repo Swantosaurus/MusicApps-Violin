@@ -5,18 +5,24 @@ package com.kobera.music.common.notes.sheet.ui
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Path
+import com.kobera.music.common.notes.sheet.ui.NotePath.drawLegedNote
+import com.kobera.music.common.notes.sheet.ui.NotePath.drawLeglesNote
+import com.kobera.music.common.notes.sheet.ui.compose.DrawNoteDescription
 import timber.log.Timber
 
 /**
  * Path for drawing a note
  * returns path with offset of center - user can move it to the right place without handeling its orientation
+ *
+ * all notes except whole note are drawb with [drawLegedNote]
+ * whole note is drawb with [drawLeglesNote]
  */
 object NotePath {
-    const val widthToHeightRatio = 1.3f
+    private const val widthToHeightRatio = 1.3f
 
-    fun drawLeglesNote(heightPx: Float): PathAndCenterOffset {
+    fun drawLeglesNote(heightPx: Float): DrawNoteDescription {
         val body = getFilledBodyPath(lineHeightPx = heightPx, offset = Offset.Zero)
-        return PathAndCenterOffset(path = body.path, body.center)
+        return DrawNoteDescription(path = body.path, body.center, isFilled = false)
     }
 
 
@@ -25,8 +31,8 @@ object NotePath {
         legLength: Float,
         facingDown: Boolean,
         flags: Int = 0,
-        filledLeg: Boolean
-    ): PathAndCenterOffset {
+        filled: Boolean
+    ): DrawNoteDescription {
         val body = if (facingDown) {
             getFilledBodyPath(lineHeightPx = heightPx, offset = Offset.Zero)
         } else {
@@ -44,7 +50,7 @@ object NotePath {
             notePathWitCenterOffset = body,
             legLength = legLength,
             noteBodyCenterY = noteBodyCenterY,
-            filledLeg = filledLeg
+            filledLeg = filled
         ).addFlags(
             facingDown = facingDown,
             legLength = legLength,
@@ -52,9 +58,10 @@ object NotePath {
             numberOfFlags = flags,
         )
 
-        return PathAndCenterOffset(
+        return DrawNoteDescription(
             path = path,
-            centerOffset = Offset(body.center.x, noteBodyCenterY)
+            center = Offset(body.center.x, noteBodyCenterY),
+            isFilled = filled
         )
     }
 
@@ -156,7 +163,7 @@ object NotePath {
     )
 
     private fun getFilledBodyPath(lineHeightPx: Float, offset: Offset): ElementPathInformation {
-        val endOffset = offset + Offset(lineHeightPx * 1.3f, lineHeightPx)
+        val endOffset = offset + Offset(lineHeightPx * widthToHeightRatio, lineHeightPx)
         val path = Path().apply {
             addOval(oval = Rect(offset, endOffset))
 

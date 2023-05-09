@@ -442,7 +442,7 @@ private fun DrawScope.drawFlat(sheetLineHeight: Float, colorFilter: ColorFilter)
 
     translate(top = -height * 3 / 4) {
         drawLine(
-            Color.Black,
+            Black,
             start = Offset(0f, 0f),
             end = Offset(0f, height),
             strokeWidth = lineWidth,
@@ -450,7 +450,7 @@ private fun DrawScope.drawFlat(sheetLineHeight: Float, colorFilter: ColorFilter)
         )
 
         drawArc(
-            color = Color.Black,
+            color = Black,
             startAngle = -135f,
             sweepAngle = 180f,
             useCenter = false,
@@ -460,7 +460,7 @@ private fun DrawScope.drawFlat(sheetLineHeight: Float, colorFilter: ColorFilter)
             colorFilter = colorFilter
         )
         drawLine(
-            color = Color.Black,
+            color = Black,
             start = Offset(0f, height),
             end = Offset(sheetLineHeight / 2, height / 2 + (sheetLineHeight / 4 + lineWidth / 2)),
             strokeWidth = 2.dp.toPx(),
@@ -503,7 +503,7 @@ private fun DrawScope.drawSharp(lineHeight: Float, colorFilter: ColorFilter) {
     translate(top = -height / 2) {
         repeat(2) {
             drawLine(
-                color = Color.Black,
+                color = Black,
                 start = Offset(lineHeight / 2 + it * lineHeight / 2, 0f),
                 end = Offset(lineHeight / 2 + it * lineHeight / 2, height),
                 strokeWidth = 2.dp.toPx(),
@@ -515,7 +515,7 @@ private fun DrawScope.drawSharp(lineHeight: Float, colorFilter: ColorFilter) {
         val yModulation = 5f
         repeat(2) {
             drawLine(
-                color = Color.Black,
+                color = Black,
                 start = Offset(0f, lineHeight / 2 + it * lineHeight / 2 + yModulation),
                 end = Offset(width, lineHeight / 2 + it * lineHeight / 2 - yModulation),
                 strokeWidth = 4.dp.toPx(),
@@ -557,7 +557,7 @@ private fun DrawScope.drawClef(
 private fun DrawScope.drawSheetLines(lineHeight: Float) {
     repeat(5) {
         drawLine(
-            color = Color.Black,
+            color = Black,
             start = Offset(0f, (it + 1) * lineHeight),
             end = Offset(size.width, (it + 1) * lineHeight)
         )
@@ -697,28 +697,28 @@ private fun DrawScope.drawNatural(lineHeight: Float, colorFilter: ColorFilter): 
     val height = lineHeight * 2
     translate(top = -height / 2) {
         drawLine(
-            Color.Black,
+            Black,
             start = Offset(0f, 0f),
             end = Offset(0f, height * 3 / 4 + 2.dp.toPx()),
             strokeWidth = 2.dp.toPx(),
             colorFilter = colorFilter
         )
         drawLine(
-            Color.Black,
+            Black,
             start = Offset(width, height / 4 - 2.dp.toPx()),
             end = Offset(width, height),
             strokeWidth = 2.dp.toPx(),
             colorFilter = colorFilter
         )
         drawLine(
-            Color.Black,
+            Black,
             start = Offset(0f, height / 2),
             end = Offset(width, height / 4),
             strokeWidth = 4.dp.toPx(),
             colorFilter = colorFilter
         )
         drawLine(
-            Color.Black,
+            Black,
             start = Offset(0f, height * 3 / 4),
             end = Offset(width, height / 2),
             strokeWidth = 4.dp.toPx(),
@@ -740,7 +740,7 @@ private fun DrawScope.drawNote(
 ): Float {
     val noteWidth = 100f
     val noteStep = lineHeight / 2
-    var notePath: DrawNoteDescription =
+    val notePath: DrawNoteDescription =
         getNotePathAndCenterOffset(note = note, lineHeight = lineHeight)
 
 
@@ -796,42 +796,36 @@ private fun getNotePathAndCenterOffset(note: SheetNote, lineHeight: Float): Draw
     val legLengthFromLineHeightRatio = 2.8f
     return when (note.noteParams.duration) {
         Duration.Sixteenth -> {
-            val pathAndOffset = NotePath.drawLegedNote(
+            NotePath.drawLegedNote(
                 heightPx = lineHeight,
                 legLength = lineHeight * legLengthFromLineHeightRatio,
                 facingDown = note > TwelvetoneTone(B, 4),
                 flags = 2,
-                filledLeg = true
+                filled = true
             )
-            DrawNoteDescription(pathAndOffset.path, pathAndOffset.centerOffset, true)
         }
 
         Duration.Eighth -> {
-            val pathAndOffset = NotePath.drawLegedNote(
+             NotePath.drawLegedNote(
                 heightPx = lineHeight,
                 legLength = lineHeight * legLengthFromLineHeightRatio,
                 facingDown = note > TwelvetoneTone(B, 4),
                 flags = 1,
-                filledLeg = true
+                filled = true
             )
-            DrawNoteDescription(pathAndOffset.path, pathAndOffset.centerOffset, true)
         }
 
         Duration.Quarter, Duration.Half -> {
-
-            val pathAndOffset = NotePath.drawLegedNote(
+            NotePath.drawLegedNote(
                 heightPx = lineHeight,
                 legLength = lineHeight * legLengthFromLineHeightRatio,
                 facingDown = note > TwelvetoneTone(B, 4),
-                filledLeg = note.noteParams.duration == Duration.Quarter
+                filled = note.noteParams.duration == Duration.Quarter
             )
-            DrawNoteDescription(pathAndOffset.path, pathAndOffset.centerOffset, (
-                    note.noteParams.duration == Duration.Quarter))
         }
 
         Duration.Whole -> {
-            val pathAndOffset = NotePath.drawLeglesNote(lineHeight)
-            DrawNoteDescription(pathAndOffset.path, pathAndOffset.centerOffset, false)
+            NotePath.drawLeglesNote(lineHeight)
         }
 
         else -> {
