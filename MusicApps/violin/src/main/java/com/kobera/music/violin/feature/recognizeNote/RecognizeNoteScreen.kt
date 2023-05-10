@@ -272,9 +272,9 @@ private fun DrawerContent(viewModel: RecognizeNoteViewModel?, scales: () -> Reco
 private fun ScaleToggleButtton(viewModel: RecognizeNoteViewModel?, scales: () -> RecognizeNoteScales, scale: Scale) {
     FilledIconToggleButton(
         modifier = Modifier.width(120.dp),
-        checked = scales().minorScales.contains(scale),
+        checked = scales().minorScales.contains(scale) || scales().majorScales.contains(scale),
         onCheckedChange = {
-            if(it) {
+            if (it) {
                 viewModel?.addScale(scale = scale)
             } else {
                 viewModel?.removeScale(scale = scale)
