@@ -13,6 +13,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import com.kobera.music.common.notes.scale.MajorScale
+import com.kobera.music.common.notes.scale.MinorScale
 import com.kobera.music.common.notes.sheet.SheetNote
 import com.kobera.music.common.notes.sheet.ui.KeySignature
 import com.kobera.music.common.notes.sheet.ui.compose.Sheet
@@ -23,6 +25,7 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 @OptIn(ExperimentalMaterial3Api::class)
 @Destination
 @Composable
+@Suppress("LongMethod")
 fun SheetTest(navigator: DestinationsNavigator) {
     val scrollState = rememberScrollState()
     Scaffold(
@@ -41,15 +44,43 @@ fun SheetTest(navigator: DestinationsNavigator) {
     ) {
         val notes: MutableList<SheetNote> = mutableListOf(
             SheetNote.A.copy(octave = 5, noteParams = SheetNote.Params(
+                SheetNote.Params.Duration.Whole
+            )),
+            SheetNote.A.copy(octave = 5, noteParams = SheetNote.Params(
+                SheetNote.Params.Duration.Half
+            )),
+            SheetNote.A.copy(octave = 5, noteParams = SheetNote.Params(
+                SheetNote.Params.Duration.Quarter
+            )),
+            SheetNote.A.copy(octave = 5, noteParams = SheetNote.Params(
                 SheetNote.Params.Duration.Eighth
             )),
+            SheetNote.A.copy(octave = 5, noteParams = SheetNote.Params(
+                SheetNote.Params.Duration.Sixteenth
+            )),
+            SheetNote.A.copy(octave = 4, noteParams = SheetNote.Params(
+                SheetNote.Params.Duration.Whole
+            )),
+            SheetNote.A.copy(octave = 4, noteParams = SheetNote.Params(
+                SheetNote.Params.Duration.Half
+            )),
+            SheetNote.A.copy(octave = 4, noteParams = SheetNote.Params(
+                SheetNote.Params.Duration.Quarter
+            )),
+            SheetNote.A.copy(octave = 4, noteParams = SheetNote.Params(
+                SheetNote.Params.Duration.Eighth
+            )),
+            SheetNote.A.copy(octave = 4, noteParams = SheetNote.Params(
+                SheetNote.Params.Duration.Sixteenth
+            )),
+
         )
-        /*for (scale in MinorScale.values()) {
+        for (scale in MinorScale.values()) {
             notes += scale.getNotes()
         }
         for (scale in MajorScale.values()) {
             notes += scale.getNotes()
-        }*/
+        }
         Sheet(
             modifier = Modifier
                 .padding(it)

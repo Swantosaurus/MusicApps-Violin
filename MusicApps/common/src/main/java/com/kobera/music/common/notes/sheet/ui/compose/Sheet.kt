@@ -500,7 +500,6 @@ private fun DrawScope.drawKeySharps(
 private fun DrawScope.drawSharp(lineHeight: Float, colorFilter: ColorFilter) {
     //vertical lines
     val height = 3f / 2 * lineHeight
-    val width = height
     translate(top = -height / 2) {
         repeat(2) {
             drawLine(
@@ -518,7 +517,7 @@ private fun DrawScope.drawSharp(lineHeight: Float, colorFilter: ColorFilter) {
             drawLine(
                 color = Black,
                 start = Offset(0f, lineHeight / 2 + it * lineHeight / 2 + yModulation),
-                end = Offset(width, lineHeight / 2 + it * lineHeight / 2 - yModulation),
+                end = Offset(height, lineHeight / 2 + it * lineHeight / 2 - yModulation),
                 strokeWidth = 4.dp.toPx(),
                 colorFilter = colorFilter
             )
@@ -757,7 +756,7 @@ private fun DrawScope.drawNote(
         = ceil(note.sheetDifference(TwelvetoneTone(G, 5)).toDouble() / 2).toInt()
     repeat(supportingLinesAtTop){
         translate (
-            left = spacingFromLeft-25f,
+            left = spacingFromLeft-15f,
             top = it * (- 2 * noteStep)
         ){
             drawSupportingLine(color = color)
@@ -767,7 +766,7 @@ private fun DrawScope.drawNote(
         = ceil( - note.sheetDifference(TwelvetoneTone(D, 4)).toDouble() / 2).toInt()
     repeat(supportingLinesAtBottom){
         translate (
-            left = spacingFromLeft-25f,
+            left = spacingFromLeft-15f,
             top = it * (2 * noteStep) + noteStep * 12
         ){
             drawSupportingLine(color = color)
@@ -782,7 +781,7 @@ private fun DrawScope.drawSupportingLine(color: Color){
     drawLine(
         color = color,
         start = Offset.Zero,
-        end = Offset(115f, 0f),
+        end = Offset(95f, 0f),
         strokeWidth = 1.dp.toPx()
     )
 }
