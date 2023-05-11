@@ -40,6 +40,7 @@ import com.kobera.music.violin.R
 import com.kobera.music.violin.feature.destinations.DirectionDestination
 import com.kobera.music.violin.feature.destinations.MetronomeWrapperDestination
 import com.kobera.music.violin.feature.destinations.RecognizeNoteScreenDestination
+import com.kobera.music.violin.feature.destinations.ScalesScreenDestination
 import com.kobera.music.violin.feature.destinations.SheetMusicListScreenDestination
 import com.kobera.music.violin.feature.destinations.TunerScreenDestination
 import com.ramcosta.composedestinations.annotation.Destination
@@ -266,6 +267,11 @@ private fun getSections(): List<NavigationSection> =
                     icon = painterResource(id = R.drawable.ic_violin),
                     title = stringResource(R.string.sheets),
                     destination = SheetMusicListScreenDestination
+                ),
+                NavigationDescription(
+                    icon = painterResource(id = R.drawable.ic_violin),
+                    title = stringResource(id = R.string.scales),
+                    destination = ScalesScreenDestination
                 )
             )
         ),

@@ -23,8 +23,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.kobera.music.common.ui.component.CenteredNavigationBarWithNavigateBack
 import com.kobera.music.violin.R
-import com.kobera.music.violin.feature.destinations.ScalesScreenDestination
 import com.kobera.music.violin.feature.destinations.SheetTestDestination
+import com.kobera.music.violin.feature.destinations.SheetWrapperDestination
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
@@ -63,11 +63,6 @@ fun SheetMusicListScreenBody(navigator: DestinationsNavigator?) {
                 .padding(paddingValues),
         ) {
             LazyColumn(state = lazyListState){
-                item {
-                    ListItem(title = stringResource(R.string.scales)){
-                        navigator?.navigate(ScalesScreenDestination)
-                    }
-                }
                 item{
                     ListItem(title = "Testing Sheet") {
                         navigator?.navigate(SheetTestDestination)
@@ -75,8 +70,9 @@ fun SheetMusicListScreenBody(navigator: DestinationsNavigator?) {
                 }
 
                 items(@Suppress("MagicNumber") 1000){
-                    ListItem(title = "TODO Songs $it") {
-                        
+                    val songName = "TODO Songs $it"
+                    ListItem(title = songName) {
+                       navigator?.navigate(SheetWrapperDestination(songName = songName))
                     }
                 }
             }

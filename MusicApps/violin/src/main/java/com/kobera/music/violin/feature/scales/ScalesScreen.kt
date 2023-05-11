@@ -1,4 +1,4 @@
-package com.kobera.music.violin.feature.sheetMusic.scales
+package com.kobera.music.violin.feature.scales
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
