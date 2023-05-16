@@ -7,20 +7,21 @@ import kotlin.math.sqrt
  * Harmony Product Spectrum algorithm to find the fundamental frequency of a sound
  */
 object HarmonyProductSpectrum {
-    fun hps(input: List<Double>, iterations: Int): List<Double> {
+    fun hps(input: List<Double>, iterations: Int, minFourierIndexSearched: Int = 0): List<Double> {
         check(iterations > 1) { "iterations must be greater than 1" }
-        var output = input.toMutableList()
+        val output = input.toMutableList()
         for (i in 2..iterations) {
-            for (j in 0 until (input.size - 1) / i) {
-                output[j] = sqrt(output[j] * List(i) {
+            for (j in minFourierIndexSearched until (input.size - 1) / i) {
+                output[j] = sqrt(output[j] * List(i) { listIndex ->
                     // just rethrowing exception that gives better detail
                     @Suppress("TooGenericExceptionCaught", "SwallowedException")
                     try {
-                        input[j * i + it]
+                        val index = (j * i + listIndex - i/2).let { if (it < 0) 0 else it }
+                        input[index]
                     } catch (e :IndexOutOfBoundsException){
-                        throw IndexOutOfBoundsException("j= $j i=$i move=$it")
+                        throw IndexOutOfBoundsException("j= $j i=$i move=$listIndex")
                     }
-                }.average())
+                }.max())
             }
         }
         return output
