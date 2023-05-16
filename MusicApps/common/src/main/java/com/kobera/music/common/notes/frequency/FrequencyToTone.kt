@@ -8,7 +8,7 @@ import kotlin.math.abs
  */
 object FrequencyToTone {
 
-    @Deprecated("Use findClosestNote(frequency, notes) instead")
+    @Deprecated("Use findClosestTone instead", replaceWith = ReplaceWith("findClosestTone(frequency, notes)"))
     fun transform(
         frequency: Double,
         unknownString: String,

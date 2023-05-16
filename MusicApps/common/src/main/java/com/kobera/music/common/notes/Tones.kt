@@ -12,13 +12,13 @@ object Tones {
     val numberOfTones = InnerTwelveToneInterpretation.numberOfTones
 
     val twelvtoneStep = 2.0.pow(twelvetoneStepExponent)
-    fun getTones(frequencyA4: Double): Map<String, ToneWithFrequency> = //arrayOf(
+    fun getTones(frequencyA4: Double): Map<String, ToneWithFrequency> =
         getTones(frequencyA4 = frequencyA4, InTunePrecision.HIGH)
 
     fun getTones(
         frequencyA4: Double,
         inTunePrecision: InTunePrecision
-    ): Map<String, ToneWithFrequency> = //arrayOf(
+    ): Map<String, ToneWithFrequency> =
         generateTonesFromC2toB7(
             frequencyA4 = frequencyA4,
             inTuneRange = inTunePrecision

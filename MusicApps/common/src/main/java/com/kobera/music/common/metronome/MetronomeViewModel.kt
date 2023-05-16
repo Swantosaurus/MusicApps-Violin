@@ -21,7 +21,7 @@ val Context.metronomeDataStore by preferencesDataStore("metronome")
 
 class MetronomeViewModel(applicationContext: Context) : ViewModel() {
     private val _metronomeState: MutableStateFlow<MetronomeState> = MutableStateFlow(
-        MetronomeState.Stropped
+        MetronomeState.Stopped
     )
 
     private val primaryTickSound = MediaPlayer.create(applicationContext, R.raw.metronome1)
@@ -103,7 +103,7 @@ class MetronomeViewModel(applicationContext: Context) : ViewModel() {
 
     fun stopMetronome(){
         metronomeJob?.cancel()
-        _metronomeState.value = MetronomeState.Stropped
+        _metronomeState.value = MetronomeState.Stopped
     }
 
     fun changeNumberOfTicks(to: Int) {
@@ -153,5 +153,5 @@ sealed interface MetronomeState{
     object SecondaryTick: Running
     object HideTick: Running
 
-    object Stropped: MetronomeState
+    object Stopped: MetronomeState
 }

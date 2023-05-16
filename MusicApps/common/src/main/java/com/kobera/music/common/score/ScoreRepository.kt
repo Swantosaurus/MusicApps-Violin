@@ -34,7 +34,7 @@ class ScoreRepository(
     private fun getScoresToday(): Flow<List<ScoreEntity>> =
         scoreDao.getAll().map { scores ->
             scores.filter {
-                (Calendar.getInstance().timeInMillis - it.timestamp) < MilisInADay
+                (Calendar.getInstance().timeInMillis - it.timestamp) < MillisInADay
             }
         }
 
@@ -52,7 +52,7 @@ class ScoreRepository(
 
     data class WinsAndLoses(val wins: Int, val loses: Int)
     companion object {
-        const val MilisInADay = 1000 * 60 * 60 * 24
+        const val MillisInADay = 1000 * 60 * 60 * 24
     }
 
     suspend fun insertScore(score: ScoreEntity) = scoreDao.insert(score)

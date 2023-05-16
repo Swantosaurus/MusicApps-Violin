@@ -190,6 +190,8 @@ enum class MinorScale : Scale {
     };
 
     companion object {
+
+        @Deprecated("Use getAll() instead", replaceWith = ReplaceWith("values()"))
         fun getAll(): List<MinorScale> = values().toList()
     }
 }

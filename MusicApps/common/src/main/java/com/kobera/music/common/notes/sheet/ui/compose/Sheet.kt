@@ -74,28 +74,28 @@ fun Sheet(
                 var notesToDraw = notes
                 var extraNotesToDraw = extraNotes
                 while (notesToDraw.isNotEmpty() || extraNotesToDraw.isNotEmpty()) {
-                    var spcacingFromLeft = sheetSpacingFromLeft
+                    var spacingFromLeft = sheetSpacingFromLeft
                     val topSpacing = numberOfSheetIndex * (height + sheetSpacing) + sheetSpacing
                     translate(top = topSpacing) {
                         drawSheetLines(lineHeight = lineHeight)
-                        spcacingFromLeft = drawClef(
+                        spacingFromLeft = drawClef(
                             notationHeight = lineHeight * 6,
-                            spacingFromLeft = spcacingFromLeft,
+                            spacingFromLeft = spacingFromLeft,
                             painter = clefPainter
                         )
-                        spcacingFromLeft = drawKeySignature(
-                            spacingFromLeft = spcacingFromLeft,
+                        spacingFromLeft = drawKeySignature(
+                            spacingFromLeft = spacingFromLeft,
                             keySignature = keySignature,
                             lineHeight = lineHeight
                         )
                         if (leftOffsetForNotes == null) {
-                            leftOffsetForNotes = spcacingFromLeft
+                            leftOffsetForNotes = spacingFromLeft
                         }
                         notesToDraw = drawNotes(
                             keySignature = keySignature,
                             notes = notesToDraw,
                             lineHeight = lineHeight,
-                            spacingFromLeft = spcacingFromLeft,
+                            spacingFromLeft = spacingFromLeft,
                             color = Black
                         )
                         extraNotesToDraw = drawNotes(
@@ -352,7 +352,7 @@ fun SheetPreviewAccidental() {
 @Suppress("LongMethod")
 @Preview
 @Composable
-fun SheetPreviewDurtions() {
+fun SheetPreviewDurations() {
     Box(
         Modifier
             .fillMaxSize()

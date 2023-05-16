@@ -194,6 +194,7 @@ enum class MajorScale : Scale {
     };
 
     companion object {
+        @Deprecated("Use .values() instead", ReplaceWith("values()"))
         fun getAll(): List<MajorScale> = values().toList()
     }
 }

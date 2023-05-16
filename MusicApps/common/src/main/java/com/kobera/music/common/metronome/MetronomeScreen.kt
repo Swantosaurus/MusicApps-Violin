@@ -211,8 +211,8 @@ private fun NumberOfBeatsSetting(numberOfBeats: Int, changeNumberOfBeats: (Int) 
 @Composable
 @Suppress("LongMethod")
 private fun BpmSetting(metronomeSpeed: Int, metronomeSpeedChange: (Int) -> Unit) {
-    //copy of state so TextField doesnt update on every change
-    // -> user can better work with it (when directly modifiing state it worked wierdy with its cap)
+    //copy of state so TextField doesn't update on every change
+    // -> user can better work with it (when directly modifying state it worked weirdly with its cap)
     var metronomeSpeedValue by remember {
         mutableStateOf(metronomeSpeed.toString())
     }
@@ -273,9 +273,7 @@ private fun BpmSetting(metronomeSpeed: Int, metronomeSpeedChange: (Int) -> Unit)
         ChangeButton(
             changeValue = {
                 metronomeSpeedChange(metronomeSpeed + 1)
-                metronomeSpeedValue = (metronomeSpeedValue.toInt() + 1).let {
-                    frequencyFilter(it)
-                }.toString()
+                metronomeSpeedValue = frequencyFilter((metronomeSpeedValue.toInt() + 1)).toString()
             },
             painter = painterResource(id = R.drawable.baseline_add_24)
         )
