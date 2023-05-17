@@ -3,7 +3,7 @@
 this project is demo application for Android focused on motivateing young violinists. 
 
 Contains:
-- Frequency Analysis using modified FFT, NDFT, HPS and Window Method to determine final frequency.
+- Frequency Analysis using modified FFT, NDFT, HPS and Window Method to determine final frequency. Or for less stable faster note recognition using FastYIN
 - Sheet rendering
 - Metronome
 - Game with note recognition
