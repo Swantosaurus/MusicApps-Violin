@@ -19,7 +19,7 @@ import com.kobera.music.common.sound.fourier.FourierTransform
  * and this implementation:
  * https://github.com/patriceguyot/Yin (MIT license)
  */
-class FastYIN(
+class FastYin(
     private val sampleRate: Int,
     minFrequency: Double = 80.0,
     maxFrequency: Double = 3000.0,
