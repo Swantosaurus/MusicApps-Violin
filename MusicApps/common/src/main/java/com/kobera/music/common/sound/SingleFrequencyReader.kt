@@ -135,7 +135,7 @@ open class SingleFrequencyReader(
     }
 
     private fun cleanupUsingHPS(fftFrequencyDomain: List<Double>): List<Double> =
-        HarmonyProductSpectrum.hps(fftFrequencyDomain, hpsIterations)
+        HarmonyProductSpectrum.hps(fftFrequencyDomain, hpsIterations, minFourierIndexSearched)
 
     private fun lookupFrequencyDomainAfterHPS(
         frequencyDomain: List<Double>,

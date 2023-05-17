@@ -16,7 +16,18 @@ data class ComplexNumber(val real: Double, val imag: Double){
     infix operator fun minus(other: ComplexNumber) : ComplexNumber {
         return ComplexNumber(real - other.real, imag - other.imag)
     }
+
+    fun scale(alpha: Double) =
+        ComplexNumber(real * alpha, imag * alpha)
+
+    fun conjugate(): ComplexNumber {
+        return ComplexNumber(real, -imag)
+    }
     fun magnitude() : Double = sqrt(real * real + imag * imag)
+
+    companion object {
+        val Zero = ComplexNumber(0.0, 0.0)
+    }
 }
 
 /**

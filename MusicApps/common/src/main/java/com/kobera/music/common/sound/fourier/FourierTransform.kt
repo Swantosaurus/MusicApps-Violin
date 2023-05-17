@@ -69,13 +69,13 @@ object FourierTransform {
         return output
     }
 
-    fun fft(sampleData: ShortArray): Array<ComplexNumber?> =
+    fun fft(sampleData: ShortArray): Array<ComplexNumber> =
         fft(sampleData.map { ComplexNumber(it.toDouble(), 0.0) }.toTypedArray())
 
     /**
      *  radix 2 Cooley-Tukey FastFourierTransform O(n*log(n))
      */
-    fun fft(sampleData: Array<ComplexNumber?>): Array<ComplexNumber?> {
+    fun fft(sampleData: Array<ComplexNumber>): Array<ComplexNumber> {
         //recursion break
         if (sampleData.size == 1) return arrayOf(sampleData[0])
 
@@ -83,28 +83,95 @@ object FourierTransform {
         require(sampleData.size % 2 == 0) { "${sampleData.size} is not a power of 2" }
 
         // even
-        val even: Array<ComplexNumber?> = arrayOfNulls<ComplexNumber?>( sampleData.size / 2)
-        for (k in 0 until sampleData.size / 2) {
-            even[k] = sampleData[2 * k]
+        val even: Array<ComplexNumber> = Array(sampleData.size / 2){
+            sampleData[2 * it]
         }
-        val evenFFT: Array<ComplexNumber?> = fft(even)
+        val evenFFT: Array<ComplexNumber> = fft(even)
 
         // odd
-        val odd: Array<ComplexNumber?> = even
+        val odd: Array<ComplexNumber> = even
         for (k in 0 until sampleData.size / 2) {
             odd[k] = sampleData[2 * k + 1]
         }
-        val oddFFT: Array<ComplexNumber?> = fft(odd)
+        val oddFFT: Array<ComplexNumber> = fft(odd)
 
         // combine
-        val result: Array<ComplexNumber?> = arrayOfNulls(sampleData.size)
+        val result: Array<ComplexNumber> = Array(sampleData.size){ ComplexNumber.Zero }
         for (position in 0 until sampleData.size / 2) {
             val kth = -2 * position * Math.PI / sampleData.size
             val wk = ComplexNumber(cos(kth), sin(kth))
-            result[position] = evenFFT[position]!! + (wk * oddFFT[position]!!)
-            result[position + sampleData.size / 2] = evenFFT[position]!! - (wk * oddFFT[position]!!)
+            result[position] = evenFFT[position] + (wk * oddFFT[position])
+            result[position + sampleData.size / 2] = evenFFT[position] - (wk * oddFFT[position])
         }
         return result
+    }
+
+    /**
+     *  inverse FastFourierTransform O(n*log(n)) inspired by https://introcs.cs.princeton.edu/java/97data/FFT.java.html
+     */
+    fun ifft(x: Array<ComplexNumber>): Array<ComplexNumber> {
+        val n = x.size
+        var y: Array<ComplexNumber> = Array(n) { ComplexNumber.Zero }
+
+        // take conjugate
+        for (i in 0 until n) {
+            y[i] = x[i].conjugate()
+        }
+
+        // compute forward FFT
+        y = fft(y)
+
+        // take conjugate again
+        for (i in 0 until n) {
+            y[i] = y[i].conjugate()
+        }
+
+        // divide by n
+        for (i in 0 until n) {
+            y[i] = y[i].scale(1.0 / n)
+        }
+
+        return y
+    }
+
+
+    // compute the circular convolution of x and y
+    /**
+     * inspired by https://introcs.cs.princeton.edu/java/97data/FFT.java.html
+     */
+    fun cconvolve(x: Array<ComplexNumber>, y: Array<ComplexNumber>): Array<ComplexNumber> {
+
+        // should probably pad x and y with 0s so that they have same length
+        // and are powers of 2
+        require(x.size == y.size) { "Dimensions don't agree" }
+        val n = x.size
+
+        // compute FFT of each sequence
+        val a: Array<ComplexNumber> = fft(x)
+        val b: Array<ComplexNumber> = fft(y)
+
+        // point-wise multiply
+        val c: Array<ComplexNumber> = Array<ComplexNumber>(n) { ComplexNumber.Zero }
+        for (i in 0 until n) {
+            c[i] = a[i].times(b[i])
+        }
+
+        // compute inverse FFT
+        return ifft(c)
+    }
+
+    // compute the linear convolution of x and y
+    /**
+     * inspired by https://introcs.cs.princeton.edu/java/97data/FFT.java.html
+     */
+    fun convolve(x: Array<ComplexNumber>, y: Array<ComplexNumber>): Array<ComplexNumber> {
+        val a: Array<ComplexNumber> = Array(2 * x.size) { ComplexNumber.Zero }
+        for (i in x.indices) a[i] = x[i]
+        for (i in x.size until 2 * x.size) a[i] = ComplexNumber.Zero
+        val b: Array<ComplexNumber> = Array(2 * x.size) { ComplexNumber.Zero }
+        for (i in y.indices) b[i] = y[i]
+        for (i in y.size until 2 * y.size) b[i] = ComplexNumber.Zero
+        return cconvolve(a, b)
     }
 }
 

@@ -9,6 +9,9 @@ import org.koin.androidx.compose.getViewModel
 
 @Destination
 @Composable
-fun MetronomeWrapper(navigator: DestinationsNavigator, metronomeViewModel: MetronomeViewModel= getViewModel()) {
+fun MetronomeWrapper(
+    navigator: DestinationsNavigator,
+    metronomeViewModel: MetronomeViewModel = getViewModel()
+) {
     MetronomeScreen(navigator = navigator, viewModel = metronomeViewModel)
 }
