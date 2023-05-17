@@ -67,6 +67,7 @@ class YinSingleFrequencyReader(
                 if(audioData.sum() == 0) return@collect //audio recording not started yet
 
                 val pitch = yin.pitchDetection(audioData = audioData)
+                @Suppress("MagicNumber")
                 if(pitch <= 80.0){
                     _frequency.value = FrequencyState.Silence
                 } else {
