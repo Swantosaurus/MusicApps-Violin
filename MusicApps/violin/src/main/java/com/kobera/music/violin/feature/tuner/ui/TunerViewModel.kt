@@ -8,7 +8,8 @@ import com.kobera.music.common.notes.Tones
 import com.kobera.music.common.notes.frequency.FrequencyToTone
 import com.kobera.music.common.notes.frequency.InRangePrecision
 import com.kobera.music.common.notes.frequency.ToneWithFrequency
-import com.kobera.music.common.sound.SingleFrequencyReader
+import com.kobera.music.common.sound.f0Readers.FrequencyState
+import com.kobera.music.common.sound.f0Readers.SingleFrequencyReaderWorker
 import com.kobera.music.common.sound.frequency.A4Frequency
 import com.kobera.music.common.ui.component.LastNoteState
 import com.kobera.music.violin.feature.tuner.model.TunerSensitivityStorage
@@ -24,7 +25,7 @@ import org.koin.core.component.inject
 
 class TunerViewModel(
     applicationContext: Context,
-    private val frequencyReader: SingleFrequencyReader,
+    private val frequencyReader: SingleFrequencyReaderWorker,
     val a4Frequency: A4Frequency,
     val tunerSensitivityStorage : TunerSensitivityStorage
 ): ViewModel() {
@@ -46,12 +47,12 @@ class TunerViewModel(
         viewModelScope.launch {
             frequencyReader.frequency.collect {
                 when(it) {
-                    is SingleFrequencyReader.FrequencyState.Silence -> {
+                    is FrequencyState.Silence -> {
                         lastHadNote?.let { lastNote ->
                             _note.value = LastNoteState.Silence(lastNote.note, lastNote.frequency)
                         }
                     }
-                    is SingleFrequencyReader.FrequencyState.HasFrequency -> {
+                    is FrequencyState.HasFrequency -> {
                         val note = FrequencyToTone.findClosestTone(
                             frequency = it.frequency,
                             notes = _notesInTuner.value.notes.values
@@ -85,7 +86,7 @@ class TunerViewModel(
             }
         }
 
-        frequencyReader.setSilenceThreshold((to*silenceThresholdMultiplier).toLong())
+        frequencyReader.setSilenceThreshold((to*silenceThresholdMultiplier).toDouble())
     }
 
     fun setTunerNotes(to: NotesInTunerState) {

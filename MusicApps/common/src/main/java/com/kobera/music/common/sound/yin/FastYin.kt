@@ -1,5 +1,6 @@
 package com.kobera.music.common.sound.yin
 
+import com.kobera.music.common.sound.Frequency
 import com.kobera.music.common.sound.fourier.ComplexNumber
 import com.kobera.music.common.sound.fourier.FourierTransform
 
@@ -21,22 +22,20 @@ import com.kobera.music.common.sound.fourier.FourierTransform
  */
 class FastYin(
     private val sampleRate: Int,
-    minFrequency: Double = 80.0,
-    maxFrequency: Double = 3000.0,
-    private val threshold: Double = 0.2,
-    private val audioData: List<Double>
+    minFrequency: Frequency = @Suppress("MagicNumber") Frequency(80.0),
+    maxFrequency: Frequency = @Suppress("MagicNumber") Frequency(3000.0),
+    private val threshold: Double = 0.15,
 ) {
-    val tauMin = sampleRate / maxFrequency
-    val tauMax = sampleRate / minFrequency
+    private val tauMin = sampleRate / maxFrequency.value
+    private val tauMax = sampleRate / minFrequency.value
 
 
    //TODO do we need smaler window????
-    fun pitchDetection(audioData: List<Double>): Double {
-        val df = difference(audioData)
+    fun pitchDetection(audioData: ShortArray): Double {
+        val df = difference(audioData.map { it.toDouble() })
         val cmdf = comutativeMeanNormalizedDifferenceFunction(df)
         val pitchIndex = getPitch(cmdf = cmdf)
-
-        val parabolicEstimatePitch = parabolicInterpolation(pitchIndex, cmdf)
+        val parabolicEstimatePitch = parabolicInterpolation(pitchIndex, cmdf, audioData)
 
         if(cmdf.min() > tauMin){
             println("argMins = ${cmdf.min()}")
@@ -46,16 +45,17 @@ class FastYin(
             println("harmonic rates = ${cmdf[pitchIndex]}")
         } else {
             println("harmonic rates = ${cmdf.min()}")
+            return 0.0
         }
        return sampleRate/parabolicEstimatePitch
    }
 
-    private fun parabolicInterpolation(pitch: Int, cmdf: Array<Double>): Double {
-        val betterTau: Double
+    private fun parabolicInterpolation(pitch: Int, cmdf: Array<Double>, audioData: ShortArray): Double {
+        val parabolicTau: Double
         val x0: Int = (pitch - 1).let { if(it < 0)0 else it }
         val x2: Int = (pitch + 1).let { if(it > audioData.size) audioData.size else it }
 
-        betterTau = if (x0 == pitch) {
+        parabolicTau = if (x0 == pitch) {
             if (cmdf[pitch] <= cmdf[x2]) {
                 pitch.toDouble()
             } else {
@@ -74,7 +74,7 @@ class FastYin(
 
             pitch + (s2 - s0) / (2 * (2 * s1 - s2 - s0))
         }
-        return betterTau
+        return parabolicTau
     }
 
     private fun getPitch(cmdf: Array<Double>): Int{

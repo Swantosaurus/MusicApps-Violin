@@ -24,8 +24,8 @@ import com.kobera.music.common.notes.sheet.SheetNote.Companion.toSheetNote
 import com.kobera.music.common.score.ScoreRepository
 import com.kobera.music.common.score.data.ScoreEntity
 import com.kobera.music.common.score.data.ScoreType
-import com.kobera.music.common.sound.SingleFrequencyReader
-import com.kobera.music.common.sound.SingleFrequencyReader.FrequencyState
+import com.kobera.music.common.sound.f0Readers.FrequencyState
+import com.kobera.music.common.sound.f0Readers.SingleFrequencyReaderWorker
 import com.kobera.music.common.sound.frequency.A4Frequency
 import com.kobera.music.common.ui.component.TUNER_METER_ANGLE
 import com.kobera.music.violin.R
@@ -44,7 +44,7 @@ val Context.recognizeNoteDataStore by dataStore("recognize_note_data_store.json"
 
 
 class RecognizeNoteViewModel(
-    private val singleFrequencyReader: SingleFrequencyReader,
+    private val singleFrequencyReader: SingleFrequencyReaderWorker,
     applicationContext: Context,
     a4Frequency: A4Frequency,
     private val gamesAudioSensitivityStorage: GamesAudioSensitivityStorage,
@@ -206,8 +206,7 @@ class RecognizeNoteViewModel(
             }
         }
         singleFrequencyReader.setSilenceThreshold(
-            (to * GamesAudioSensitivityStorage.gamesSensitivityMultiplayer
-        ).toLong())
+            (to * GamesAudioSensitivityStorage.gamesSensitivityMultiplayer).toDouble())
     }
 
     fun addScale(scale: Scale){

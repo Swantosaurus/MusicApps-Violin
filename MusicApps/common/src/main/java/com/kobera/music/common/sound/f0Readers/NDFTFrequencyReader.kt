@@ -1,6 +1,13 @@
-package com.kobera.music.common.sound
+package com.kobera.music.common.sound.f0Readers
 
+import com.kobera.music.common.WorkerState
+import com.kobera.music.common.sound.Frequency
+import com.kobera.music.common.sound.HarmonyProductSpectrum
+import com.kobera.music.common.sound.PcmAudioRecorder
 import com.kobera.music.common.sound.fourier.FourierTransform
+import com.kobera.music.common.sound.fromFourierIndex
+import com.kobera.music.common.sound.toFourierIndexDouble
+import com.kobera.music.common.sound.toFourierIndexIntRoundDown
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -26,7 +33,7 @@ import kotlin.math.roundToInt
 
 
 @Suppress("MagicNumber","LongParameterList")
-open class SingleFrequencyReader(
+open class NDFTFrequencyReader(
     private val pcmAudioRecorder: PcmAudioRecorder,
     minSearchedFrequency: Frequency = Frequency(150.0),
     maxSearchedFrequency: Frequency = Frequency(2000.0),
@@ -34,7 +41,7 @@ open class SingleFrequencyReader(
     silenceThreshold: Long = 3_000_000L,
     private val fineTuneLookupRange: Int = 1,
     private val hpsIterations: Int
-) {
+) : SingleFrequencyReaderWorker {
     private val _frequency : MutableStateFlow<FrequencyState> = MutableStateFlow(
         FrequencyState.Silence
     )
@@ -42,7 +49,7 @@ open class SingleFrequencyReader(
     /**
      * The frequency flow. Emits the frequency as a flow.
      */
-    val frequency = _frequency.asStateFlow()
+    override val frequency = _frequency.asStateFlow()
 
     private val maxFourierIndexSearched = maxSearchedFrequency.toFourierIndexIntRoundDown()
 
@@ -51,9 +58,9 @@ open class SingleFrequencyReader(
 
     private var _silenceThreshold: MutableStateFlow<Long> = MutableStateFlow(silenceThreshold)
 
-    private val _state: MutableStateFlow<FrequencyReaderState> =
+    private val _state: MutableStateFlow<WorkerState> =
         MutableStateFlow(
-            FrequencyReaderState.Stopped
+            WorkerState.Stopped
         )
 
     private val scope = CoroutineScope(Dispatchers.Default + Job())
@@ -68,9 +75,9 @@ open class SingleFrequencyReader(
         }
     }
 
-    fun stop() {
+    override fun stop() {
         _frequency.value = FrequencyState.Silence
-        if (_state.value == FrequencyReaderState.Stopped) {
+        if (_state.value == WorkerState.Stopped) {
             Timber.w(TAG, "Already stopped")
             return
         }
@@ -78,19 +85,19 @@ open class SingleFrequencyReader(
         pcmAudioRecorder.stop()
         job?.cancel()
 
-        _state.value = FrequencyReaderState.Stopped
+        _state.value = WorkerState.Stopped
     }
 
-    fun setSilenceThreshold(silenceThreshold: Long) {
-        this._silenceThreshold.value = silenceThreshold
+    override fun setSilenceThreshold(silenceThreshold: Double) {
+        this._silenceThreshold.value = silenceThreshold.toLong()
     }
 
-    fun start() {
-        if (_state.value == FrequencyReaderState.Recording) {
+    override fun start() {
+        if (_state.value == WorkerState.Running) {
             Timber.w("Already recording")
             return
         }
-        _state.value = FrequencyReaderState.Recording
+        _state.value = WorkerState.Running
         pcmAudioRecorder.start()
 
         startTransformOnNewThread()
@@ -101,7 +108,7 @@ open class SingleFrequencyReader(
             pcmAudioRecorder.pcmAudioDataFlow.collect { pcmAudioData ->
                 var frequencyDomain: List<Double> =
                     FourierTransform.fft(pcmAudioData).map { complexNumber ->
-                        complexNumber!!.magnitude()
+                        complexNumber.magnitude()
                     }.toList()
 
                 if (hpsActive) {
@@ -242,17 +249,6 @@ open class SingleFrequencyReader(
         }
     }
 
-
-    sealed interface FrequencyState {
-        object Silence : FrequencyState
-        class HasFrequency(val frequency: Double) : FrequencyState
-    }
-
-    enum class FrequencyReaderState {
-        Stopped,
-        Recording
-    }
-
     @Suppress("VariableNaming")
     private val TAG = this.javaClass.simpleName
 }
@@ -261,7 +257,7 @@ open class SingleFrequencyReader(
 /**
  * SingleFrequencyReader for violin usage
  */
-class ViolinSingleFrequencyReader(pcmAudioRecorder: PcmAudioRecorder): SingleFrequencyReader(
+class ViolinSingleFrequencyReader(pcmAudioRecorder: PcmAudioRecorder): NDFTFrequencyReader(
     pcmAudioRecorder = pcmAudioRecorder,
     hpsIterations = 4
 )
@@ -269,7 +265,7 @@ class ViolinSingleFrequencyReader(pcmAudioRecorder: PcmAudioRecorder): SingleFre
 /**
  * SingleFrequencyReader for sound geneerator usage
  */
-class SoundGeneratorFrequencyReader(pcmAudioRecorder: PcmAudioRecorder): SingleFrequencyReader(
+class SoundGeneratorFrequencyReader(pcmAudioRecorder: PcmAudioRecorder): NDFTFrequencyReader(
     pcmAudioRecorder = pcmAudioRecorder,
     hpsIterations = 1
 )

@@ -1,9 +1,10 @@
 package com.kobera.music.common.sound.di
 
 import com.kobera.music.common.sound.PcmAudioRecorder
-import com.kobera.music.common.sound.SingleFrequencyReader
-import com.kobera.music.common.sound.ViolinSingleFrequencyReader
+import com.kobera.music.common.sound.f0Readers.SingleFrequencyReaderWorker
+import com.kobera.music.common.sound.f0Readers.YinSingleFrequencyReader
 import com.kobera.music.common.sound.frequency.A4Frequency
+import com.kobera.music.common.sound.yin.FastYin
 import org.koin.dsl.module
 
 val soundModule = module {
@@ -12,9 +13,12 @@ val soundModule = module {
     /**
      * there you can swap SingleFrequency readers between testing for generator and for violin
      */
-    factory<SingleFrequencyReader> {
-        ViolinSingleFrequencyReader(pcmAudioRecorder = get())
+    single { FastYin(sampleRate = PcmAudioRecorder.sampleRate) }
+
+    factory<SingleFrequencyReaderWorker> {
+        //ViolinSingleFrequencyReader(pcmAudioRecorder = get())
         //SoundGeneratorFrequencyReader(pcmAudioRecorder = get())
+        YinSingleFrequencyReader(pcmAudioRecorder = get(), yin = get())
     }
 }
 
