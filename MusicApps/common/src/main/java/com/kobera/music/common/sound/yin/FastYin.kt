@@ -3,6 +3,7 @@ package com.kobera.music.common.sound.yin
 import com.kobera.music.common.sound.Frequency
 import com.kobera.music.common.sound.fourier.ComplexNumber
 import com.kobera.music.common.sound.fourier.FourierTransform
+import com.kobera.music.common.util.cumSum
 
 
 /**
@@ -24,13 +25,20 @@ class FastYin(
     private val sampleRate: Int,
     minFrequency: Frequency = @Suppress("MagicNumber") Frequency(80.0),
     maxFrequency: Frequency = @Suppress("MagicNumber") Frequency(3000.0),
-    private val threshold: Double = 0.15,
+    private val threshold: Double = 0.15, //0.15 works fine and paper commands 0.1 - 0.15
 ) {
     private val tauMin = sampleRate / maxFrequency.value
     private val tauMax = sampleRate / minFrequency.value
 
 
-   //TODO do we need smaler window????
+    //TODO do we need smaller window????
+    //TODO whats the precision??
+    /**
+     * should be O(N*ln(N))
+     *
+     * @param audioData audio data
+     * @return pitch in Hz
+     */
     fun pitchDetection(audioData: ShortArray): Double {
         val df = difference(audioData.map { it.toDouble() })
         val cmdf = comutativeMeanNormalizedDifferenceFunction(df)
@@ -101,7 +109,6 @@ class FastYin(
         return dfCpy
     }
 
-    //difference works same as snake one
     private fun difference(audioData: List<Double>): DoubleArray {
         val w = audioData.size
         val audioArray = audioData.toTypedArray()
@@ -121,15 +128,6 @@ class FastYin(
             cumSum[w - i] + cumSum[w] - cumSum[i] - 2 * conv[w - 1 + i].real
         }
         return tmpRes.toDoubleArray()
-    }
-
-    private fun Array<Double>.cumSum(): Array<Double>{
-        var sum = 0.0
-        for (i in this.indices) {
-            sum += this[i]
-            this[i] = sum
-        }
-        return this
     }
 
     private fun Array<Double>.cumSumIgnoreFirst(): Array<Double>{

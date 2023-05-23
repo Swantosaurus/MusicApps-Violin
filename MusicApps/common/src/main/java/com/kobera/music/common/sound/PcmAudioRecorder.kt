@@ -102,6 +102,7 @@ class PcmAudioRecorder(private val applicationContext : Context) {
     companion object {
         const val sampleRate = 192_000
         const val readSize = 8192 //32_768 // 2 pow 15
+        const val maxAmplitude = Short.MAX_VALUE
     }
 
     /**

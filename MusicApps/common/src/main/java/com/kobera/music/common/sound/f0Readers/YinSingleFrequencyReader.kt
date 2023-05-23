@@ -11,13 +11,18 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import kotlin.math.abs
 
 
 /**
  * PDA - Pitch Detection Algorithm - based on YIN
- * erturns the frequency of a single frequency from a PCM audio stream.
+ * returns the frequency of a single frequency from a PCM audio stream.
  *
- * -- less acurate than [NDFTFrequencyReader] method but requires less audio samples.
+ * -- less accurate than [NDFTFrequencyReader] method but requires less audio samples.
+ *
+ * TODO add link to Václav Kobera thesis
+ *
+ * doesn't uses transforms specific for musical instruments therefore theres no need for version for generator
  */
 class YinSingleFrequencyReader(
     private val pcmAudioRecorder: PcmAudioRecorder,
@@ -32,6 +37,10 @@ class YinSingleFrequencyReader(
     private val scope = CoroutineScope(Dispatchers.Default + Job())
 
     private var job: Job? = null
+
+    private val defaultAmplitudeScale = 0.5
+    
+    private var amplitudeScale: Double = defaultAmplitudeScale
 
     override fun start() {
         _frequency.value = FrequencyState.Silence
@@ -58,13 +67,24 @@ class YinSingleFrequencyReader(
     }
 
     override fun setSilenceThreshold(silenceThreshold: Double) {
-       //TODO("Not yet implemented")
+        assert(silenceThreshold in 0.0.. 1.0){
+            "silenceThreshold has to be in range <0.0, 1.0>"
+        }
+
+        amplitudeScale = silenceThreshold
     }
 
     private fun startTransformOnNewCoroutine(){
         job = scope.launch {
             pcmAudioRecorder.pcmAudioDataFlow.collect { audioData ->
                 if(audioData.sum() == 0) return@collect //audio recording not started yet
+
+                //TODO we can do better by breaking of for loop when we find amplitude > 0 but that's minor optimization
+                if(lookupMaxAmplitudeValue(audioData) < amplitudeScale * PcmAudioRecorder.maxAmplitude){
+                    _frequency.value = FrequencyState.Silence
+                    return@collect
+                }
+
 
                 val pitch = yin.pitchDetection(audioData = audioData)
                 @Suppress("MagicNumber")
@@ -75,5 +95,17 @@ class YinSingleFrequencyReader(
                 }
             }
         }
+    }
+
+    /** O(N) */
+    private fun lookupMaxAmplitudeValue(audioData: ShortArray): Int {
+        var maxAmplitude = 0
+        for (i in audioData.indices) {
+            val amplitude = abs(audioData[i].toInt())
+            if (amplitude > maxAmplitude) {
+                maxAmplitude = amplitude
+            }
+        }
+        return maxAmplitude
     }
 }
