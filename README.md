@@ -1,9 +1,9 @@
-# Bakalarka
+# MusicApps
 
 this project is demo application for Android focused on motivateing young violinists. 
 
 Contains:
-- Frequency Analysis using modified FFT, NDFT, HPS and Window Method to determine final frequency.
+- Frequency Analysis using modified FFT, NDFT, HPS and Window Method to determine final frequency. (see also FastYin branch that uses different method)
 - Sheet rendering
 - Metronome
 - Game with note recognition
