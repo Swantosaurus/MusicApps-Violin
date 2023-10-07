@@ -1,4 +1,4 @@
-# Bakalarka
+# MusicApps
 
 this project is demo application for Android focused on motivateing young violinists. 
 
